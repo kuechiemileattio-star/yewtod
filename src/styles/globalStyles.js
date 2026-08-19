@@ -2,7 +2,7 @@ import { FONTS, T } from "../theme.js";
 
 export const GLOBAL_STYLES = `${FONTS}
   * { box-sizing: border-box; }
-  body { margin: 0; background: ${T.paper}; }
+  body { margin: 0; min-width: 320px; overflow-x: hidden; background: ${T.paper}; }
   html { scroll-behavior: smooth; }
   body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', sans-serif; }
   h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif !important; letter-spacing: -.02em; }
@@ -34,7 +34,7 @@ export const GLOBAL_STYLES = `${FONTS}
   @keyframes ytdOrbit { from { transform: rotate(0deg) translateX(0); } 50% { transform: rotate(180deg) translateX(8px); } to { transform: rotate(360deg) translateX(0); } }
   @keyframes ytdAccentPulse { 0%, 100% { opacity: .35; transform: scale(.96); } 50% { opacity: .7; transform: scale(1); } }
 
-  .ytd-app-shell { position: relative; overflow: hidden; background-size: 180% 180% !important; animation: ytdAmbient 24s ease-in-out infinite; }
+  .ytd-app-shell { position: relative; min-height: 100vh; overflow-x: clip; background-size: 180% 180% !important; animation: ytdAmbient 24s ease-in-out infinite; }
   .ytd-app-shell::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .26; background-image: linear-gradient(${T.line}38 1px, transparent 1px), linear-gradient(90deg, ${T.line}38 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, black, transparent 72%); }
   .ytd-app-shell::after { content: ""; position: absolute; z-index: 0; top: -20%; left: -20%; width: 34%; height: 150%; pointer-events: none; background: linear-gradient(90deg, transparent, ${T.lime}14, transparent); filter: blur(12px); animation: ytdLightSweep 14s ease-in-out 2s infinite; }
   .ytd-home-page { position: relative; z-index: 1; }
@@ -93,6 +93,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-editorial-section-tinted::before { display: none; }
   .ytd-editorial-section-tinted::after { content: ''; position: absolute; z-index: -1; inset: 0 0 28px; background: linear-gradient(135deg, ${T.paperAlt}88, transparent 72%); border-radius: 20px; pointer-events: none; }
   .ytd-page-anim { animation: ytdFadeUp .65s cubic-bezier(.16,1,.3,1) both; position: relative; z-index: 1; }
+  .ytd-page-anim, .ytd-home-page, .ytd-collab-page, .ytd-meet-page, .ytd-book-detail-page { min-width: 0; }
   .ytd-scroll-progress { position: absolute; left: 0; top: 0; height: 3px; z-index: 2; background: ${T.lime}; animation: ytdBarPulse 2.4s ease-in-out infinite; transition: width .12s ease-out; }
   .ytd-navbar { box-shadow: 0 10px 30px -26px ${T.greenDeep}; }
   .ytd-navbar .ytd-nav-link-active { box-shadow: inset 0 -3px 0 ${T.green}; }
@@ -130,6 +131,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-btn:hover .ytd-btn-shine { animation: ytdButtonShine .7s ease both; }
   .ytd-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px ${T.ink}66; }
   .ytd-btn:active { transform: translateY(0); }
+  .ytd-btn:focus-visible, .ytd-nav-link:focus-visible, .ytd-mobile-toggle:focus-visible { outline: 2px solid ${T.lime}; outline-offset: 3px; }
   .ytd-btn svg { transition: transform .25s ease; }
   .ytd-btn:hover svg { transform: translateX(4px); }
   .ytd-pill { transition: transform .2s ease, border-color .2s ease, background .2s ease; }
@@ -409,11 +411,17 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-dashboard-stat-grid { grid-template-columns: repeat(2, 1fr); }
     .ytd-dashboard-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
     .ytd-dashboard-bar-row { grid-template-columns: 160px 1fr 22px; }
+    .ytd-collab-hero, .ytd-meet-hero { gap: 34px; }
+    .ytd-collab-layout { grid-template-columns: .85fr 1.15fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; }
     .ytd-reveal, .ytd-stagger > *, .ytd-page-anim, .ytd-node-pulse circle:first-child, .ytd-node-line-draw, .ytd-app-shell, .ytd-cover img, .ytd-logo-btn, .ytd-hero-visual, .ytd-scroll-progress, .ytd-footer-cta::before, .ytd-admin-view, .ytd-admin-view-dashboard .ytd-stat-card, .ytd-admin-shell table tbody tr, .ytd-section-label, .ytd-dashboard-new, .ytd-dashboard-stat, .ytd-dashboard-panel, .ytd-dashboard-quick-actions, .ytd-admin-modal-backdrop, .ytd-admin-book-modal, .ytd-editorial-hero .ytd-hero-visual::before, .ytd-editorial-hero .ytd-hero-visual::after, .ytd-newsletter-panel::before, .ytd-footer-cta::after, .ytd-footer-marquee span, .ytd-platform-pillar, .ytd-meet-hero-copy, .ytd-meet-hero-mark, .ytd-meet-method-card, .ytd-founder-portrait, .ytd-collab-hero, .ytd-collab-hero-note, .ytd-collab-aside, .ytd-collab-type, .ytd-collab-success { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
+  }
+  @media (hover: none) {
+    .ytd-card:hover, .ytd-book-card:hover, .ytd-platform-pillar:hover, .ytd-platform-pillar:hover .ytd-platform-icon, .ytd-meet-method-card:hover, .ytd-admin-book-card:hover, .ytd-admin-member:hover, .ytd-hero-visual:hover { transform: none; }
+    .ytd-btn:hover { transform: none; box-shadow: none; }
   }
   @media (max-width: 860px) {
     .ytd-desktop-nav { display: none !important; }
@@ -421,6 +429,11 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-hero-grid, .ytd-grid-3, .ytd-founder, .ytd-form-row, .ytd-dash-grid, .ytd-stat-grid, .ytd-home-hero { grid-template-columns: 1fr !important; }
     .ytd-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
     .ytd-hero-visual { order: -1; max-width: 560px; width: 100%; margin: 0 auto 12px; }
+    .ytd-collab-hero, .ytd-meet-hero { grid-template-columns: 1fr; gap: 30px; }
+    .ytd-collab-hero-note { justify-self: start; }
+    .ytd-collab-layout { grid-template-columns: 1fr; }
+    .ytd-collab-aside { order: 2; }
+    .ytd-collab-form-wrap { order: 1; }
     .ytd-qa-row { grid-template-columns: 1fr !important; gap: 10px !important; }
     .ytd-admin-sidebar { display: none; }
     .ytd-admin-main { padding: 24px 20px 54px !important; }
@@ -432,13 +445,18 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-welcome { align-items: flex-start; flex-direction: column; padding: 22px; }
     .ytd-media-grid { grid-template-columns: repeat(3, 1fr) !important; }
     .ytd-admin-books { grid-template-columns: 1fr !important; }
+    .ytd-book-detail-grid { grid-template-columns: minmax(0, 220px) 1fr !important; gap: 28px !important; }
+    .ytd-book-detail-page { padding-top: 38px !important; }
   }
   @media (max-width: 640px) {
+    .ytd-app-shell { background-size: 240% 240% !important; animation-duration: 40s; }
+    .ytd-app-shell::after { animation-duration: 22s; opacity: .45; }
     .ytd-navbar > div:not(.ytd-scroll-progress) { padding-left: 16px !important; padding-right: 16px !important; }
     .ytd-logo-btn span { font-size: 20px !important; }
     .ytd-logo-btn .ytd-brand-logo-frame { width: 132px; height: 32px; }
     .ytd-mobile-menu { padding-left: 16px !important; padding-right: 16px !important; }
     .ytd-home-hero { padding: 44px 18px 38px !important; gap: 22px !important; }
+    .ytd-home-hero .ytd-btn { width: 100%; justify-content: center; }
     .ytd-platform-intro { padding: 0 18px 48px !important; }
     .ytd-platform-intro-heading { grid-template-columns: 1fr; gap: 10px; }
     .ytd-platform-pillars { grid-template-columns: 1fr; }
@@ -459,6 +477,10 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-hero-visual { min-height: 280px !important; }
     .ytd-grid-4 { grid-template-columns: 1fr !important; }
     .ytd-grid-3 { gap: 22px !important; }
+    .ytd-book-detail-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+    .ytd-book-detail-cover { width: min(220px, 72vw) !important; margin: 0 auto; }
+    .ytd-book-detail-copy h1 { font-size: clamp(32px, 10vw, 46px) !important; }
+    .ytd-book-detail-copy > p { font-size: 17px !important; }
     .ytd-row { align-items: flex-start !important; flex-direction: column !important; gap: 8px !important; padding: 16px 0 !important; }
     .ytd-row > div { width: 100%; }
     .ytd-row h4 { white-space: normal !important; font-size: 16px !important; }
@@ -485,6 +507,7 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-dashboard-hero { min-height: 0; padding: 20px; gap: 20px; }
     .ytd-dashboard-hero h1 { font-size: 34px; }
     .ytd-dashboard-action { width: 100%; justify-content: center; }
+    .ytd-btn { min-height: 44px; }
     .ytd-dashboard-panel-heading { gap: 10px; }
     .ytd-dashboard-panel-heading button { flex-shrink: 0; }
     .ytd-dashboard-post, .ytd-dashboard-collab { align-items: start; }
@@ -513,5 +536,9 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-member-status { text-align: right; }
     .ytd-admin-invite-form { grid-template-columns: 1fr; }
     .ytd-admin-invite-form .ytd-btn { justify-content: center; }
+    .ytd-collab-form-wrap { padding: 16px; }
+    .ytd-collab-hero-note { max-width: 100%; }
+    .ytd-book-reviews-heading h2 { font-size: 25px; }
+    .ytd-book-review p { font-size: 16px; }
   }
 `;
