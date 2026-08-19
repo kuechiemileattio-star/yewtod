@@ -4,7 +4,7 @@ import { T } from "../theme.js";
 import { ADMIN_COLLABS, CATEGORIES, WORKS } from "../data.js";
 import StatusPill from "./StatusPill.jsx";
 
-export default function AdminDashboard({ posts, onNewPost }) {
+export default function AdminDashboard({ posts, onNewPost, onViewPosts, onViewCollabs, onViewBooks }) {
   const stats = [
     ["Publications", posts.length, FileText, "+12% ce mois"],
     ["Brouillons", posts.filter(post => post.statut === "Brouillon").length, TrendingUp, "À finaliser"],
@@ -33,9 +33,16 @@ export default function AdminDashboard({ posts, onNewPost }) {
         ))}
       </div>
 
+      <div className="ytd-dashboard-quick-actions">
+        <span>Actions rapides</span>
+        <button onClick={onNewPost}><Plus size={14} /> Créer un brouillon</button>
+        <button onClick={onViewCollabs}><Inbox size={14} /> Voir les demandes</button>
+        <button onClick={onViewBooks}><BookOpen size={14} /> Ouvrir la bibliothèque</button>
+      </div>
+
       <div className="ytd-dashboard-grid">
         <section className="ytd-dashboard-panel ytd-dashboard-publications">
-          <div className="ytd-dashboard-panel-heading"><div><span>Flux éditorial</span><h2>Dernières publications</h2></div><button>Voir tout <ArrowUpRight size={14} /></button></div>
+          <div className="ytd-dashboard-panel-heading"><div><span>Flux éditorial</span><h2>Dernières publications</h2></div><button onClick={onViewPosts}>Voir tout <ArrowUpRight size={14} /></button></div>
           <div className="ytd-dashboard-post-list">
             {posts.slice(0, 5).map((post, index) => (
               <div className="ytd-dashboard-post" key={post.id}>

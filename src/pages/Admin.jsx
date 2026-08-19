@@ -64,7 +64,7 @@ export default function Admin({ exitAdmin }) {
           <div><span className="ytd-admin-kicker">Yewtod SS / CMS</span><strong>{tabs.find(([key]) => key === tab)?.[1]}</strong></div>
           <span className="ytd-admin-live"><span /> Système actif</span>
         </div>
-        {tab === "dashboard" && <AdminDashboard posts={posts} onNewPost={() => setTab("posts")} />}
+        {tab === "dashboard" && <AdminDashboard posts={posts} onNewPost={() => setTab("posts")} onViewPosts={() => setTab("posts")} onViewCollabs={() => setTab("collabs")} onViewBooks={() => setTab("books")} />}
         {tab === "__legacy-dashboard" && (
           <div className="ytd-admin-view ytd-admin-view-dashboard">
             <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Dashboard</h1>

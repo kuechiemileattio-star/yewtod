@@ -59,6 +59,7 @@ export default function NavBar({ page, setPage }) {
             </button>
           ))}
           <button onClick={() => { setPage("collab"); setOpen(false); }} style={{ background: T.ink, border: "none", textAlign: "left", cursor: "pointer", fontFamily: "'Space Mono', monospace", fontSize: 12, color: T.paper, padding: "12px 14px" }}>Parlons projet <ArrowUpRight size={14} style={{ verticalAlign: "middle" }} /></button>
+          <button onClick={() => { setPage("admin"); setOpen(false); }} className="ytd-mobile-admin-link" style={{ background: "none", border: `1px solid ${T.line}`, textAlign: "left", cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: T.inkSoft, padding: "10px 14px" }}><Settings size={13} style={{ verticalAlign: "middle", marginRight: 7 }} /> Administration</button>
       </div>
     </div>
   );

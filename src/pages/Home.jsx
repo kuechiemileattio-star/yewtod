@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowRight, Mail, Check } from "lucide-react";
+import { ArrowRight, Mail, Check, Compass, Network, Lightbulb } from "lucide-react";
 import { T } from "../theme.js";
 import { WORKS, fmtDate } from "../data.js";
 import NodeMark from "../components/NodeMark.jsx";
@@ -19,19 +19,19 @@ export default function Home({ setPage, openWork }) {
   const featured = WORKS.slice(1, 5);
 
   return (
-    <div>
+    <div className="ytd-home-page">
       {/* HERO */}
-      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 60px", display: "grid", gridTemplateColumns: "1.05fr .95fr", alignItems: "center", gap: 56 }} className="ytd-home-hero">
+      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 60px", display: "grid", gridTemplateColumns: "1.05fr .95fr", alignItems: "center", gap: 56 }} className="ytd-home-hero ytd-editorial-hero">
         <div className="ytd-stagger" style={{ maxWidth: 720 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
             <NodeMark pulse />
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Média personnel</span>
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Média de recherche appliquée</span>
           </div>
           <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5.5vw, 62px)", lineHeight: 1.06, fontWeight: 500, color: T.ink, letterSpacing: "-0.015em", margin: 0 }}>
-            Comprendre les systèmes qui façonnent nos sociétés.
+            Des idées claires pour comprendre un monde complexe.
           </h1>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 18, lineHeight: 1.65, color: T.inkSoft, marginTop: 24, maxWidth: 620 }}>
-            Yewtod SS documente une pratique de recherche appliquée aux sciences sociales, aux systèmes complexes, à l'économie, à la politique publique et à l'intelligence artificielle — article après article, expérimentation après expérimentation.
+            Yewtod SS est une plateforme indépendante qui rend accessibles les sciences sociales, l'économie, les politiques publiques, les systèmes complexes et l'intelligence artificielle. Nous transformons la recherche en repères utiles pour mieux comprendre, décider et agir.
           </p>
           <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
             <Btn variant="green" onClick={() => setPage("works")}>Explorer les travaux <ArrowRight size={16} /></Btn>
@@ -50,10 +50,30 @@ export default function Home({ setPage, openWork }) {
         </div>
       </section>
 
+      <section className="ytd-platform-intro" style={{ maxWidth: 1120, margin: "0 auto", padding: "10px 24px 72px" }}>
+        <div className="ytd-platform-intro-heading">
+          <span>Ce que vous trouverez ici</span>
+          <h2>Une plateforme pour prendre du recul, puis passer à l'action.</h2>
+        </div>
+        <div className="ytd-platform-pillars">
+          {[
+            [Compass, "Comprendre", "Des articles et des analyses pour décoder les forces qui transforment nos sociétés."],
+            [Network, "Relier", "Des ponts entre données, institutions, économie, technologie et expériences de terrain."],
+            [Lightbulb, "Expérimenter", "Des méthodes, des livres et des idées testées pour apprendre sans simplifier à outrance."],
+          ].map(([Icon, title, text], index) => (
+            <article className="ytd-platform-pillar" key={title} style={{ animationDelay: `${index * 100}ms` }}>
+              <div className="ytd-platform-icon"><Icon size={20} /></div>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <Divider margin="0 0 64px" />
 
       {/* DERNIER ARTICLE / RAPPORT / VIDÉO */}
-      <Reveal as="section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
+      <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
         <SectionLabel>À la une</SectionLabel>
         <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 48 }} className="ytd-hero-grid">
           <div onClick={() => openWork(latest)} className="ytd-card" style={{ cursor: "pointer" }}>
@@ -89,7 +109,7 @@ export default function Home({ setPage, openWork }) {
       </Reveal>
 
       {/* TRAVAUX MIS EN AVANT */}
-      <Reveal as="section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
+      <Reveal as="section" className="ytd-editorial-section ytd-editorial-section-tinted" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
         <SectionLabel>Travaux mis en avant</SectionLabel>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 28 }} className="ytd-grid-4">
           {featured.map((w, i) => (
@@ -105,7 +125,7 @@ export default function Home({ setPage, openWork }) {
       <Divider margin="0 0 72px" />
 
       {/* DERNIÈRES PUBLICATIONS */}
-      <Reveal as="section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
+      <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
         <SectionLabel>Dernières publications</SectionLabel>
         <div>
           {WORKS.slice(0, 6).map((w, i) => (
@@ -124,8 +144,8 @@ export default function Home({ setPage, openWork }) {
       </Reveal>
 
       {/* NEWSLETTER */}
-      <Reveal as="section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px" }}>
-        <div style={{ background: T.greenDeep, padding: "56px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
+      <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px" }}>
+        <div className="ytd-newsletter-panel" style={{ background: T.greenDeep, padding: "56px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
           <div style={{ maxWidth: 460 }}>
             <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 26, color: "#fff", margin: "0 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, color: "#D9E4E2", margin: 0, lineHeight: 1.6 }}>

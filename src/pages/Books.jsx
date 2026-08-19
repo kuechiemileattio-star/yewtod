@@ -29,7 +29,7 @@ export default function Books() {
           <Reveal key={b.id} delay={(i % 3) * 80}>
           <article className="ytd-book-card" style={{ display: "flex", flexDirection: "column", background: T.paper, border: `1px solid ${T.line}`, overflow: "hidden" }}>
             <div className="ytd-book-cover" style={{ height: 220, position: "relative", background: `linear-gradient(160deg, ${b.tone}20, ${b.tone}38)`, borderBottom: `1px solid ${T.line}`, overflow: "hidden" }}>
-              <img src={BOOK_COVERS[b.title]} alt={`Couverture de ${b.title}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img loading="lazy" src={BOOK_COVERS[b.title]} alt={`Couverture de ${b.title}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               <span style={{ position: "absolute", left: 12, bottom: 12, fontFamily: "'Space Mono', monospace", fontSize: 9.5, color: T.paper, background: `${T.greenDeep}E6`, padding: "5px 8px", textTransform: "uppercase" }}>À lire</span>
             </div>
             <div style={{ padding: "18px 18px 20px" }}>

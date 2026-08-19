@@ -24,7 +24,7 @@ export default function Cover({ tone, label, tall }) {
         display: "flex", alignItems: "flex-end",
       }}
     >
-      {images[label] && <img src={images[label]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.78) contrast(.96)", opacity: 0.86 }} />}
+      {images[label] && <img loading="lazy" src={images[label]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.78) contrast(.96)", opacity: 0.86 }} />}
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 35%, ${T.ink}99 100%)` }} />
       <svg className="ytd-cover-lines" width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.5 }} preserveAspectRatio="none">
         <line x1="0%" y1="30%" x2="100%" y2="10%" stroke={tone} strokeWidth="1" opacity="0.25" />

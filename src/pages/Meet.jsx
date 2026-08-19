@@ -4,6 +4,7 @@ import NodeMark from "../components/NodeMark.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
+import { ArrowDownRight, BookOpen, Network, Target } from "lucide-react";
 
 export default function Meet() {
   const qa = [
@@ -16,15 +17,32 @@ export default function Meet() {
   const values = ["Rigueur", "Curiosité", "Transparence", "Utilité publique", "Humilité intellectuelle"];
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px 110px" }}>
+    <div className="ytd-meet-page" style={{ maxWidth: 1060, margin: "0 auto", padding: "72px 24px 110px" }}>
+      <header className="ytd-meet-hero">
+      <div className="ytd-meet-hero-copy">
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <NodeMark />
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Meet Yewtod</span>
       </div>
-      <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(34px, 4.5vw, 50px)", fontWeight: 500, lineHeight: 1.1, margin: "0 0 48px" }}>
-        Le projet, sa méthode et la personne derrière.
+      <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 64px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 20px" }}>
+        Une recherche qui aide à voir plus loin.
       </h1>
+      <p className="ytd-meet-lead">Yewtod SS transforme des sujets complexes en idées lisibles, vérifiables et utiles pour celles et ceux qui veulent comprendre le monde autrement.</p>
+      </div>
+      <div className="ytd-meet-hero-mark"><NodeMark size={22} color={T.paper} /><span>Recherche<br />appliquée</span><ArrowDownRight size={22} /></div>
+      </header>
 
+      <section className="ytd-meet-method">
+        <SectionLabel>La manière de travailler</SectionLabel>
+        <div className="ytd-meet-method-grid">
+          {[[BookOpen, "Observer", "Lire largement, écouter les terrains et regarder les données avant de tirer des conclusions."], [Network, "Relier", "Mettre en relation les disciplines, les institutions et les expériences qui éclairent un même problème."], [Target, "Rendre utile", "Publier des analyses exigeantes, mais assez claires pour nourrir une décision ou une conversation."]].map(([Icon, title, text], index) => (
+            <article className="ytd-meet-method-card" key={title} style={{ animationDelay: `${index * 100}ms` }}><div><Icon size={20} /></div><h2>{title}</h2><p>{text}</p></article>
+          ))}
+        </div>
+      </section>
+
+      <section className="ytd-meet-questions">
+      <SectionLabel>Le projet en questions</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 36, marginBottom: 80 }}>
         {qa.map(([q, a], i) => (
           <Reveal key={q} delay={i * 70}>
@@ -35,10 +53,11 @@ export default function Meet() {
           </Reveal>
         ))}
       </div>
+      </section>
 
       <Reveal><SectionLabel>Le fondateur</SectionLabel></Reveal>
-      <Reveal><div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 40 }} className="ytd-founder">
-        <div style={{ width: 200, height: 240, background: T.paperAlt, border: `1px solid ${T.line}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Reveal><div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 48 }} className="ytd-founder ytd-founder-panel">
+        <div className="ytd-founder-portrait" style={{ width: 240, height: 290, background: T.greenDeep, border: `1px solid ${T.line}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <NodeMark size={16} color={T.green} />
         </div>
         <div>

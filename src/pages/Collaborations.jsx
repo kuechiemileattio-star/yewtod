@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowRight, Image as ImageIcon, Check } from "lucide-react";
+import { ArrowRight, Image as ImageIcon, Check, ArrowUpRight, FlaskConical, Mic2, PenLine } from "lucide-react";
 import { T } from "../theme.js";
 import { COLLAB_TYPES } from "../data.js";
 import NodeMark from "../components/NodeMark.jsx";
@@ -13,18 +13,32 @@ export default function Collaborations() {
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px 110px" }}>
+    <div className="ytd-collab-page" style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 110px" }}>
+      <div className="ytd-collab-hero">
+      <div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <NodeMark />
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Collaborations</span>
       </div>
-      <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(32px, 4.5vw, 46px)", fontWeight: 500, lineHeight: 1.12, margin: "0 0 16px" }}>Proposer une collaboration</h1>
+      <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 62px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 16px" }}>Faisons avancer une idée ensemble.</h1>
       <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, maxWidth: 560, marginBottom: 48 }}>
-        Recherche, livre, article, intervention, partenariat, interview, étude ou simple message — chaque demande est lue personnellement.
+        Une recherche à construire, un article à écrire, une intervention à préparer ou une question à creuser : racontez-nous votre projet, même s'il n'est pas encore totalement défini.
       </p>
+      </div>
+      <div className="ytd-collab-hero-note"><ArrowUpRight size={20} /><span>Chaque demande est lue personnellement.</span></div>
+      </div>
+
+      <div className="ytd-collab-layout">
+      <aside className="ytd-collab-aside">
+        <span className="ytd-collab-aside-label">Ce que nous pouvons construire</span>
+        {[[FlaskConical, "Recherche", "Problème, terrain, données et méthode."], [PenLine, "Écriture", "Article, livre, note ou série éditoriale."], [Mic2, "Transmission", "Interview, intervention ou conversation publique."]].map(([Icon, title, text], index) => (
+          <div className="ytd-collab-type" key={title} style={{ animationDelay: `${index * 90}ms` }}><Icon size={18} /><div><strong>{title}</strong><span>{text}</span></div></div>
+        ))}
+      </aside>
+      <div className="ytd-collab-form-wrap">
 
       {sent ? (
-        <div style={{ padding: 32, border: `1px solid ${T.line}`, background: T.paperAlt, display: "flex", alignItems: "center", gap: 14 }}>
+        <div className="ytd-collab-success" style={{ padding: 32, border: `1px solid ${T.line}`, background: T.paperAlt, display: "flex", alignItems: "center", gap: 14 }}>
           <Check size={22} color={T.green} />
           <div>
             <div style={{ fontFamily: "'Newsreader', serif", fontSize: 19, fontWeight: 600 }}>Demande envoyée</div>
@@ -32,7 +46,7 @@ export default function Collaborations() {
           </div>
         </div>
       ) : (
-        <Reveal as="form" style={{ display: "flex", flexDirection: "column", gap: 22 }} onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+        <Reveal as="form" className="ytd-collab-form" style={{ display: "flex", flexDirection: "column", gap: 22 }} onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="ytd-form-row">
             <Field label="Nom"><input required value={form.nom} onChange={set("nom")} style={inputStyle} /></Field>
             <Field label="Organisation"><input value={form.org} onChange={set("org")} style={inputStyle} /></Field>
@@ -57,6 +71,8 @@ export default function Collaborations() {
           <div><Btn type="submit" variant="green">Envoyer la demande <ArrowRight size={15} /></Btn></div>
         </Reveal>
       )}
+      </div>
+      </div>
     </div>
   );
 }
