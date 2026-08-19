@@ -60,6 +60,19 @@ export default function Admin({ exitAdmin }) {
       </aside>
 
       <main className="ytd-admin-main" style={{ flex: 1, padding: "28px 44px 70px", minWidth: 0 }}>
+        <nav className="ytd-admin-mobile-tabs" aria-label="Navigation du CMS">
+          {tabs.map(([key, label, Icon]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className="ytd-admin-mobile-tab"
+              aria-current={tab === key ? "page" : undefined}
+            >
+              <Icon size={15} />
+              {label}
+            </button>
+          ))}
+        </nav>
         <div className="ytd-admin-topbar">
           <div><span className="ytd-admin-kicker">Yewtod SS / CMS</span><strong>{tabs.find(([key]) => key === tab)?.[1]}</strong></div>
           <span className="ytd-admin-live"><span /> Système actif</span>

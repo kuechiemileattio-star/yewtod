@@ -164,6 +164,9 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-shell { background: linear-gradient(135deg, ${T.paper} 0%, ${T.paperAlt} 100%) !important; }
   .ytd-admin-main { background: linear-gradient(135deg, ${T.paper} 0%, ${T.paperAlt} 100%); }
   .ytd-admin-topbar { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid ${T.line}; }
+  .ytd-admin-mobile-tabs { display: none; }
+  .ytd-admin-mobile-tab { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 9px 12px; border: 1px solid ${T.line}; border-radius: 4px; color: ${T.inkSoft}; background: ${T.paper}; cursor: pointer; font: 11px 'Plus Jakarta Sans', sans-serif; white-space: nowrap; }
+  .ytd-admin-mobile-tab[aria-current='page'] { border-color: ${T.greenDeep}; color: ${T.paper}; background: ${T.greenDeep}; }
   .ytd-admin-topbar strong { display: block; font-family: 'DM Serif Display', serif; color: ${T.ink}; font-size: 25px; font-weight: 400; margin-top: 4px; }
   .ytd-admin-kicker { display: block; font-family: 'Space Mono', monospace; color: ${T.green}; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
   .ytd-admin-live { display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; color: ${T.inkSoft}; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
@@ -318,6 +321,7 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-qa-row { grid-template-columns: 1fr !important; gap: 10px !important; }
     .ytd-admin-sidebar { display: none; }
     .ytd-admin-main { padding: 24px 20px 54px !important; }
+    .ytd-admin-mobile-tabs { display: flex; gap: 8px; overflow-x: auto; margin: -4px 0 22px; padding: 2px 2px 8px; scrollbar-width: thin; }
     .ytd-admin-topbar { align-items: flex-start; flex-direction: column; }
     .ytd-dashboard-stat-grid, .ytd-dashboard-grid { grid-template-columns: 1fr !important; }
     .ytd-dashboard-hero { align-items: flex-start; flex-direction: column; padding: 24px; }
