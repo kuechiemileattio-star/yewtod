@@ -27,7 +27,7 @@ export default function YewtodSS() {
       : page === "books"
         ? { openBook }
       : page === "work-detail"
-        ? { work: activeWork, back: () => go("works"), openWork }
+        ? { work: activeWork, back, openWork }
         : page === "book-detail"
           ? { book: activeBook, reviews: visitorReviews[activeBook?.id] || [], onPublishReview: review => publishBookReview(activeBook.id, review), back, openBook }
           : page === "collab-detail"
