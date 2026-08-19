@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ArrowUpRight, Edit3, X } from "lucide-react";
 import { T } from "../theme.js";
 import { BOOK_COVERS } from "../data.js";
@@ -13,7 +14,8 @@ export default function BookPreviewModal({ book, reviews = [], onEdit, onClose }
     };
   }, [onClose]);
 
-  return (
+  return createPortal(
+    (
     <div className="ytd-admin-modal-backdrop" onMouseDown={event => event.target === event.currentTarget && onClose()}>
       <section className="ytd-admin-book-preview ytd-admin-book-modal" role="dialog" aria-modal="true" aria-labelledby="book-preview-title">
         <div className="ytd-admin-book-preview-head"><span className="ytd-admin-kicker">Aperçu de la fiche</span><button onClick={onClose} aria-label="Fermer"><X size={18} /></button></div>
@@ -28,5 +30,7 @@ export default function BookPreviewModal({ book, reviews = [], onEdit, onClose }
         <div className="ytd-admin-book-preview-actions"><Btn variant="green" onClick={onEdit}><Edit3 size={15} /> Modifier la fiche</Btn>{book.link && <a href={book.link} target="_blank" rel="noreferrer"><ArrowUpRight size={15} /> Ouvrir le lien</a>}</div>
       </section>
     </div>
+    ),
+    document.body,
   );
 }

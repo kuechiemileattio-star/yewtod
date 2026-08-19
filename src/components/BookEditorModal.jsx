@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Save, X } from "lucide-react";
 import { T } from "../theme.js";
 import { BOOK_CATEGORIES } from "../data.js";
@@ -16,7 +17,8 @@ export default function BookEditorModal({ book, onChange, onSave, onClose }) {
 
   const update = key => event => onChange({ ...book, [key]: event.target.value });
 
-  return (
+  return createPortal(
+    (
     <div className="ytd-admin-modal-backdrop" onMouseDown={event => event.target === event.currentTarget && onClose()}>
       <form className="ytd-admin-book-editor ytd-admin-book-modal" role="dialog" aria-modal="true" aria-labelledby="book-editor-title" onSubmit={onSave}>
         <div className="ytd-admin-book-editor-head">
@@ -36,5 +38,7 @@ export default function BookEditorModal({ book, onChange, onSave, onClose }) {
         <div className="ytd-admin-book-editor-actions"><Btn type="submit" variant="green"><Save size={15} /> Enregistrer la fiche</Btn><Btn type="button" variant="outline" onClick={onClose}>Annuler</Btn></div>
       </form>
     </div>
+    ),
+    document.body,
   );
 }

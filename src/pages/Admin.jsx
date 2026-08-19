@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, LayoutGrid, FileText, BookOpen, Handshake, Image as ImageIcon,
-  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search, X,
+  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search,
 } from "lucide-react";
 import { T } from "../theme.js";
 import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS } from "../data.js";
@@ -14,6 +14,7 @@ import StatusPill from "../components/StatusPill.jsx";
 import AdminDashboard from "../components/AdminDashboard.jsx";
 import BookEditorModal from "../components/BookEditorModal.jsx";
 import BookPreviewModal from "../components/BookPreviewModal.jsx";
+import PostEditorModal from "../components/PostEditorModal.jsx";
 
 const ROLE_PERMISSIONS = {
   Propriétaire: ["Tout gérer", "Gérer les membres", "Modifier les paramètres", "Publier et supprimer"],
@@ -208,7 +209,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
 
             <div className="ytd-admin-add-bar"><span>Ajouter un contenu éditorial</span><Btn variant="green" onClick={() => setIsPostComposerOpen(true)}><Plus size={15} /> Nouvelle publication</Btn></div>
 
-            {(isPostComposerOpen || editingPost) && <div className="ytd-admin-modal-backdrop" onMouseDown={event => event.target === event.currentTarget && (setIsPostComposerOpen(false), setEditingPost(null))}><form onSubmit={editingPost ? savePost : addDraft} className="ytd-admin-panel ytd-admin-form ytd-admin-content-modal" role="dialog" aria-modal="true" aria-labelledby="post-modal-title"><div className="ytd-admin-book-editor-head"><div><span className="ytd-admin-kicker">{editingPost ? "Modification" : "Nouveau contenu"}</span><h2 id="post-modal-title">{editingPost ? "Modifier la publication" : "Créer un brouillon"}</h2></div><button type="button" onClick={() => { setIsPostComposerOpen(false); setEditingPost(null); }} aria-label="Fermer"><X size={18} /></button></div><Field label="Titre"><input required value={editingPost ? editingPost.title : draftTitle} onChange={e => editingPost ? setEditingPost({ ...editingPost, title: e.target.value }) : setDraftTitle(e.target.value)} style={inputStyle} placeholder="Titre de la publication" /></Field><Field label="Catégorie"><select value={editingPost ? editingPost.category : draftCat} onChange={e => editingPost ? setEditingPost({ ...editingPost, category: e.target.value }) : setDraftCat(e.target.value)} style={inputStyle}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></Field>{editingPost && <Field label="Statut"><select value={editingPost.statut} onChange={e => setEditingPost({ ...editingPost, statut: e.target.value })} style={inputStyle}><option>Publié</option><option>Brouillon</option></select></Field>}<div className="ytd-admin-book-editor-actions"><Btn type="submit" variant="green">Enregistrer</Btn><Btn type="button" variant="outline" onClick={() => { setIsPostComposerOpen(false); setEditingPost(null); }}>Annuler</Btn></div></form></div>}
+            {(isPostComposerOpen || editingPost) && <PostEditorModal post={editingPost} draftTitle={draftTitle} draftCat={draftCat} onChangePost={setEditingPost} onChangeDraft={setDraftTitle} onSave={editingPost ? savePost : addDraft} onClose={() => { setIsPostComposerOpen(false); setEditingPost(null); }} />}
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
               <thead>

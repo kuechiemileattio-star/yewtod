@@ -217,7 +217,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-book-editor-head h2 { margin: 5px 0 0; font: 500 24px 'Fraunces', serif; }
   .ytd-admin-book-editor-head button, .ytd-admin-icon-button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid ${T.line}; color: ${T.inkSoft}; background: transparent; cursor: pointer; }
   .ytd-admin-book-fields { display: grid; grid-template-columns: 1.4fr 1.1fr 1fr 1fr; gap: 12px; }
-  .ytd-admin-book-editor-actions { display: flex; gap: 9px; }
+  .ytd-admin-book-editor-actions { position: sticky; bottom: -1px; z-index: 3; display: flex; gap: 9px; padding: 12px 0 2px; background: ${T.paper}; }
   .ytd-admin-modal-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 28px; overscroll-behavior: contain; background: ${T.ink}88; animation: ytdAdminFade .25s ease both; }
   .ytd-admin-book-modal { width: min(700px, 100%); min-height: 0; max-height: min(88dvh, 820px); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: auto; border: 1px solid ${T.line}; border-radius: 14px; box-shadow: 0 28px 70px -30px ${T.ink}; animation: ytdAdminModalIn .45s cubic-bezier(.16,1,.3,1) both; }
   .ytd-admin-book-preview { display: grid; align-content: start; gap: 12px; padding: 28px; color: ${T.ink}; background: ${T.paper}; }
@@ -238,7 +238,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-book-preview-review-list small { margin-left: 8px; color: ${T.inkSoft}; font: 9px 'JetBrains Mono', monospace; }
   .ytd-admin-book-preview-review-list p { margin: 7px 0 0; color: ${T.ink}; font: 14px/1.45 'Fraunces', serif; }
   .ytd-admin-book-preview-review-list > p { margin: 0; color: ${T.inkSoft}; font: 12px 'Plus Jakarta Sans', sans-serif; }
-  .ytd-admin-book-preview-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .ytd-admin-book-preview-actions { position: sticky; bottom: -1px; z-index: 3; display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 12px 0 2px; background: ${T.paper}; }
   .ytd-admin-book-preview-actions a { display: inline-flex; align-items: center; gap: 6px; color: ${T.green}; font: 12px 'JetBrains Mono', monospace; }
   .ytd-book-detail-cover { animation: ytdImageReveal .7s cubic-bezier(.16,1,.3,1) both; }
   .ytd-book-detail-copy { animation: ytdAdminIn .55s .12s cubic-bezier(.16,1,.3,1) both; }
