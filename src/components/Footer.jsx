@@ -1,6 +1,7 @@
 import React from "react";
 import { T } from "../theme.js";
 import NodeMark from "./NodeMark.jsx";
+import BrandLogo from "./BrandLogo.jsx";
 import { ArrowUpRight, Mail, MoveUpRight } from "lucide-react";
 
 export default function Footer({ setPage }) {
@@ -18,8 +19,7 @@ export default function Footer({ setPage }) {
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "48px 24px 38px", display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 56 }}>
         <div className="ytd-footer-brand" style={{ maxWidth: 320 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <NodeMark size={9} />
-            <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: T.paper }}>Yewtod <i style={{ color: T.green }}>SS</i></span>
+            <BrandLogo dark />
           </div>
           <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13.5, color: `${T.paper}AA`, lineHeight: 1.6 }}>
             Un espace de réflexion sur les sciences sociales, les systèmes complexes, l'économie, la politique publique et l'intelligence artificielle.

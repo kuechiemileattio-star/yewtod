@@ -69,7 +69,7 @@ export const WORKS = [
 export const BOOK_CATEGORIES = ["IA", "économie", "politique", "physique", "mathématiques", "philosophie", "entrepreneuriat", "histoire", "sciences sociales"];
 
 export const BOOKS = [
-  { id: "b1", title: "Thinking in Systems", author: "Donella Meadows", category: "sciences sociales", difficulty: "Accessible", note: "Le livre que je recommande toujours en premier pour raisonner en boucles plutôt qu'en lignes droites.", tone: T.green },
+  { id: "b1", title: "Thinking in Systems", author: "Donella Meadows", category: "sciences sociales", difficulty: "Accessible", note: "Le livre que je recommande toujours en premier pour raisonner en boucles plutôt qu'en lignes droites.", description: "Une introduction lumineuse aux boucles de rétroaction, aux délais et aux points de levier qui structurent les systèmes.", reviews: [{ id: "r1", author: "Yewtod", text: "Un excellent point de départ pour apprendre à regarder les relations plutôt que les objets.", date: "2026-08-10" }], tone: T.green },
   { id: "b2", title: "The Origins of Political Order", author: "Francis Fukuyama", category: "politique", difficulty: "Exigeant", note: "Une histoire comparée de la formation des États, indispensable pour penser les institutions africaines.", tone: T.red },
   { id: "b3", title: "Poor Economics", author: "Banerjee & Duflo", category: "économie", difficulty: "Accessible", note: "L'économie du développement telle qu'elle devrait s'écrire : au ras du terrain.", tone: T.inkSoft },
   { id: "b4", title: "Superintelligence", author: "Nick Bostrom", category: "IA", difficulty: "Exigeant", note: "Daté sur certains points, mais toujours la meilleure charpente pour penser les risques long terme de l'IA.", tone: T.green },

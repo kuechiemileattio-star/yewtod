@@ -1,23 +1,54 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, LayoutGrid, FileText, BookOpen, Handshake, Image as ImageIcon,
-  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2,
+  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search,
 } from "lucide-react";
 import { T } from "../theme.js";
-import { WORKS, CATEGORIES, BOOKS, ADMIN_COLLABS } from "../data.js";
+import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS } from "../data.js";
 import NodeMark from "../components/NodeMark.jsx";
+import BrandLogo from "../components/BrandLogo.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Btn from "../components/Btn.jsx";
 import Field, { inputStyle } from "../components/Field.jsx";
 import StatusPill from "../components/StatusPill.jsx";
 import AdminDashboard from "../components/AdminDashboard.jsx";
+import BookEditorModal from "../components/BookEditorModal.jsx";
+import BookPreviewModal from "../components/BookPreviewModal.jsx";
 
-export default function Admin({ exitAdmin }) {
+const ROLE_PERMISSIONS = {
+  Propriétaire: ["Tout gérer", "Gérer les membres", "Modifier les paramètres", "Publier et supprimer"],
+  Administrateur: ["Gérer les membres", "Modifier les paramètres", "Publier et supprimer"],
+  Développeur: ["Gérer les médias", "Modifier les paramètres techniques", "Consulter les contenus"],
+  Éditeur: ["Créer et modifier", "Publier les contenus", "Gérer les livres"],
+  Lecteur: ["Consulter le dashboard", "Consulter les contenus"],
+};
+
+const ROLE_DESCRIPTIONS = {
+  Propriétaire: "Accès complet au projet et à l’équipe.",
+  Administrateur: "Gère le contenu, les réglages et les membres.",
+  Développeur: "Intervient sur les médias et les réglages techniques.",
+  Éditeur: "Produit et publie les contenus éditoriaux.",
+  Lecteur: "Accès en lecture seule aux espaces autorisés.",
+};
+
+export default function Admin({ exitAdmin, visitorReviews = {} }) {
   const [tab, setTab] = useState("dashboard");
   const [posts, setPosts] = useState(WORKS.map(w => ({ ...w, statut: "Publié" })));
   const [collabFilter, setCollabFilter] = useState("Tous");
   const [draftTitle, setDraftTitle] = useState("");
   const [draftCat, setDraftCat] = useState(CATEGORIES[0]);
+  const [editingPost, setEditingPost] = useState(null);
+  const [books, setBooks] = useState(BOOKS);
+  const [bookFilter, setBookFilter] = useState("Toutes");
+  const [bookSearch, setBookSearch] = useState("");
+  const [editingBook, setEditingBook] = useState(null);
+  const [previewBook, setPreviewBook] = useState(null);
+  const [selectedCollab, setSelectedCollab] = useState(null);
+  const [siteName, setSiteName] = useState("Yewtod SS");
+  const [siteDescription, setSiteDescription] = useState("Plateforme de réflexion sur les sciences sociales, les systèmes complexes et la politique publique.");
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("Éditeur");
+  const [teamMembers, setTeamMembers] = useState([{ id: "m1", name: "Yewtod", email: "owner@yewtod.ss", role: "Propriétaire", status: "Actif" }]);
 
   const tabs = [
     ["dashboard", "Dashboard", LayoutGrid],
@@ -37,6 +68,25 @@ export default function Admin({ exitAdmin }) {
     setDraftTitle("");
   }
 
+  function savePost(e) {
+    e.preventDefault();
+    setPosts(posts.map(post => post.id === editingPost.id ? editingPost : post));
+    setEditingPost(null);
+  }
+
+  function saveBook(e) {
+    e.preventDefault();
+    setBooks(books.some(book => book.id === editingBook.id) ? books.map(book => book.id === editingBook.id ? editingBook : book) : [editingBook, ...books]);
+    setEditingBook(null);
+  }
+
+  function addMember(e) {
+    e.preventDefault();
+    if (!newMemberEmail.trim() || teamMembers.some(member => member.email === newMemberEmail.trim())) return;
+    setTeamMembers([...teamMembers, { id: "m" + Date.now(), name: newMemberEmail.split("@")[0], email: newMemberEmail.trim(), role: newMemberRole, status: "Invitation envoyée" }]);
+    setNewMemberEmail("");
+  }
+
   return (
     <div className="ytd-admin-shell" style={{ display: "flex", minHeight: "100vh", background: T.paper }}>
       <aside style={{ width: 250, flexShrink: 0, borderRight: `1px solid ${T.line}`, padding: "28px 18px", position: "sticky", top: 0, height: "100vh", background: T.greenDeep }} className="ytd-admin-sidebar">
@@ -44,8 +94,7 @@ export default function Admin({ exitAdmin }) {
           <ArrowLeft size={14} /> Retour au site
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 34, padding: "0 4px" }}>
-          <NodeMark size={9} />
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: T.paper }}>Yewtod <i style={{ color: T.lime }}>SS</i></span>
+          <BrandLogo dark />
           <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9.5, color: T.lime, border: `1px solid ${T.lime}66`, padding: "2px 6px", borderRadius: 10 }}>CMS</span>
         </div>
         {tabs.map(([key, label, Icon]) => (
@@ -167,6 +216,13 @@ export default function Admin({ exitAdmin }) {
               <Btn type="submit" variant="green"><Plus size={15} /> Créer le brouillon</Btn>
             </form>
 
+            {editingPost && <form onSubmit={savePost} className="ytd-admin-panel ytd-admin-form" style={{ display: "flex", gap: 10, marginBottom: 30, flexWrap: "wrap", alignItems: "flex-end", border: `1px solid ${T.green}`, padding: 18, background: T.paper }}>
+              <Field label="Titre"><input required value={editingPost.title} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} style={{ ...inputStyle, width: 320 }} /></Field>
+              <Field label="Catégorie"><select value={editingPost.category} onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} style={{ ...inputStyle, width: 200 }}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></Field>
+              <Field label="Statut"><select value={editingPost.statut} onChange={e => setEditingPost({ ...editingPost, statut: e.target.value })} style={{ ...inputStyle, width: 160 }}><option>Publié</option><option>Brouillon</option></select></Field>
+              <Btn type="submit" variant="green">Enregistrer</Btn><Btn type="button" variant="outline" onClick={() => setEditingPost(null)}>Annuler</Btn>
+            </form>}
+
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
               <thead>
                 <tr style={{ borderBottom: `1px solid ${T.line}`, textAlign: "left" }}>
@@ -183,7 +239,7 @@ export default function Admin({ exitAdmin }) {
                     <td style={{ padding: "12px 8px", color: T.inkSoft, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5 }}>{p.date}</td>
                     <td style={{ padding: "12px 8px" }}><StatusPill statut={p.statut} /></td>
                     <td style={{ padding: "12px 8px", textAlign: "right" }}>
-                      <Edit3 size={14} color={T.inkSoft} style={{ marginRight: 12, cursor: "pointer" }} />
+                      <Edit3 size={14} color={T.inkSoft} style={{ marginRight: 12, cursor: "pointer" }} onClick={() => setEditingPost({ ...p })} />
                       <Trash2 size={14} color={T.inkSoft} style={{ cursor: "pointer" }} onClick={() => setPosts(posts.filter(x => x.id !== p.id))} />
                     </td>
                   </tr>
@@ -195,20 +251,16 @@ export default function Admin({ exitAdmin }) {
 
         {tab === "books" && (
           <div className="ytd-admin-view">
-            <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Livres</h1>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, marginBottom: 28 }}>Gérer les fiches de la bibliothèque personnelle.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }} className="ytd-admin-books">
-              {BOOKS.map(b => (
-                <div key={b.id} style={{ border: `1px solid ${T.line}`, background: "#fff", padding: 16, display: "flex", gap: 14, alignItems: "center" }}>
-                  <div style={{ width: 44, height: 60, background: T.paperAlt, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><BookOpen size={16} color={b.tone} /></div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "'Newsreader', serif", fontSize: 15, fontWeight: 600 }}>{b.title}</div>
-                    <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>{b.category} · {b.difficulty}</div>
-                  </div>
-                  <Edit3 size={14} color={T.inkSoft} style={{ cursor: "pointer" }} />
-                </div>
-              ))}
+            <div className="ytd-admin-section-heading"><div><span className="ytd-admin-kicker">Bibliothèque éditoriale</span><h1>Livres</h1><p>Organiser les références, enrichir les avis et préparer les fiches publiques.</p></div><Btn variant="green" onClick={() => setEditingBook({ id: "b" + Date.now(), title: "", author: "", category: BOOK_CATEGORIES[0], difficulty: "Accessible", description: "", note: "", reviews: [], link: "", tone: T.green })}><Plus size={15} /> Ajouter un livre</Btn></div>
+            <div className="ytd-admin-book-toolbar">
+              <label className="ytd-admin-search"><Search size={15} /><input value={bookSearch} onChange={e => setBookSearch(e.target.value)} placeholder="Rechercher un livre ou un auteur" /></label>
+              <div className="ytd-admin-filter-scroll">{["Toutes", ...BOOK_CATEGORIES].map(category => <button key={category} onClick={() => setBookFilter(category)} className={bookFilter === category ? "is-active" : ""}>{category}</button>)}</div>
             </div>
+            <div className="ytd-admin-books">
+              {books.filter(book => (bookFilter === "Toutes" || book.category === bookFilter) && `${book.title} ${book.author}`.toLowerCase().includes(bookSearch.toLowerCase())).map((book, index) => <article key={book.id} className="ytd-admin-book-card" style={{ animationDelay: `${index * 55}ms` }} onClick={() => setPreviewBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} onKeyDown={event => event.key === "Enter" && setPreviewBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} role="button" tabIndex={0}><div className="ytd-admin-book-cover" style={{ background: `linear-gradient(145deg, ${book.tone}, ${T.greenDeep})` }}><img src={book.cover || BOOK_COVERS[book.title]} alt={`Couverture de ${book.title}`} onError={e => { e.currentTarget.style.display = "none"; }} /><BookOpen size={22} /></div><div className="ytd-admin-book-copy"><span>{book.category} · {book.difficulty}</span><h2>{book.title}</h2><small>{book.author}</small><p>{book.note}</p></div><button className="ytd-admin-icon-button" onClick={event => { event.stopPropagation(); setEditingBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "" }); }} aria-label={`Modifier ${book.title}`}><Edit3 size={16} /></button></article>)}
+            </div>
+            {editingBook && <BookEditorModal book={editingBook} onChange={setEditingBook} onSave={saveBook} onClose={() => setEditingBook(null)} />}
+            {previewBook && <BookPreviewModal book={previewBook} reviews={visitorReviews[previewBook.id] || []} onEdit={() => { setEditingBook(previewBook); setPreviewBook(null); }} onClose={() => setPreviewBook(null)} />}
           </div>
         )}
 
@@ -239,7 +291,7 @@ export default function Admin({ exitAdmin }) {
               <tbody>
                 {filteredCollabs.map(c => (
                   <tr key={c.id} className="ytd-table-row" style={{ borderBottom: `1px solid ${T.line}` }}>
-                    <td style={{ padding: "12px 8px" }}>{c.nom}</td>
+                    <td style={{ padding: "12px 8px" }}><button onClick={() => setSelectedCollab(c)} style={{ border: 0, padding: 0, background: "none", color: T.ink, cursor: "pointer", font: "inherit", textDecoration: "underline" }}>{c.nom}</button></td>
                     <td style={{ padding: "12px 8px", color: T.inkSoft }}>{c.org}</td>
                     <td style={{ padding: "12px 8px", color: T.inkSoft }}>{c.type}</td>
                     <td style={{ padding: "12px 8px", color: T.inkSoft, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5 }}>{c.date}</td>
@@ -248,6 +300,13 @@ export default function Admin({ exitAdmin }) {
                 ))}
               </tbody>
             </table>
+            {selectedCollab && <div className="ytd-admin-panel" style={{ marginTop: 24, padding: 22, border: `1px solid ${T.green}`, background: T.paper }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "start" }}>
+                <div><span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: T.green, textTransform: "uppercase" }}>Fiche de collaboration</span><h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, margin: "7px 0 4px" }}>{selectedCollab.nom}</h2><p style={{ margin: 0, color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>{selectedCollab.org} · {selectedCollab.type} · {selectedCollab.date}</p></div>
+                <button onClick={() => setSelectedCollab(null)} style={{ border: 0, background: "none", cursor: "pointer", color: T.inkSoft }}>Fermer</button>
+              </div>
+              <p style={{ fontFamily: "'Newsreader', serif", fontSize: 18, lineHeight: 1.55, marginBottom: 0 }}>Cette demande peut maintenant être consultée depuis l'administration. Les notes internes et les prochaines étapes pourront être ajoutées ici.</p>
+            </div>}
           </div>
         )}
 
@@ -267,14 +326,16 @@ export default function Admin({ exitAdmin }) {
         )}
 
         {tab === "settings" && (
-          <div className="ytd-admin-view">
-            <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Paramètres</h1>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, marginBottom: 28 }}>Informations du site, réseaux sociaux, SEO, menu, favicon et logo.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 520 }}>
-              <Field label="Nom du site"><input defaultValue="Yewtod SS" style={inputStyle} /></Field>
-              <Field label="Description SEO"><textarea rows={3} style={{ ...inputStyle, resize: "vertical" }} defaultValue="Plateforme de réflexion sur les sciences sociales, les systèmes complexes et la politique publique." /></Field>
-              <Field label="Réseaux sociaux"><input placeholder="X, LinkedIn, YouTube…" style={inputStyle} /></Field>
-              <Btn variant="green" style={{ alignSelf: "flex-start" }}>Enregistrer les paramètres</Btn>
+          <div className="ytd-admin-view ytd-admin-settings">
+            <div className="ytd-admin-section-heading"><div><span className="ytd-admin-kicker">Configuration du projet</span><h1>Paramètres</h1><p>Organiser l’identité du site, ses accès et les responsabilités de l’équipe.</p></div></div>
+            <section className="ytd-admin-settings-card"><div className="ytd-admin-settings-card-heading"><div><span>Identité éditoriale</span><h2>Informations du site</h2></div><span className="ytd-admin-settings-index">01</span></div><div className="ytd-admin-settings-fields"><Field label="Nom du site"><input value={siteName} onChange={e => setSiteName(e.target.value)} style={inputStyle} /></Field><Field label="Description SEO"><textarea rows={3} value={siteDescription} onChange={e => setSiteDescription(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field><Field label="Réseaux sociaux"><input placeholder="X, LinkedIn, YouTube…" style={inputStyle} /></Field></div><Btn type="button" variant="green" style={{ alignSelf: "flex-start" }}>Enregistrer les paramètres</Btn></section>
+            <div>
+              <section className="ytd-admin-team-section">
+                <div className="ytd-admin-team-heading"><div><span className="ytd-admin-kicker">Organisation</span><h2>Équipe et accès</h2><p>Inviter des collaborateurs et contrôler les actions disponibles selon leur rôle.</p></div><span className="ytd-admin-team-count">{teamMembers.length} membre{teamMembers.length > 1 ? "s" : ""}</span></div>
+                <div className="ytd-admin-role-legend">{Object.entries(ROLE_DESCRIPTIONS).map(([role, description]) => <div key={role}><strong>{role}</strong><span>{description}</span></div>)}</div>
+                <div className="ytd-admin-members">{teamMembers.map(member => <article key={member.id} className="ytd-admin-member"><div className="ytd-admin-member-avatar">{member.name.slice(0, 1).toUpperCase()}</div><div className="ytd-admin-member-main"><strong>{member.name}</strong><small>{member.email}</small><div className="ytd-admin-permissions">{ROLE_PERMISSIONS[member.role].map(permission => <span key={permission}>{permission}</span>)}</div></div><div className="ytd-admin-member-actions"><select value={member.role} onChange={e => setTeamMembers(teamMembers.map(item => item.id === member.id ? { ...item, role: e.target.value } : item))} disabled={member.role === "Propriétaire"}>{Object.keys(ROLE_PERMISSIONS).map(role => <option key={role}>{role}</option>)}</select><span className="ytd-admin-member-status">{member.status}</span></div></article>)}</div>
+                <form onSubmit={addMember} className="ytd-admin-invite-form"><input required type="email" value={newMemberEmail} onChange={e => setNewMemberEmail(e.target.value)} placeholder="email@exemple.com" style={inputStyle} /><select value={newMemberRole} onChange={e => setNewMemberRole(e.target.value)} style={inputStyle}>{Object.keys(ROLE_PERMISSIONS).filter(role => role !== "Propriétaire").map(role => <option key={role}>{role}</option>)}</select><Btn type="submit" variant="green"><Plus size={14} /> Inviter</Btn></form>
+              </section>
             </div>
           </div>
         )}

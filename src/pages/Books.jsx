@@ -3,7 +3,7 @@ import { T } from "../theme.js";
 import { BOOKS, BOOK_CATEGORIES, BOOK_COVERS } from "../data.js";
 import Reveal from "../components/Reveal.jsx";
 
-export default function Books() {
+export default function Books({ openBook }) {
   const [cat, setCat] = useState("Toutes");
   const filtered = cat === "Toutes" ? BOOKS : BOOKS.filter(b => b.category === cat);
 
@@ -27,7 +27,7 @@ export default function Books() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 28 }} className="ytd-grid-3 ytd-books-grid">
         {filtered.map((b, i) => (
           <Reveal key={b.id} delay={(i % 3) * 80}>
-          <article className="ytd-book-card" style={{ display: "flex", flexDirection: "column", background: T.paper, border: `1px solid ${T.line}`, overflow: "hidden" }}>
+          <article onClick={() => openBook(b)} onKeyDown={e => e.key === "Enter" && openBook(b)} role="button" tabIndex={0} className="ytd-book-card" style={{ display: "flex", flexDirection: "column", background: T.paper, border: `1px solid ${T.line}`, overflow: "hidden", cursor: "pointer" }}>
             <div className="ytd-book-cover" style={{ height: 220, position: "relative", background: `linear-gradient(160deg, ${b.tone}20, ${b.tone}38)`, borderBottom: `1px solid ${T.line}`, overflow: "hidden" }}>
               <img loading="lazy" src={BOOK_COVERS[b.title]} alt={`Couverture de ${b.title}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               <span style={{ position: "absolute", left: 12, bottom: 12, fontFamily: "'Space Mono', monospace", fontSize: 9.5, color: T.paper, background: `${T.greenDeep}E6`, padding: "5px 8px", textTransform: "uppercase" }}>À lire</span>

@@ -5,6 +5,16 @@ import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
 import Tag from "../components/Tag.jsx";
 
+const TYPE_GUIDANCE = {
+  Articles: "Analyse argumentée, sources et prise de position claire.",
+  Rapports: "Synthèse documentée, méthodologie, résultats et recommandations.",
+  Études: "Question de recherche, terrain, méthode et discussion des résultats.",
+  "Notes de recherche": "Hypothèse courte, observations de terrain et pistes à tester.",
+  "Séries documentaires": "Épisode, contexte, intervenants et format audiovisuel.",
+  Expérimentations: "Protocole, données, limites et ce que l'essai permet d'apprendre.",
+  "Visualisations de données": "Jeu de données, méthode de lecture et visualisation interactive.",
+};
+
 export default function Works({ openWork }) {
   const [cat, setCat] = useState("Toutes");
   const filtered = cat === "Toutes" ? WORKS : WORKS.filter(w => w.category === cat);
@@ -37,6 +47,7 @@ export default function Works({ openWork }) {
               <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: T.inkSoft }}>{fmtDate(w.date)} · {w.readTime}</span>
               <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 20, fontWeight: 600, margin: "8px 0 8px", lineHeight: 1.25 }}>{w.title}</h3>
               <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, lineHeight: 1.55, margin: "0 0 10px" }}>{w.excerpt}</p>
+              <span style={{ display: "block", fontFamily: "'Inter', sans-serif", fontSize: 12, color: T.green, lineHeight: 1.45, marginBottom: 10 }}>{TYPE_GUIDANCE[w.category]}</span>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{w.tags.map(t => <Tag key={t}>{t}</Tag>)}</div>
             </div>
           </div>

@@ -40,7 +40,7 @@ export default function Home({ setPage, openWork }) {
         </div>
         <div className="ytd-hero-visual" style={{ position: "relative", minHeight: 360 }}>
           <div style={{ position: "absolute", inset: "12px 0 0 36px", background: T.greenDeep, transform: "rotate(3deg)" }} />
-          <div style={{ position: "relative", background: T.paperAlt, padding: 12, border: `1px solid ${T.line}`, transform: "rotate(-3deg)" }}>
+          <div onClick={() => openWork(latest)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && openWork(latest)} style={{ position: "relative", background: T.paperAlt, padding: 12, border: `1px solid ${T.line}`, transform: "rotate(-3deg)", cursor: "pointer" }}>
             <Cover tone={latest.tone} label={latest.category} tall />
             <div style={{ padding: "14px 8px 4px" }}>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: T.green, textTransform: "uppercase" }}>À lire maintenant</span>

@@ -156,6 +156,11 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-row { transition: background .2s ease, padding-left .2s ease; }
   .ytd-row:hover { background: ${T.paperAlt}CC; padding-left: 8px; }
   .ytd-admin-tab { transition: background .2s ease, border-color .2s ease, padding-left .2s ease; }
+  .ytd-brand-logo-frame { position: relative; display: block; width: 156px; height: 38px; overflow: hidden; }
+  .ytd-brand-logo { position: absolute; top: -330%; left: -36%; width: 182%; max-width: none; height: auto; mix-blend-mode: multiply; }
+  .ytd-brand-logo-dark .ytd-brand-logo { filter: invert(1); mix-blend-mode: screen; }
+  .ytd-admin-sidebar .ytd-brand-logo-frame { width: 142px; height: 35px; }
+  .ytd-footer-brand .ytd-brand-logo-frame { width: 178px; height: 44px; }
   .ytd-admin-tab:hover { background: ${T.paperAlt}90; padding-left: 16px; }
   .ytd-table-row { transition: background .18s ease; }
   .ytd-table-row:hover { background: ${T.paperAlt}70; }
@@ -167,6 +172,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-mobile-tabs { display: none; }
   .ytd-admin-mobile-tab { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 9px 12px; border: 1px solid ${T.line}; border-radius: 4px; color: ${T.inkSoft}; background: ${T.paper}; cursor: pointer; font: 11px 'Plus Jakarta Sans', sans-serif; white-space: nowrap; }
   .ytd-admin-mobile-tab[aria-current='page'] { border-color: ${T.greenDeep}; color: ${T.paper}; background: ${T.greenDeep}; }
+  .ytd-admin-mobile-tab:focus-visible, .ytd-admin-tab:focus-visible { outline: 2px solid ${T.lime}; outline-offset: 2px; }
   .ytd-admin-topbar strong { display: block; font-family: 'DM Serif Display', serif; color: ${T.ink}; font-size: 25px; font-weight: 400; margin-top: 4px; }
   .ytd-admin-kicker { display: block; font-family: 'Space Mono', monospace; color: ${T.green}; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
   .ytd-admin-live { display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; color: ${T.inkSoft}; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
@@ -192,6 +198,103 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-list-panel > div { transition: transform .22s ease, background .22s ease; border-radius: 4px; }
   .ytd-admin-list-panel > div:hover { transform: translateX(5px); background: ${T.paperAlt}; padding-left: 8px !important; }
   .ytd-admin-form { border-radius: 8px; box-shadow: 0 14px 30px -26px ${T.ink}99; }
+  .ytd-admin-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+  .ytd-admin-section-heading h1 { margin: 5px 0 6px; color: ${T.ink}; font: 500 32px 'Fraunces', serif; }
+  .ytd-admin-section-heading p { margin: 0; color: ${T.inkSoft}; font: 13px/1.5 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-toolbar { display: flex; gap: 14px; align-items: center; margin-bottom: 22px; padding: 10px; border: 1px solid ${T.line}; background: ${T.paper}; }
+  .ytd-admin-search { display: flex; align-items: center; gap: 8px; min-width: 270px; padding: 9px 11px; color: ${T.inkSoft}; background: ${T.paperAlt}; }
+  .ytd-admin-search input { width: 100%; border: 0; outline: 0; color: ${T.ink}; background: transparent; font: 12px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-filter-scroll { display: flex; gap: 6px; overflow-x: auto; }
+  .ytd-admin-filter-scroll button { flex: 0 0 auto; padding: 7px 10px; border: 1px solid transparent; color: ${T.inkSoft}; background: transparent; cursor: pointer; font: 10px 'JetBrains Mono', monospace; }
+  .ytd-admin-filter-scroll button:hover, .ytd-admin-filter-scroll button.is-active { border-color: ${T.greenDeep}; color: ${T.paper}; background: ${T.greenDeep}; }
+  .ytd-admin-book-editor { display: grid; gap: 16px; margin-bottom: 24px; padding: 22px; border: 1px solid ${T.green}; background: ${T.paper}; box-shadow: 0 18px 35px -28px ${T.greenDeep}; animation: ytdAdminIn .4s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-admin-book-editor-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+  .ytd-admin-book-editor-head h2 { margin: 5px 0 0; font: 500 24px 'Fraunces', serif; }
+  .ytd-admin-book-editor-head button, .ytd-admin-icon-button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid ${T.line}; color: ${T.inkSoft}; background: transparent; cursor: pointer; }
+  .ytd-admin-book-fields { display: grid; grid-template-columns: 1.4fr 1.1fr 1fr 1fr; gap: 12px; }
+  .ytd-admin-book-editor-actions { display: flex; gap: 9px; }
+  .ytd-admin-modal-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; justify-content: flex-end; overflow-y: auto; overscroll-behavior: contain; background: ${T.ink}88; animation: ytdAdminFade .25s ease both; }
+  .ytd-admin-book-modal { width: min(620px, 100%); min-height: 100dvh; max-height: 100dvh; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: 0; border: 0; border-left: 1px solid ${T.line}; box-shadow: -24px 0 50px -30px ${T.ink}; animation: ytdAdminDrawer .45s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-admin-book-preview { display: grid; align-content: start; gap: 12px; padding: 28px; color: ${T.ink}; background: ${T.paper}; }
+  .ytd-admin-book-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .ytd-admin-book-preview-head button { display: grid; place-items: center; border: 1px solid ${T.line}; color: ${T.inkSoft}; background: transparent; cursor: pointer; }
+  .ytd-admin-book-preview-cover { width: 100%; max-height: 280px; object-fit: cover; border: 1px solid ${T.line}; }
+  .ytd-admin-book-preview h2 { margin: 0; font: 500 32px/1.1 'Fraunces', serif; }
+  .ytd-admin-book-preview-author { margin: 0; color: ${T.inkSoft}; font: 13px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-preview-description { margin: 4px 0 0; color: ${T.inkSoft}; font: 14px/1.55 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-preview-note { margin-top: 10px; padding: 16px; border-left: 3px solid ${T.red}; background: ${T.paperAlt}; }
+  .ytd-admin-book-preview-note span { color: ${T.red}; font: 10px 'JetBrains Mono', monospace; text-transform: uppercase; }
+  .ytd-admin-book-preview-note p { margin: 8px 0 0; color: ${T.ink}; font: 18px/1.5 'Fraunces', serif; }
+  .ytd-admin-book-preview-reviews { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid ${T.line}; color: ${T.inkSoft}; font: 10px 'JetBrains Mono', monospace; text-transform: uppercase; }
+  .ytd-admin-book-preview-reviews strong { color: ${T.green}; }
+  .ytd-admin-book-preview-review-list { display: grid; gap: 8px; }
+  .ytd-admin-book-preview-review-list article { padding: 12px; border: 1px solid ${T.line}; background: ${T.paperAlt}; }
+  .ytd-admin-book-preview-review-list strong { color: ${T.ink}; font: 600 12px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-preview-review-list small { margin-left: 8px; color: ${T.inkSoft}; font: 9px 'JetBrains Mono', monospace; }
+  .ytd-admin-book-preview-review-list p { margin: 7px 0 0; color: ${T.ink}; font: 14px/1.45 'Fraunces', serif; }
+  .ytd-admin-book-preview-review-list > p { margin: 0; color: ${T.inkSoft}; font: 12px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-preview-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .ytd-admin-book-preview-actions a { display: inline-flex; align-items: center; gap: 6px; color: ${T.green}; font: 12px 'JetBrains Mono', monospace; }
+  .ytd-book-detail-cover { animation: ytdImageReveal .7s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-book-detail-copy { animation: ytdAdminIn .55s .12s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-book-reviews { margin-top: 72px; padding-top: 30px; border-top: 1px solid ${T.line}; animation: ytdAdminIn .55s .2s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-book-reviews-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+  .ytd-book-reviews-heading h2 { margin: 7px 0 0; color: ${T.ink}; font: 500 30px 'Fraunces', serif; }
+  .ytd-book-reviews-heading strong { color: ${T.green}; font: 28px 'Fraunces', serif; }
+  .ytd-book-review-list { display: grid; gap: 12px; }
+  .ytd-book-review { padding: 18px; border: 1px solid ${T.line}; background: ${T.paper}; animation: ytdAdminIn .45s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-book-review > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .ytd-book-review strong { color: ${T.ink}; font: 600 13px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-book-review small { color: ${T.inkSoft}; font: 10px 'JetBrains Mono', monospace; }
+  .ytd-book-review p { margin: 10px 0 0; color: ${T.ink}; font: 17px/1.55 'Fraunces', serif; }
+  .ytd-book-empty-review { color: ${T.inkSoft}; font: 14px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-book-review-form { display: grid; gap: 10px; margin-top: 24px; padding: 20px; border: 1px solid ${T.line}; background: ${T.paperAlt}; }
+  .ytd-book-review-form input, .ytd-book-review-form textarea { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid ${T.line}; outline: none; color: ${T.ink}; background: ${T.paper}; font: 13px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-book-review-form textarea { resize: vertical; }
+  .ytd-admin-books { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .ytd-admin-book-card { position: relative; display: flex; align-items: stretch; min-width: 0; overflow: hidden; border: 1px solid ${T.line}; background: ${T.paper}; opacity: 0; animation: ytdAdminIn .5s cubic-bezier(.16,1,.3,1) both; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .ytd-admin-book-card:hover { transform: translateY(-5px); border-color: ${T.green}; box-shadow: 0 16px 28px -22px ${T.greenDeep}; }
+  .ytd-admin-book-cover { display: grid; place-items: center; width: 62px; flex: 0 0 62px; color: ${T.paper}; }
+  .ytd-admin-book-cover img { width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+  .ytd-admin-book-cover img + svg { display: none; }
+  .ytd-admin-book-copy { min-width: 0; padding: 15px 38px 15px 16px; }
+  .ytd-admin-book-copy > span { color: ${T.green}; font: 9px 'JetBrains Mono', monospace; text-transform: uppercase; }
+  .ytd-admin-book-copy h2 { overflow: hidden; margin: 5px 0 2px; color: ${T.ink}; font: 500 18px/1.15 'Fraunces', serif; text-overflow: ellipsis; white-space: nowrap; }
+  .ytd-admin-book-copy small { color: ${T.inkSoft}; font: 11px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-book-copy p { display: -webkit-box; overflow: hidden; margin: 8px 0 0; color: ${T.inkSoft}; font: 11px/1.4 'Plus Jakarta Sans', sans-serif; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .ytd-admin-book-card .ytd-admin-icon-button { position: absolute; top: 12px; right: 12px; transition: color .2s ease, background .2s ease, transform .2s ease; }
+  .ytd-admin-book-card .ytd-admin-icon-button:hover { transform: rotate(-8deg); color: ${T.ink}; background: ${T.lime}; }
+  .ytd-admin-team-section { display: grid; gap: 18px; margin-top: 34px; padding-top: 26px; border-top: 1px solid ${T.line}; }
+  .ytd-admin-team-heading { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
+  .ytd-admin-team-heading h2 { margin: 5px 0 5px; color: ${T.ink}; font: 500 27px 'Fraunces', serif; }
+  .ytd-admin-team-heading p { margin: 0; color: ${T.inkSoft}; font: 12px/1.5 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-team-count { padding: 6px 9px; color: ${T.greenDeep}; background: ${T.lime}; font: 10px 'JetBrains Mono', monospace; white-space: nowrap; }
+  .ytd-admin-role-legend { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .ytd-admin-role-legend > div { padding: 11px; border: 1px solid ${T.line}; background: ${T.paper}; }
+  .ytd-admin-role-legend strong { display: block; color: ${T.ink}; font: 600 11px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-role-legend span { display: block; margin-top: 5px; color: ${T.inkSoft}; font: 10px/1.4 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-members { display: grid; gap: 8px; }
+  .ytd-admin-member { display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid ${T.line}; background: ${T.paper}; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .ytd-admin-member:hover { transform: translateX(4px); border-color: ${T.green}; box-shadow: 0 10px 24px -20px ${T.greenDeep}; }
+  .ytd-admin-member-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; color: ${T.paper}; background: ${T.greenDeep}; border-radius: 50%; font: 600 13px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-member-main { min-width: 0; flex: 1; }
+  .ytd-admin-member-main strong { display: block; color: ${T.ink}; font: 600 13px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-member-main small { display: block; margin-top: 2px; color: ${T.inkSoft}; font: 11px 'JetBrains Mono', monospace; }
+  .ytd-admin-permissions { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .ytd-admin-permissions span { padding: 3px 6px; color: ${T.inkSoft}; background: ${T.paperAlt}; font: 9px 'JetBrains Mono', monospace; }
+  .ytd-admin-member-actions { display: grid; justify-items: end; gap: 7px; }
+  .ytd-admin-member-actions select { padding: 7px 8px; border: 1px solid ${T.line}; color: ${T.ink}; background: ${T.paper}; font: 10px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-member-status { color: ${T.green}; font: 9px 'JetBrains Mono', monospace; }
+  .ytd-admin-invite-form { display: grid; grid-template-columns: 1fr 170px auto; gap: 9px; align-items: end; }
+  .ytd-admin-settings { max-width: 980px; }
+  .ytd-admin-settings-card { display: grid; gap: 20px; padding: 24px; border: 1px solid ${T.line}; background: ${T.paper}; box-shadow: 0 16px 32px -28px ${T.greenDeep}; animation: ytdAdminIn .5s .08s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-admin-settings-card-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid ${T.line}; }
+  .ytd-admin-settings-card-heading span:first-child { color: ${T.green}; font: 10px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+  .ytd-admin-settings-card-heading h2 { margin: 6px 0 0; color: ${T.ink}; font: 500 25px 'Fraunces', serif; }
+  .ytd-admin-settings-index { color: ${T.inkSoft}; font: 11px 'JetBrains Mono', monospace; }
+  .ytd-admin-settings-fields { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 14px; }
+  @keyframes ytdAdminFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ytdAdminDrawer { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
   .ytd-admin-tab { position: relative; overflow: hidden; }
   .ytd-admin-tab::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: ${T.lime}; transform: scaleY(0); transition: transform .25s ease; }
   .ytd-admin-tab:hover::after, .ytd-admin-tab[aria-current='page']::after { transform: scaleY(1); }
@@ -310,7 +413,7 @@ export const GLOBAL_STYLES = `${FONTS}
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; }
-    .ytd-reveal, .ytd-stagger > *, .ytd-page-anim, .ytd-node-pulse circle:first-child, .ytd-node-line-draw, .ytd-app-shell, .ytd-cover img, .ytd-logo-btn, .ytd-hero-visual, .ytd-scroll-progress, .ytd-footer-cta::before, .ytd-admin-view, .ytd-admin-view-dashboard .ytd-stat-card, .ytd-admin-shell table tbody tr, .ytd-section-label, .ytd-dashboard-new, .ytd-dashboard-stat, .ytd-dashboard-panel, .ytd-dashboard-quick-actions, .ytd-editorial-hero .ytd-hero-visual::before, .ytd-editorial-hero .ytd-hero-visual::after, .ytd-newsletter-panel::before, .ytd-footer-cta::after, .ytd-footer-marquee span, .ytd-platform-pillar, .ytd-meet-hero-copy, .ytd-meet-hero-mark, .ytd-meet-method-card, .ytd-founder-portrait, .ytd-collab-hero, .ytd-collab-hero-note, .ytd-collab-aside, .ytd-collab-type, .ytd-collab-success { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
+    .ytd-reveal, .ytd-stagger > *, .ytd-page-anim, .ytd-node-pulse circle:first-child, .ytd-node-line-draw, .ytd-app-shell, .ytd-cover img, .ytd-logo-btn, .ytd-hero-visual, .ytd-scroll-progress, .ytd-footer-cta::before, .ytd-admin-view, .ytd-admin-view-dashboard .ytd-stat-card, .ytd-admin-shell table tbody tr, .ytd-section-label, .ytd-dashboard-new, .ytd-dashboard-stat, .ytd-dashboard-panel, .ytd-dashboard-quick-actions, .ytd-admin-modal-backdrop, .ytd-admin-book-modal, .ytd-editorial-hero .ytd-hero-visual::before, .ytd-editorial-hero .ytd-hero-visual::after, .ytd-newsletter-panel::before, .ytd-footer-cta::after, .ytd-footer-marquee span, .ytd-platform-pillar, .ytd-meet-hero-copy, .ytd-meet-hero-mark, .ytd-meet-method-card, .ytd-founder-portrait, .ytd-collab-hero, .ytd-collab-hero-note, .ytd-collab-aside, .ytd-collab-type, .ytd-collab-success { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
   }
   @media (max-width: 860px) {
     .ytd-desktop-nav { display: none !important; }
@@ -333,6 +436,7 @@ export const GLOBAL_STYLES = `${FONTS}
   @media (max-width: 640px) {
     .ytd-navbar > div:not(.ytd-scroll-progress) { padding-left: 16px !important; padding-right: 16px !important; }
     .ytd-logo-btn span { font-size: 20px !important; }
+    .ytd-logo-btn .ytd-brand-logo-frame { width: 132px; height: 32px; }
     .ytd-mobile-menu { padding-left: 16px !important; padding-right: 16px !important; }
     .ytd-home-hero { padding: 44px 18px 38px !important; gap: 22px !important; }
     .ytd-platform-intro { padding: 0 18px 48px !important; }
@@ -374,5 +478,40 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-books-grid { grid-template-columns: 1fr !important; }
     .ytd-book-cover { height: 260px !important; }
     .ytd-admin-main { padding: 20px 14px 44px !important; }
+    .ytd-admin-mobile-tabs { margin-right: -14px; margin-left: -14px; padding-right: 14px; padding-left: 14px; }
+    .ytd-admin-topbar { gap: 10px; padding-bottom: 18px; margin-bottom: 18px; }
+    .ytd-admin-topbar strong { font-size: 22px; }
+    .ytd-admin-live { font-size: 9px; }
+    .ytd-dashboard-hero { min-height: 0; padding: 20px; gap: 20px; }
+    .ytd-dashboard-hero h1 { font-size: 34px; }
+    .ytd-dashboard-action { width: 100%; justify-content: center; }
+    .ytd-dashboard-panel-heading { gap: 10px; }
+    .ytd-dashboard-panel-heading button { flex-shrink: 0; }
+    .ytd-dashboard-post, .ytd-dashboard-collab { align-items: start; }
+    .ytd-dashboard-post > .ytd-status-pill, .ytd-dashboard-collab > .ytd-status-pill { grid-column: 2; justify-self: start; }
+    .ytd-dashboard-bar-row { grid-template-columns: minmax(0, 1fr) 52px 16px; }
+    .ytd-admin-form input, .ytd-admin-form select { width: 100% !important; }
+    .ytd-admin-form > * { width: 100%; }
+    .ytd-admin-form button { width: 100%; justify-content: center; }
+    .ytd-admin-section-heading { align-items: flex-start; flex-direction: column; gap: 14px; }
+    .ytd-admin-section-heading .ytd-btn { width: 100%; justify-content: center; }
+    .ytd-admin-book-toolbar { align-items: stretch; flex-direction: column; }
+    .ytd-admin-search { min-width: 0; }
+    .ytd-admin-book-fields { grid-template-columns: 1fr; }
+    .ytd-admin-book-editor-actions { flex-direction: column; }
+    .ytd-admin-book-editor-actions .ytd-btn { justify-content: center; }
+    .ytd-admin-book-modal { width: 100%; padding: 18px !important; }
+    .ytd-admin-settings-card { padding: 18px; }
+    .ytd-admin-settings-fields { grid-template-columns: 1fr; }
+    .ytd-book-reviews { margin-top: 48px; }
+    .ytd-book-review-form .ytd-btn { justify-content: center; }
+    .ytd-admin-books { grid-template-columns: 1fr !important; }
+    .ytd-admin-team-heading { align-items: flex-start; flex-direction: column; }
+    .ytd-admin-role-legend { grid-template-columns: 1fr 1fr; }
+    .ytd-admin-member { align-items: flex-start; flex-wrap: wrap; }
+    .ytd-admin-member-actions { width: 100%; grid-template-columns: 1fr auto; display: grid; justify-items: stretch; align-items: center; }
+    .ytd-admin-member-status { text-align: right; }
+    .ytd-admin-invite-form { grid-template-columns: 1fr; }
+    .ytd-admin-invite-form .ytd-btn { justify-content: center; }
   }
 `;

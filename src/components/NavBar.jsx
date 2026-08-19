@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Menu, X, Settings, ArrowUpRight } from "lucide-react";
 import { T } from "../theme.js";
 import NodeMark from "./NodeMark.jsx";
+import BrandLogo from "./BrandLogo.jsx";
 
 export default function NavBar({ page, setPage }) {
   const [open, setOpen] = useState(false);
@@ -24,8 +25,7 @@ export default function NavBar({ page, setPage }) {
       <div className="ytd-scroll-progress" style={{ width: `${progress}%` }} />
       <div style={{ maxWidth: 1180, margin: "0 auto", padding: "15px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 28 }}>
         <button onClick={() => setPage("home")} className="ytd-logo-btn" style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
-          <NodeMark size={9} pulse />
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 23, color: T.ink }}>Yewtod <i style={{ color: T.red }}>SS</i></span>
+          <BrandLogo />
         </button>
 
         <div className="ytd-desktop-nav ytd-nav-links" style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" }}>
