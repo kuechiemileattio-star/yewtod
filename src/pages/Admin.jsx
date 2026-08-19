@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, LayoutGrid, FileText, BookOpen, Handshake, Image as ImageIcon,
-  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search,
+  Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search, X,
 } from "lucide-react";
 import { T } from "../theme.js";
 import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS } from "../data.js";
@@ -37,6 +37,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
   const [collabFilter, setCollabFilter] = useState("Tous");
   const [draftTitle, setDraftTitle] = useState("");
   const [draftCat, setDraftCat] = useState(CATEGORIES[0]);
+  const [isPostComposerOpen, setIsPostComposerOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [books, setBooks] = useState(BOOKS);
   const [bookFilter, setBookFilter] = useState("Toutes");
@@ -66,6 +67,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
     if (!draftTitle.trim()) return;
     setPosts([{ id: "d" + Date.now(), title: draftTitle, category: draftCat, date: new Date().toISOString().slice(0, 10), author: "Yewtod", readTime: "—", tags: [], tone: T.green, statut: "Brouillon" }, ...posts]);
     setDraftTitle("");
+    setIsPostComposerOpen(false);
   }
 
   function savePost(e) {
@@ -204,24 +206,9 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
             <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Publications</h1>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, marginBottom: 28 }}>Créer, modifier et publier articles, rapports, études, vidéos et notes.</p>
 
-            <form onSubmit={addDraft} className="ytd-admin-panel ytd-admin-form" style={{ display: "flex", gap: 10, marginBottom: 30, flexWrap: "wrap", alignItems: "flex-end", border: `1px solid ${T.line}`, padding: 18, background: T.paper }}>
-              <Field label="Titre du nouveau brouillon">
-                <input value={draftTitle} onChange={e => setDraftTitle(e.target.value)} style={{ ...inputStyle, width: 320 }} placeholder="Titre de la publication" />
-              </Field>
-              <Field label="Catégorie">
-                <select value={draftCat} onChange={e => setDraftCat(e.target.value)} style={{ ...inputStyle, width: 200 }}>
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-              </Field>
-              <Btn type="submit" variant="green"><Plus size={15} /> Créer le brouillon</Btn>
-            </form>
+            <div className="ytd-admin-add-bar"><span>Ajouter un contenu éditorial</span><Btn variant="green" onClick={() => setIsPostComposerOpen(true)}><Plus size={15} /> Nouvelle publication</Btn></div>
 
-            {editingPost && <form onSubmit={savePost} className="ytd-admin-panel ytd-admin-form" style={{ display: "flex", gap: 10, marginBottom: 30, flexWrap: "wrap", alignItems: "flex-end", border: `1px solid ${T.green}`, padding: 18, background: T.paper }}>
-              <Field label="Titre"><input required value={editingPost.title} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} style={{ ...inputStyle, width: 320 }} /></Field>
-              <Field label="Catégorie"><select value={editingPost.category} onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} style={{ ...inputStyle, width: 200 }}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></Field>
-              <Field label="Statut"><select value={editingPost.statut} onChange={e => setEditingPost({ ...editingPost, statut: e.target.value })} style={{ ...inputStyle, width: 160 }}><option>Publié</option><option>Brouillon</option></select></Field>
-              <Btn type="submit" variant="green">Enregistrer</Btn><Btn type="button" variant="outline" onClick={() => setEditingPost(null)}>Annuler</Btn>
-            </form>}
+            {(isPostComposerOpen || editingPost) && <div className="ytd-admin-modal-backdrop" onMouseDown={event => event.target === event.currentTarget && (setIsPostComposerOpen(false), setEditingPost(null))}><form onSubmit={editingPost ? savePost : addDraft} className="ytd-admin-panel ytd-admin-form ytd-admin-content-modal" role="dialog" aria-modal="true" aria-labelledby="post-modal-title"><div className="ytd-admin-book-editor-head"><div><span className="ytd-admin-kicker">{editingPost ? "Modification" : "Nouveau contenu"}</span><h2 id="post-modal-title">{editingPost ? "Modifier la publication" : "Créer un brouillon"}</h2></div><button type="button" onClick={() => { setIsPostComposerOpen(false); setEditingPost(null); }} aria-label="Fermer"><X size={18} /></button></div><Field label="Titre"><input required value={editingPost ? editingPost.title : draftTitle} onChange={e => editingPost ? setEditingPost({ ...editingPost, title: e.target.value }) : setDraftTitle(e.target.value)} style={inputStyle} placeholder="Titre de la publication" /></Field><Field label="Catégorie"><select value={editingPost ? editingPost.category : draftCat} onChange={e => editingPost ? setEditingPost({ ...editingPost, category: e.target.value }) : setDraftCat(e.target.value)} style={inputStyle}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></Field>{editingPost && <Field label="Statut"><select value={editingPost.statut} onChange={e => setEditingPost({ ...editingPost, statut: e.target.value })} style={inputStyle}><option>Publié</option><option>Brouillon</option></select></Field>}<div className="ytd-admin-book-editor-actions"><Btn type="submit" variant="green">Enregistrer</Btn><Btn type="button" variant="outline" onClick={() => { setIsPostComposerOpen(false); setEditingPost(null); }}>Annuler</Btn></div></form></div>}
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
               <thead>

@@ -2,7 +2,8 @@ import { FONTS, T } from "../theme.js";
 
 export const GLOBAL_STYLES = `${FONTS}
   * { box-sizing: border-box; }
-  body { margin: 0; min-width: 320px; overflow-x: hidden; background: ${T.paper}; }
+  html, body, #root { margin: 0; padding: 0; min-width: 320px; }
+  body { overflow-x: hidden; background: ${T.paper}; }
   html { scroll-behavior: smooth; }
   body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', sans-serif; }
   h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif !important; letter-spacing: -.02em; }
@@ -36,7 +37,7 @@ export const GLOBAL_STYLES = `${FONTS}
 
   .ytd-app-shell { position: relative; min-height: 100vh; overflow-x: clip; background-size: 180% 180% !important; animation: ytdAmbient 24s ease-in-out infinite; }
   .ytd-app-shell::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .26; background-image: linear-gradient(${T.line}38 1px, transparent 1px), linear-gradient(90deg, ${T.line}38 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, black, transparent 72%); }
-  .ytd-app-shell::after { content: ""; position: absolute; z-index: 0; top: -20%; left: -20%; width: 34%; height: 150%; pointer-events: none; background: linear-gradient(90deg, transparent, ${T.lime}14, transparent); filter: blur(12px); animation: ytdLightSweep 14s ease-in-out 2s infinite; }
+  .ytd-app-shell::after { content: ""; position: fixed; z-index: 0; top: 0; left: -20%; width: 34%; height: 100vh; pointer-events: none; background: linear-gradient(90deg, transparent, ${T.lime}14, transparent); filter: blur(12px); animation: ytdLightSweep 14s ease-in-out 2s infinite; }
   .ytd-home-page { position: relative; z-index: 1; }
   .ytd-platform-intro { position: relative; }
   .ytd-meet-page { position: relative; z-index: 1; }
@@ -200,6 +201,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-list-panel > div { transition: transform .22s ease, background .22s ease; border-radius: 4px; }
   .ytd-admin-list-panel > div:hover { transform: translateX(5px); background: ${T.paperAlt}; padding-left: 8px !important; }
   .ytd-admin-form { border-radius: 8px; box-shadow: 0 14px 30px -26px ${T.ink}99; }
+  .ytd-admin-add-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; padding: 12px 14px; border: 1px solid ${T.line}; background: ${T.paperAlt}; color: ${T.inkSoft}; font: 10px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+  .ytd-admin-content-modal { display: grid; gap: 18px; width: min(560px, 100%); max-height: min(88dvh, 700px); overflow-y: auto; padding: 28px; border: 1px solid ${T.line}; border-radius: 14px; background: ${T.paper}; box-shadow: 0 28px 70px -30px ${T.ink}; animation: ytdAdminModalIn .45s cubic-bezier(.16,1,.3,1) both; }
   .ytd-admin-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
   .ytd-admin-section-heading h1 { margin: 5px 0 6px; color: ${T.ink}; font: 500 32px 'Fraunces', serif; }
   .ytd-admin-section-heading p { margin: 0; color: ${T.inkSoft}; font: 13px/1.5 'Plus Jakarta Sans', sans-serif; }
@@ -215,8 +218,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-book-editor-head button, .ytd-admin-icon-button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid ${T.line}; color: ${T.inkSoft}; background: transparent; cursor: pointer; }
   .ytd-admin-book-fields { display: grid; grid-template-columns: 1.4fr 1.1fr 1fr 1fr; gap: 12px; }
   .ytd-admin-book-editor-actions { display: flex; gap: 9px; }
-  .ytd-admin-modal-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; justify-content: flex-end; overflow-y: auto; overscroll-behavior: contain; background: ${T.ink}88; animation: ytdAdminFade .25s ease both; }
-  .ytd-admin-book-modal { width: min(620px, 100%); min-height: 100dvh; max-height: 100dvh; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: 0; border: 0; border-left: 1px solid ${T.line}; box-shadow: -24px 0 50px -30px ${T.ink}; animation: ytdAdminDrawer .45s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-admin-modal-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 28px; overscroll-behavior: contain; background: ${T.ink}88; animation: ytdAdminFade .25s ease both; }
+  .ytd-admin-book-modal { width: min(700px, 100%); min-height: 0; max-height: min(88dvh, 820px); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: auto; border: 1px solid ${T.line}; border-radius: 14px; box-shadow: 0 28px 70px -30px ${T.ink}; animation: ytdAdminModalIn .45s cubic-bezier(.16,1,.3,1) both; }
   .ytd-admin-book-preview { display: grid; align-content: start; gap: 12px; padding: 28px; color: ${T.ink}; background: ${T.paper}; }
   .ytd-admin-book-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .ytd-admin-book-preview-head button { display: grid; place-items: center; border: 1px solid ${T.line}; color: ${T.inkSoft}; background: transparent; cursor: pointer; }
@@ -297,6 +300,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-settings-fields { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 14px; }
   @keyframes ytdAdminFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes ytdAdminDrawer { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes ytdAdminModalIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .ytd-admin-tab { position: relative; overflow: hidden; }
   .ytd-admin-tab::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: ${T.lime}; transform: scaleY(0); transition: transform .25s ease; }
   .ytd-admin-tab:hover::after, .ytd-admin-tab[aria-current='page']::after { transform: scaleY(1); }
@@ -365,6 +369,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-dashboard-bar-row:hover i { filter: brightness(1.12); box-shadow: 0 0 10px ${T.red}66; }
   .ytd-dashboard-bar-row strong { color: ${T.ink}; text-align: right; }
   .ytd-footer-cta { position: relative; overflow: hidden; }
+  .ytd-footer { display: block; width: 100%; clear: both; margin: 0; padding: 0; background: ${T.ink}; }
+  .ytd-footer-legal { margin: 0; background: ${T.ink}; }
   .ytd-footer-cta { color: ${T.paper}; background: linear-gradient(115deg, ${T.greenDeep} 0%, ${T.greenDeep} 58%, ${T.red} 150%); }
   .ytd-footer-cta::after { content: ''; position: absolute; width: 420px; height: 420px; right: -90px; top: -250px; border: 1px solid ${T.lime}66; border-radius: 50%; box-shadow: 0 0 0 26px ${T.lime}10, 0 0 0 54px ${T.lime}08; animation: ytdAccentPulse 5s ease-in-out infinite; pointer-events: none; }
   .ytd-footer-eyebrow, .ytd-footer-heading { position: relative; z-index: 1; display: block; color: ${T.lime}; font: 10px 'JetBrains Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
@@ -449,6 +455,13 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-book-detail-page { padding-top: 38px !important; }
   }
   @media (max-width: 640px) {
+    .ytd-footer { margin: 0; }
+    .ytd-footer-cta-inner { gap: 24px !important; }
+    .ytd-footer-cta-button { width: 100%; justify-content: center; }
+    .ytd-footer-marquee { padding: 11px 0; font-size: 9px; }
+    .ytd-footer-base > div { grid-template-columns: 1fr !important; gap: 26px !important; }
+    .ytd-footer-brand, .ytd-footer-brand p { max-width: 100% !important; }
+    .ytd-footer-legal { padding: 16px 18px !important; line-height: 1.5; }
     .ytd-app-shell { background-size: 240% 240% !important; animation-duration: 40s; }
     .ytd-app-shell::after { animation-duration: 22s; opacity: .45; }
     .ytd-navbar > div:not(.ytd-scroll-progress) { padding-left: 16px !important; padding-right: 16px !important; }
@@ -523,7 +536,11 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-book-fields { grid-template-columns: 1fr; }
     .ytd-admin-book-editor-actions { flex-direction: column; }
     .ytd-admin-book-editor-actions .ytd-btn { justify-content: center; }
-    .ytd-admin-book-modal { width: 100%; padding: 18px !important; }
+    .ytd-admin-modal-backdrop { align-items: center; padding: 14px; }
+    .ytd-admin-book-modal { width: 100%; max-height: 94dvh; padding: 18px !important; border-radius: 12px; }
+    .ytd-admin-add-bar { align-items: stretch; flex-direction: column; }
+    .ytd-admin-add-bar .ytd-btn { width: 100%; justify-content: center; }
+    .ytd-admin-content-modal { max-height: 94dvh; padding: 18px; border-radius: 12px; }
     .ytd-admin-settings-card { padding: 18px; }
     .ytd-admin-settings-fields { grid-template-columns: 1fr; }
     .ytd-book-reviews { margin-top: 48px; }
