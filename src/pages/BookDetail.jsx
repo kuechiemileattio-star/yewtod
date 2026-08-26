@@ -28,13 +28,15 @@ export default function BookDetail({ book, reviews = [], onPublishReview, back, 
         <div className="ytd-book-detail-copy">
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.green, textTransform: "uppercase" }}>{book.category} · {book.difficulty}</span>
           <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(34px, 5vw, 54px)", fontWeight: 500, lineHeight: 1.08, margin: "12px 0 6px" }}>{book.title}</h1>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: T.inkSoft, margin: "0 0 28px" }}>{book.author}</p>
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: T.inkSoft, margin: "0 0 28px" }}>{book.author}{book.publisher ? ` · ${book.publisher}` : ""}{book.publicationYear ? ` · ${book.publicationYear}` : ""}</p>
           <div style={{ borderLeft: `3px solid ${T.red}`, padding: "4px 0 4px 18px", marginBottom: 30 }}>
             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: T.red, textTransform: "uppercase" }}>Avis de Yewtod</span>
-            <p style={{ fontFamily: "'Newsreader', serif", fontSize: 22, lineHeight: 1.45, margin: "8px 0 0" }}>{book.note}</p>
+            <p style={{ fontFamily: "'Newsreader', serif", fontSize: 22, lineHeight: 1.45, margin: "8px 0 0" }}>{book.personalReview}</p>
           </div>
-          <p style={{ fontFamily: "'Newsreader', serif", fontSize: 19, lineHeight: 1.7 }}>{book.description || "Une fiche de lecture pour situer ce livre, préciser ce qu'il apporte et donner des pistes pour poursuivre la réflexion."}</p>
-          {book.link ? <a href={book.link} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: T.green, fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}><ExternalLink size={15} /> Ressource externe</a> : <Btn variant="outline" style={{ marginTop: 12 }}><ExternalLink size={15} /> Ressource à venir</Btn>}
+          <p style={{ fontFamily: "'Newsreader', serif", fontSize: 19, lineHeight: 1.7, whiteSpace: "pre-line" }}>{book.summary || "Une fiche de lecture pour situer ce livre, préciser ce qu'il apporte et donner des pistes pour poursuivre la réflexion."}</p>
+          {book.favoriteQuotes && <section style={{ marginTop: 28 }}><h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 500 }}>Citations favorites</h2><p style={{ fontFamily: "'Newsreader', serif", fontSize: 18, lineHeight: 1.6, whiteSpace: "pre-line" }}>{book.favoriteQuotes}</p></section>}
+          {book.similar && <section style={{ marginTop: 28 }}><h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 500 }}>Ouvrages similaires</h2><p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, lineHeight: 1.7, whiteSpace: "pre-line" }}>{book.similar}</p></section>}
+          {book.purchaseOrReadLink ? <a href={book.purchaseOrReadLink} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: T.green, fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}><ExternalLink size={15} /> Ressource externe</a> : <Btn variant="outline" style={{ marginTop: 12 }}><ExternalLink size={15} /> Ressource à venir</Btn>}
         </div>
       </div>
       <section className="ytd-book-reviews">

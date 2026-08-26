@@ -28,13 +28,17 @@ export default function BookEditorModal({ book, onChange, onSave, onClose }) {
         <div className="ytd-admin-book-fields">
           <Field label="Titre"><input required value={book.title} onChange={update("title")} style={inputStyle} /></Field>
           <Field label="Auteur"><input required value={book.author} onChange={update("author")} style={inputStyle} /></Field>
+          <Field label="Maison d'édition"><input value={book.publisher || ""} onChange={update("publisher")} style={inputStyle} /></Field>
+          <Field label="Année de publication"><input type="number" value={book.publicationYear || ""} onChange={update("publicationYear")} style={inputStyle} /></Field>
           <Field label="Catégorie"><select value={book.category} onChange={update("category")} style={inputStyle}>{BOOK_CATEGORIES.map(category => <option key={category}>{category}</option>)}</select></Field>
-          <Field label="Niveau"><select value={book.difficulty} onChange={update("difficulty")} style={inputStyle}><option>Accessible</option><option>Intermédiaire</option><option>Exigeant</option></select></Field>
+          <Field label="Niveau de difficulté"><select value={book.difficultyLevel || "débutant"} onChange={update("difficultyLevel")} style={inputStyle}><option>débutant</option><option>intermédiaire</option><option>avancé</option></select></Field>
         </div>
-        <Field label="Description du livre"><textarea rows={4} value={book.description || ""} onChange={update("description")} placeholder="Présenter le livre et son intérêt" style={{ ...inputStyle, resize: "vertical" }} /></Field>
-        <Field label="Avis éditorial de Yewtod"><textarea required rows={5} value={book.note} onChange={update("note")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
-        <Field label="Image de couverture"><input type="url" value={book.cover || ""} onChange={update("cover")} placeholder="https://.../image.jpg" style={inputStyle} /></Field>
-        <Field label="Lien vers une ressource"><input value={book.link || ""} onChange={update("link")} placeholder="https://..." style={inputStyle} /></Field>
+        <Field label="Résumé"><textarea rows={4} value={book.summary || ""} onChange={update("summary")} placeholder="Présenter le livre et son intérêt" style={{ ...inputStyle, resize: "vertical" }} /></Field>
+        <Field label="Avis personnel"><textarea required rows={5} value={book.personalReview || ""} onChange={update("personalReview")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
+        <Field label="Citations favorites"><textarea rows={4} value={book.favoriteQuotes || ""} onChange={update("favoriteQuotes")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
+        <Field label="Ouvrages similaires"><textarea rows={3} value={book.similar || ""} onChange={update("similar")} placeholder="Un ouvrage par ligne" style={{ ...inputStyle, resize: "vertical" }} /></Field>
+        <Field label="Couverture"><input type="url" value={book.coverImage || ""} onChange={update("coverImage")} placeholder="https://.../image.jpg" style={inputStyle} /></Field>
+        <Field label="Lien d'achat ou de consultation"><input type="url" value={book.purchaseOrReadLink || ""} onChange={update("purchaseOrReadLink")} placeholder="https://..." style={inputStyle} /></Field>
         <div className="ytd-admin-book-editor-actions"><Btn type="submit" variant="green"><Save size={15} /> Enregistrer la fiche</Btn><Btn type="button" variant="outline" onClick={onClose}>Annuler</Btn></div>
       </form>
     </div>

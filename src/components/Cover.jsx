@@ -1,7 +1,7 @@
 import React from "react";
 import { T } from "../theme.js";
 
-export default function Cover({ tone, label, tall }) {
+export default function Cover({ tone, label, tall, image }) {
   const images = {
     Articles: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=85",
     Rapports: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=85",
@@ -24,7 +24,7 @@ export default function Cover({ tone, label, tall }) {
         display: "flex", alignItems: "flex-end",
       }}
     >
-      {images[label] && <img loading="lazy" src={images[label]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.78) contrast(.96)", opacity: 0.86 }} />}
+      {(image || images[label]) && <img loading="lazy" src={image || images[label]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.78) contrast(.96)", opacity: 0.86 }} />}
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 35%, ${T.ink}99 100%)` }} />
       <svg className="ytd-cover-lines" width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.5 }} preserveAspectRatio="none">
         <line x1="0%" y1="30%" x2="100%" y2="10%" stroke={tone} strokeWidth="1" opacity="0.25" />

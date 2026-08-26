@@ -4,7 +4,7 @@ import {
   Settings, Archive, Filter, Plus, BarChart3, Inbox, Edit3, Trash2, Search,
 } from "lucide-react";
 import { T } from "../theme.js";
-import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS } from "../data.js";
+import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS, emptyContentFields } from "../data.js";
 import NodeMark from "../components/NodeMark.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -38,6 +38,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
   const [collabFilter, setCollabFilter] = useState("Tous");
   const [draftTitle, setDraftTitle] = useState("");
   const [draftCat, setDraftCat] = useState(CATEGORIES[0]);
+  const [draftFields, setDraftFields] = useState(() => emptyContentFields(CATEGORIES[0]));
   const [isPostComposerOpen, setIsPostComposerOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [books, setBooks] = useState(BOOKS);
@@ -66,8 +67,9 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
   function addDraft(e) {
     e.preventDefault();
     if (!draftTitle.trim()) return;
-    setPosts([{ id: "d" + Date.now(), title: draftTitle, category: draftCat, date: new Date().toISOString().slice(0, 10), author: "Yewtod", readTime: "—", tags: [], tone: T.green, statut: "Brouillon" }, ...posts]);
+    setPosts([{ id: "d" + Date.now(), title: draftTitle, category: draftCat, date: new Date().toISOString().slice(0, 10), author: "Yewtod", readTime: "—", tags: [], tone: T.green, statut: "Brouillon", ...draftFields }, ...posts]);
     setDraftTitle("");
+    setDraftFields(emptyContentFields(draftCat));
     setIsPostComposerOpen(false);
   }
 
@@ -209,7 +211,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
 
             <div className="ytd-admin-add-bar"><span>Ajouter un contenu éditorial</span><Btn variant="green" onClick={() => setIsPostComposerOpen(true)}><Plus size={15} /> Nouvelle publication</Btn></div>
 
-            {(isPostComposerOpen || editingPost) && <PostEditorModal post={editingPost} draftTitle={draftTitle} draftCat={draftCat} onChangePost={setEditingPost} onChangeDraft={setDraftTitle} onSave={editingPost ? savePost : addDraft} onClose={() => { setIsPostComposerOpen(false); setEditingPost(null); }} />}
+            {(isPostComposerOpen || editingPost) && <PostEditorModal post={editingPost} draftTitle={draftTitle} draftCat={draftCat} draftFields={draftFields} onChangePost={setEditingPost} onChangeDraft={setDraftTitle} onChangeDraftCat={setDraftCat} onChangeDraftFields={setDraftFields} onSave={editingPost ? savePost : addDraft} onClose={() => { setIsPostComposerOpen(false); setEditingPost(null); }} />}
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
               <thead>
@@ -239,13 +241,13 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
 
         {tab === "books" && (
           <div className="ytd-admin-view">
-            <div className="ytd-admin-section-heading"><div><span className="ytd-admin-kicker">Bibliothèque éditoriale</span><h1>Livres</h1><p>Organiser les références, enrichir les avis et préparer les fiches publiques.</p></div><Btn variant="green" onClick={() => setEditingBook({ id: "b" + Date.now(), title: "", author: "", category: BOOK_CATEGORIES[0], difficulty: "Accessible", description: "", note: "", reviews: [], link: "", tone: T.green })}><Plus size={15} /> Ajouter un livre</Btn></div>
+            <div className="ytd-admin-section-heading"><div><span className="ytd-admin-kicker">Bibliothèque éditoriale</span><h1>Livres</h1><p>Organiser les références, enrichir les avis et préparer les fiches publiques.</p></div><Btn variant="green" onClick={() => setEditingBook({ id: "b" + Date.now(), title: "", author: "", publisher: "", publicationYear: "", category: BOOK_CATEGORIES[0], difficultyLevel: "débutant", summary: "", personalReview: "", favoriteQuotes: "", similarBooks: "", reviews: [], purchaseOrReadLink: "", coverImage: "", tone: T.green })}><Plus size={15} /> Ajouter un livre</Btn></div>
             <div className="ytd-admin-book-toolbar">
               <label className="ytd-admin-search"><Search size={15} /><input value={bookSearch} onChange={e => setBookSearch(e.target.value)} placeholder="Rechercher un livre ou un auteur" /></label>
               <div className="ytd-admin-filter-scroll">{["Toutes", ...BOOK_CATEGORIES].map(category => <button key={category} onClick={() => setBookFilter(category)} className={bookFilter === category ? "is-active" : ""}>{category}</button>)}</div>
             </div>
             <div className="ytd-admin-books">
-              {books.filter(book => (bookFilter === "Toutes" || book.category === bookFilter) && `${book.title} ${book.author}`.toLowerCase().includes(bookSearch.toLowerCase())).map((book, index) => <article key={book.id} className="ytd-admin-book-card" style={{ animationDelay: `${index * 55}ms` }} onClick={() => setPreviewBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} onKeyDown={event => event.key === "Enter" && setPreviewBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} role="button" tabIndex={0}><div className="ytd-admin-book-cover" style={{ background: `linear-gradient(145deg, ${book.tone}, ${T.greenDeep})` }}><img src={book.cover || BOOK_COVERS[book.title]} alt={`Couverture de ${book.title}`} onError={e => { e.currentTarget.style.display = "none"; }} /><BookOpen size={22} /></div><div className="ytd-admin-book-copy"><span>{book.category} · {book.difficulty}</span><h2>{book.title}</h2><small>{book.author}</small><p>{book.note}</p></div><button className="ytd-admin-icon-button" onClick={event => { event.stopPropagation(); setEditingBook({ ...book, cover: book.cover || BOOK_COVERS[book.title] || "" }); }} aria-label={`Modifier ${book.title}`}><Edit3 size={16} /></button></article>)}
+              {books.filter(book => (bookFilter === "Toutes" || book.category === bookFilter) && `${book.title} ${book.author}`.toLowerCase().includes(bookSearch.toLowerCase())).map((book, index) => <article key={book.id} className="ytd-admin-book-card" style={{ animationDelay: `${index * 55}ms` }} onClick={() => setPreviewBook({ ...book, coverImage: book.coverImage || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} onKeyDown={event => event.key === "Enter" && setPreviewBook({ ...book, coverImage: book.coverImage || BOOK_COVERS[book.title] || "", reviews: visitorReviews[book.id] || [] })} role="button" tabIndex={0}><div className="ytd-admin-book-cover" style={{ background: `linear-gradient(145deg, ${book.tone}, ${T.greenDeep})` }}><img src={book.coverImage || BOOK_COVERS[book.title]} alt={`Couverture de ${book.title}`} onError={e => { e.currentTarget.style.display = "none"; }} /><BookOpen size={22} /></div><div className="ytd-admin-book-copy"><span>{book.category} · {book.difficulty}</span><h2>{book.title}</h2><small>{book.author}</small><p>{book.personalReview}</p></div><button className="ytd-admin-icon-button" onClick={event => { event.stopPropagation(); setEditingBook({ ...book, coverImage: book.coverImage || BOOK_COVERS[book.title] || "" }); }} aria-label={`Modifier ${book.title}`}><Edit3 size={16} /></button></article>)}
             </div>
             {editingBook && <BookEditorModal book={editingBook} onChange={setEditingBook} onSave={saveBook} onClose={() => setEditingBook(null)} />}
             {previewBook && <BookPreviewModal book={previewBook} reviews={visitorReviews[previewBook.id] || []} onEdit={() => { setEditingBook(previewBook); setPreviewBook(null); }} onClose={() => setPreviewBook(null)} />}
