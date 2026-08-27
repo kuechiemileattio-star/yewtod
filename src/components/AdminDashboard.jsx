@@ -3,8 +3,9 @@ import { ArrowUpRight, BarChart3, BookOpen, FileText, Inbox, Plus, TrendingUp } 
 import { T } from "../theme.js";
 import { ADMIN_COLLABS, CATEGORIES, WORKS } from "../data.js";
 import StatusPill from "./StatusPill.jsx";
+import Cover from "./Cover.jsx";
 
-export default function AdminDashboard({ posts, onNewPost, onViewPosts, onViewCollabs, onViewBooks }) {
+export default function AdminDashboard({ posts, onNewPost, onViewPosts, onViewCollabs, onViewBooks, onViewPost }) {
   const stats = [
     ["Publications", posts.length, FileText, "+12% ce mois"],
     ["Brouillons", posts.filter(post => post.statut === "Brouillon").length, TrendingUp, "À finaliser"],
@@ -43,13 +44,12 @@ export default function AdminDashboard({ posts, onNewPost, onViewPosts, onViewCo
       <div className="ytd-dashboard-grid">
         <section className="ytd-dashboard-panel ytd-dashboard-publications">
           <div className="ytd-dashboard-panel-heading"><div><span>Flux éditorial</span><h2>Dernières publications</h2></div><button onClick={onViewPosts}>Voir tout <ArrowUpRight size={14} /></button></div>
-          <div className="ytd-dashboard-post-list">
+          <div className="ytd-dashboard-post-list ytd-dashboard-post-grid">
             {posts.slice(0, 5).map((post, index) => (
-              <div className="ytd-dashboard-post" key={post.id}>
-                <span className="ytd-dashboard-index">0{index + 1}</span>
-                <div><strong>{post.title}</strong><small>{post.category} · {post.date}</small></div>
-                <StatusPill statut={post.statut} />
-              </div>
+              <article className="ytd-dashboard-post" key={post.id} style={{ animationDelay: `${index * 70}ms` }} tabIndex={0} role="button" onClick={() => onViewPost(post)} onKeyDown={event => (event.key === "Enter" || event.key === " ") && onViewPost(post)}>
+                <Cover tone={post.tone} label={post.category} title={post.title} image={post.coverImage} />
+                <div className="ytd-dashboard-post-meta"><small>{post.date}</small><StatusPill statut={post.statut} /></div>
+              </article>
             ))}
           </div>
         </section>

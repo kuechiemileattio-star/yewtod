@@ -3,9 +3,9 @@ import { T } from "../theme.js";
 import { BOOKS, BOOK_CATEGORIES, BOOK_COVERS } from "../data.js";
 import Reveal from "../components/Reveal.jsx";
 
-export default function Books({ openBook }) {
+export default function Books({ openBook, books = BOOKS }) {
   const [cat, setCat] = useState("Toutes");
-  const filtered = cat === "Toutes" ? BOOKS : BOOKS.filter(b => b.category === cat);
+  const filtered = cat === "Toutes" ? books : books.filter(b => b.category === cat);
 
   return (
     <div style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 110px" }}>

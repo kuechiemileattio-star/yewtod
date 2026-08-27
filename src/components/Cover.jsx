@@ -1,7 +1,7 @@
 import React from "react";
 import { T } from "../theme.js";
 
-export default function Cover({ tone, label, tall, image }) {
+export default function Cover({ tone, label, tall, image, title }) {
   const images = {
     Articles: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=85",
     Rapports: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=85",
@@ -33,6 +33,7 @@ export default function Cover({ tone, label, tall, image }) {
         <circle cx="82%" cy="10%" r="3" fill={tone} opacity="0.5" />
         <circle cx="60%" cy="75%" r="3" fill={tone} opacity="0.4" />
       </svg>
+      {title && <strong className="ytd-cover-title">{title}</strong>}
       <span className="ytd-cover-label" style={{
         fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: "0.06em",
         textTransform: "uppercase", color: T.paper, background: `${T.ink}D9`, padding: "5px 9px",

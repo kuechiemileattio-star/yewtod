@@ -1,40 +1,55 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 import { T } from "../theme.js";
-import { WORKS, CONTENT_FIELDS, fmtDate } from "../data.js";
+import { WORKS, CONTENT_FIELDS, DEFAULT_MEDIA, fmtDate } from "../data.js";
 import Divider from "../components/Divider.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
 import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
+import MediaDisplay, { extractMediaUrls, isVideoMedia } from "../components/MediaDisplay.jsx";
 
-export default function WorkDetail({ work, back, openWork }) {
+const IMAGE_FIELDS = new Set(["images", "screenshots", "illustrations", "imageDownload"]);
+const VIDEO_FIELDS = new Set(["video", "videos", "embeddedVideos", "trailer"]);
+
+export default function WorkDetail({ work, back, openWork, works = WORKS }) {
   if (!work) return null;
-  const related = WORKS.filter(w => w.id !== work.id && w.category === work.category).slice(0, 3);
+  const related = works.filter(w => w.id !== work.id && w.category === work.category && w.statut !== "Brouillon").slice(0, 3);
   const structuredFields = (CONTENT_FIELDS[work.category] || []).filter(([key]) => work[key]);
+  const mediaFields = structuredFields.filter(([key]) => IMAGE_FIELDS.has(key) || VIDEO_FIELDS.has(key));
+  const textFields = structuredFields.filter(([key]) => !IMAGE_FIELDS.has(key) && !VIDEO_FIELDS.has(key));
+  const associatedMedia = mediaFields.flatMap(([key, label]) => extractMediaUrls(work[key]).map(url => ({ key, label, url, type: VIDEO_FIELDS.has(key) || isVideoMedia(url) ? "video" : "image" })));
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px 110px" }}>
+    <div className="ytd-work-detail-page" style={{ maxWidth: 1000, margin: "0 auto", padding: "56px 24px 110px" }}>
       <button onClick={back} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, marginBottom: 36 }}>
         <ArrowLeft size={15} /> Retour aux Works
       </button>
-      <Tag>{work.category}</Tag>
-      <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(30px, 4.5vw, 44px)", fontWeight: 500, lineHeight: 1.12, margin: "16px 0 18px" }}>{work.title}</h1>
-      <div style={{ display: "flex", gap: 16, alignItems: "center", fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, color: T.inkSoft, marginBottom: 32 }}>
+      <div className="ytd-work-detail-hero"><div><Tag>{work.category}</Tag><h1>{work.title}</h1>
+      <div className="ytd-work-detail-meta">
         <span>{work.author}</span><span>·</span><span>{fmtDate(work.date)}</span><span>·</span><span>{work.readTime}</span>
-      </div>
-      <Cover tone={work.tone} label={work.category} tall image={work.coverImage} />
-      <div style={{ fontFamily: "'Newsreader', serif", fontSize: 19, lineHeight: 1.75, color: T.ink, marginTop: 36 }}>
+      </div></div><div className="ytd-work-detail-index"><span>Publication</span><strong>{String(work.id).replace("w", "").padStart(2, "0")}</strong><small>Yewtod SS</small></div></div>
+      <div className="ytd-work-detail-cover"><Cover tone={work.tone} label={work.category} tall image={work.coverImage || DEFAULT_MEDIA[work.category]?.image} /></div>
+      <div className="ytd-work-detail-body" style={{ fontFamily: "'Newsreader', serif", fontSize: 19, lineHeight: 1.75, color: T.ink }}>
         <p style={{ fontWeight: 500, fontSize: 21 }}>{work.subtitle || work.excerpt}</p>
-        {structuredFields.map(([key, label]) => (
-          <section key={key} style={{ marginTop: 34 }}>
-            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 500, lineHeight: 1.15, margin: "0 0 10px" }}>{label}</h2>
-            <p style={{ whiteSpace: "pre-line", margin: 0 }}>{work[key]}</p>
-          </section>
-        ))}
+        <div className="ytd-work-detail-attributes">
+          {textFields.map(([key, label], index) => (
+            <section className={`ytd-work-detail-section ytd-detail-attribute-${key}`} key={key} style={{ animationDelay: `${Math.min(index, 6) * 70}ms` }}>
+              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 500, lineHeight: 1.15, margin: "0 0 10px" }}>{label}</h2>
+              <p style={{ whiteSpace: "pre-line", margin: 0 }}>{work[key]}</p>
+            </section>
+          ))}
+          {mediaFields.filter(([key]) => extractMediaUrls(work[key]).length === 0).map(([key, label], index) => (
+            <section className={`ytd-work-detail-section ytd-detail-attribute-${key}`} key={key} style={{ animationDelay: `${Math.min(index + textFields.length, 6) * 70}ms` }}>
+              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 500, lineHeight: 1.15, margin: "0 0 10px" }}>{label}</h2>
+              <p style={{ whiteSpace: "pre-line", margin: 0 }}>{work[key]}</p>
+            </section>
+          ))}
+        </div>
+        {mediaFields.some(([key]) => extractMediaUrls(work[key]).length > 0) && <section className="ytd-work-detail-media-section"><h2>Médias associés</h2><div className="ytd-work-detail-media-grid">{associatedMedia.map(({ key, label, url, type }) => <figure key={`${key}-${url}`}><MediaDisplay type={type} url={url} alt={label} /><figcaption>{label}</figcaption></figure>)}</div></section>}
         {!structuredFields.length && <><p>Ce contenu est un exemple de mise en page pour une publication complète : le corps de l'article s'affiche ici en grande lisibilité, avec une colonne resserrée pour un confort de lecture proche de celui d'une publication éditoriale longue.</p><p>La structure peut accueillir des médias intégrés, des encadrés de données, des citations mises en valeur, des références bibliographiques et des publications associées.</p></>}
       </div>
 
-      <Divider margin="56px 0 40px" />
+      <Divider margin="68px 0 40px" />
       <SectionLabel>Publications associées</SectionLabel>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }} className="ytd-grid-3">
         {related.map((w, i) => (

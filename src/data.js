@@ -9,6 +9,17 @@ export const CATEGORIES = [
   "Séries documentaires", "Épisodes documentaires", "Expérimentations", "Visualisations de données",
 ];
 
+export const DEFAULT_MEDIA = {
+  Articles: { image: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=85" },
+  Rapports: { image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=85" },
+  Études: { image: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=85" },
+  "Notes de recherche": { image: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1200&q=85" },
+  "Séries documentaires": { image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=85", video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" },
+  "Épisodes documentaires": { image: "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=1200&q=85", video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" },
+  Expérimentations: { image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=85" },
+  "Visualisations de données": { image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=85" },
+};
+
 const ARTICLE_FIELDS = [
   ["subtitle", "Sous-titre", "text"], ["coverImage", "Image de couverture", "url"], ["summary", "Résumé", "textarea"],
   ["content", "Contenu", "textarea"], ["quotes", "Citations mises en avant", "textarea"], ["images", "Images intégrées", "textarea"],
@@ -143,7 +154,8 @@ const WORK_DETAILS = {
     quotes: "« Le comportement d'un système ne se comprend pas en isolant ses éléments. »",
     references: "Donella Meadows, Thinking in Systems\nPeter Senge, The Fifth Discipline",
     images: "Schéma des boucles de rétroaction · figure 1",
-    videos: "Entretien avec une chercheuse en politiques publiques · 04:32",
+    videos: "Entretien avec une chercheuse en politiques publiques · 04:32 · https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    embeddedVideos: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     related: "w4, w6",
   },
   w2: {
@@ -214,8 +226,8 @@ const WORK_DETAILS = {
     description: "Une série documentaire consacrée aux personnes qui construisent des solutions simples pour des problèmes difficiles.",
     theme: "Innovation frugale, autonomie locale et apprentissage par le terrain.",
     episodes: "Épisode 1 · Réparer plutôt que remplacer\nÉpisode 2 · Produire avec moins\nÉpisode 3 · Organiser l'entraide",
-    trailer: "Bande-annonce à venir.",
-    videos: "Épisode 1 · 18 minutes · publication en ligne",
+    trailer: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    videos: "Épisode 1 · 18 minutes · https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     guests: "Artisans, ingénieurs et entrepreneurs sociaux d'Afrique de l'Ouest.",
     resources: "Carnet de terrain et bibliographie de la série.",
     related: "w6, w8",
@@ -243,7 +255,7 @@ const WORK_DETAILS = {
   w10: {
     episodeNumber: "Épisode 1",
     summary: "À Cotonou, un atelier transforme des objets usés en outils du quotidien et transmet ses savoir-faire à de jeunes apprentis.",
-    video: "https://video.example.com/yewtod/reparer-plutot-que-remplacer",
+    video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     transcription: "Transcription intégrale disponible avec la vidéo.",
     guests: "Afi Lawson · réparatrice et formatrice",
     chapters: "00:00 · Le problème de l'obsolescence\n05:20 · Le geste de réparation\n12:45 · Transmettre un métier",
@@ -255,6 +267,7 @@ const WORK_DETAILS = {
 
 WORKS.forEach(work => Object.assign(work, WORK_DETAILS[work.id] || {}));
 WORKS.forEach(work => Object.assign(work, {
+  isSeed: true,
   coverImage: work.coverImage || work.cover || "",
   publishedAt: work.publishedAt || work.date,
   readingTime: work.readingTime || Number.parseInt(work.readTime, 10) || 0,
@@ -305,6 +318,7 @@ const BOOK_DETAILS = {
 
 BOOKS.forEach(book => Object.assign(book, BOOK_DETAILS[book.id] || {}));
 BOOKS.forEach(book => Object.assign(book, {
+  isSeed: true,
   coverImage: book.coverImage || "",
   publicationYear: book.publicationYear || book.year || "",
   summary: book.summary || book.description || "",

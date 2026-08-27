@@ -1,23 +1,12 @@
 import React, { useState } from "react";
 import { T } from "../theme.js";
-import { WORKS, CATEGORIES, fmtDate } from "../data.js";
+import { WORKS, CATEGORIES } from "../data.js";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
-import Tag from "../components/Tag.jsx";
 
-const TYPE_GUIDANCE = {
-  Articles: "Analyse argumentée, sources et prise de position claire.",
-  Rapports: "Synthèse documentée, méthodologie, résultats et recommandations.",
-  Études: "Question de recherche, terrain, méthode et discussion des résultats.",
-  "Notes de recherche": "Hypothèse courte, observations de terrain et pistes à tester.",
-  "Séries documentaires": "Épisode, contexte, intervenants et format audiovisuel.",
-  Expérimentations: "Protocole, données, limites et ce que l'essai permet d'apprendre.",
-  "Visualisations de données": "Jeu de données, méthode de lecture et visualisation interactive.",
-};
-
-export default function Works({ openWork }) {
+export default function Works({ openWork, works = WORKS }) {
   const [cat, setCat] = useState("Toutes");
-  const filtered = cat === "Toutes" ? WORKS : WORKS.filter(w => w.category === cat);
+  const filtered = (cat === "Toutes" ? works : works.filter(w => w.category === cat)).filter(w => w.statut !== "Brouillon" && w.statut !== "Programmé");
 
   return (
     <div style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 100px" }}>
@@ -41,16 +30,9 @@ export default function Works({ openWork }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }} className="ytd-grid-3">
         {filtered.map((w, i) => (
           <Reveal key={w.id} delay={(i % 3) * 80} as="div">
-          <div onClick={() => openWork(w)} className="ytd-card" style={{ cursor: "pointer" }}>
-            <Cover tone={w.tone} label={w.category} tall />
-            <div style={{ marginTop: 16 }}>
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: T.inkSoft }}>{fmtDate(w.date)} · {w.readTime}</span>
-              <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 20, fontWeight: 600, margin: "8px 0 8px", lineHeight: 1.25 }}>{w.title}</h3>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, lineHeight: 1.55, margin: "0 0 10px" }}>{w.excerpt}</p>
-              <span style={{ display: "block", fontFamily: "'Inter', sans-serif", fontSize: 12, color: T.green, lineHeight: 1.45, marginBottom: 10 }}>{TYPE_GUIDANCE[w.category]}</span>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{w.tags.map(t => <Tag key={t}>{t}</Tag>)}</div>
-            </div>
-          </div>
+          <article onClick={() => openWork(w)} onKeyDown={event => event.key === "Enter" && openWork(w)} className="ytd-card ytd-work-card" style={{ cursor: "pointer" }} role="link" tabIndex={0} aria-label={`Voir le détail de ${w.title}`}>
+            <Cover tone={w.tone} label={w.category} title={w.title} tall image={w.coverImage} />
+          </article>
           </Reveal>
         ))}
       </div>

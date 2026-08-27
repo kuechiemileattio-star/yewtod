@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { BOOKS, WORKS, ADMIN_COLLABS } from "../data.js";
 
-function readRoute() {
+function readRoute(works = WORKS, books = BOOKS) {
   const segments = window.location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const section = segments[0] || "home";
   const id = segments[1];
 
-  if (section === "work" && id) return { page: "work-detail", activeWork: WORKS.find(work => work.id === id) || null };
-  if (section === "book" && id) return { page: "book-detail", activeBook: BOOKS.find(book => book.id === id) || null };
+  if (section === "work" && id) return { page: "work-detail", activeWork: works.find(work => work.id === id) || null };
+  if (section === "book" && id) return { page: "book-detail", activeBook: books.find(book => book.id === id) || null };
   if (section === "collaboration" && id) return { page: "collab-detail", activeCollab: ADMIN_COLLABS.find(collab => collab.id === id) || null };
   if (["home", "works", "meet", "books", "collab", "admin"].includes(section)) return { page: section };
   return { page: "home" };
@@ -20,14 +20,14 @@ function routeFor(page, item) {
   return `#/${page}`;
 }
 
-export default function useAppNavigation() {
-  const [route, setRoute] = useState(readRoute);
+export default function useAppNavigation(works = WORKS, books = BOOKS) {
+  const [route, setRoute] = useState(() => readRoute(works, books));
   const navigationDepth = useRef(0);
 
   useEffect(() => {
     if (!window.location.hash) window.history.replaceState({}, "", "#/home");
     const handleRouteChange = () => {
-      setRoute(readRoute());
+      setRoute(readRoute(works, books));
       navigationDepth.current = Math.max(0, navigationDepth.current - 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -37,7 +37,7 @@ export default function useAppNavigation() {
       window.removeEventListener("hashchange", handleRouteChange);
       window.removeEventListener("popstate", handleRouteChange);
     };
-  }, []);
+  }, [works, books]);
 
   function navigate(page, item) {
     const nextHash = routeFor(page, item);

@@ -10,13 +10,14 @@ import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
 import Btn from "../components/Btn.jsx";
 
-export default function Home({ setPage, openWork }) {
+export default function Home({ setPage, openWork, works = WORKS }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const latest = WORKS[0];
-  const report = WORKS.find(w => w.category === "Rapports");
-  const video = WORKS.find(w => w.category === "Séries documentaires");
-  const featured = WORKS.slice(1, 5);
+  const publishedWorks = works.filter(work => work.statut !== "Brouillon" && work.statut !== "Programmé");
+  const latest = publishedWorks[0];
+  const report = publishedWorks.find(w => w.category === "Rapports");
+  const video = publishedWorks.find(w => w.category === "Séries documentaires");
+  const featured = publishedWorks.slice(1, 5);
 
   return (
     <div className="ytd-home-page">
@@ -128,7 +129,7 @@ export default function Home({ setPage, openWork }) {
       <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
         <SectionLabel>Dernières publications</SectionLabel>
         <div>
-          {WORKS.slice(0, 6).map((w, i) => (
+          {publishedWorks.slice(0, 6).map((w, i) => (
             <div key={w.id} onClick={() => openWork(w)} className="ytd-row" style={{
               cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "20px 0", borderTop: i === 0 ? `1px solid ${T.line}` : "none", borderBottom: `1px solid ${T.line}`, gap: 20,

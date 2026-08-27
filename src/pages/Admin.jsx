@@ -7,6 +7,7 @@ import { T } from "../theme.js";
 import { WORKS, CATEGORIES, BOOKS, BOOK_CATEGORIES, BOOK_COVERS, ADMIN_COLLABS, emptyContentFields } from "../data.js";
 import NodeMark from "../components/NodeMark.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
+import Cover from "../components/Cover.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Btn from "../components/Btn.jsx";
 import Field, { inputStyle } from "../components/Field.jsx";
@@ -15,6 +16,7 @@ import AdminDashboard from "../components/AdminDashboard.jsx";
 import BookEditorModal from "../components/BookEditorModal.jsx";
 import BookPreviewModal from "../components/BookPreviewModal.jsx";
 import PostEditorModal from "../components/PostEditorModal.jsx";
+import PublicationPreviewModal from "../components/PublicationPreviewModal.jsx";
 
 const ROLE_PERMISSIONS = {
   Propriétaire: ["Tout gérer", "Gérer les membres", "Modifier les paramètres", "Publier et supprimer"],
@@ -32,23 +34,32 @@ const ROLE_DESCRIPTIONS = {
   Lecteur: "Accès en lecture seule aux espaces autorisés.",
 };
 
-export default function Admin({ exitAdmin, visitorReviews = {} }) {
+export default function Admin({ exitAdmin, visitorReviews = {}, posts, setPosts, books: initialBooks = BOOKS, setBooks: updateBooks }) {
   const [tab, setTab] = useState("dashboard");
-  const [posts, setPosts] = useState(WORKS.map(w => ({ ...w, statut: "Publié" })));
   const [collabFilter, setCollabFilter] = useState("Tous");
   const [draftTitle, setDraftTitle] = useState("");
   const [draftCat, setDraftCat] = useState(CATEGORIES[0]);
+  const [draftStatus, setDraftStatus] = useState("Brouillon");
   const [draftFields, setDraftFields] = useState(() => emptyContentFields(CATEGORIES[0]));
   const [isPostComposerOpen, setIsPostComposerOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [books, setBooks] = useState(BOOKS);
+  const [previewPost, setPreviewPost] = useState(null);
+  const [books, setBooks] = useState(initialBooks);
   const [bookFilter, setBookFilter] = useState("Toutes");
   const [bookSearch, setBookSearch] = useState("");
   const [editingBook, setEditingBook] = useState(null);
   const [previewBook, setPreviewBook] = useState(null);
   const [selectedCollab, setSelectedCollab] = useState(null);
+  const [collabs, setCollabs] = useState(ADMIN_COLLABS);
   const [siteName, setSiteName] = useState("Yewtod SS");
   const [siteDescription, setSiteDescription] = useState("Plateforme de réflexion sur les sciences sociales, les systèmes complexes et la politique publique.");
+  const [socialLinks, setSocialLinks] = useState("https://www.linkedin.com/company/yewtod-ss");
+  const [seoTitle, setSeoTitle] = useState("Yewtod SS — Comprendre un monde complexe");
+  const [menuItems, setMenuItems] = useState("Home · Works · Meet Yewtod · Books · Collaborations");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [faviconUrl, setFaviconUrl] = useState("");
+  const [newsletterEnabled, setNewsletterEnabled] = useState(false);
+  const [newsletterContent, setNewsletterContent] = useState("Les nouvelles publications de Yewtod SS, une fois par mois.");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("Éditeur");
   const [teamMembers, setTeamMembers] = useState([{ id: "m1", name: "Yewtod", email: "owner@yewtod.ss", role: "Propriétaire", status: "Actif" }]);
@@ -62,14 +73,40 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
     ["settings", "Paramètres", Settings],
   ];
 
-  const filteredCollabs = collabFilter === "Tous" ? ADMIN_COLLABS : ADMIN_COLLABS.filter(c => c.statut === collabFilter);
+  const filteredCollabs = collabFilter === "Tous" ? collabs : collabs.filter(c => c.statut === collabFilter);
+
+  function updateCollabStatus(id, statut) {
+    const next = collabs.map(collab => collab.id === id ? { ...collab, statut } : collab);
+    setCollabs(next);
+    setSelectedCollab(next.find(collab => collab.id === id) || null);
+  }
+
+  function exportCollabs() {
+    const csv = ["Nom;Organisation;Email;Type;Statut;Date", ...collabs.map(collab => [collab.nom, collab.org, collab.email || "", collab.type, collab.statut, collab.date].join(";"))].join("\n");
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    link.download = "collaborations-yewtod.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function saveSettings() {
+    localStorage.setItem("yewtod-settings", JSON.stringify({ siteName, siteDescription, socialLinks, seoTitle, menuItems, logoUrl, faviconUrl, newsletterEnabled, newsletterContent }));
+    document.title = seoTitle || siteName;
+    if (faviconUrl) {
+      let favicon = document.querySelector("link[rel='icon']");
+      if (!favicon) { favicon = document.createElement("link"); favicon.rel = "icon"; document.head.appendChild(favicon); }
+      favicon.href = faviconUrl;
+    }
+  }
 
   function addDraft(e) {
     e.preventDefault();
     if (!draftTitle.trim()) return;
-    setPosts([{ id: "d" + Date.now(), title: draftTitle, category: draftCat, date: new Date().toISOString().slice(0, 10), author: "Yewtod", readTime: "—", tags: [], tone: T.green, statut: "Brouillon", ...draftFields }, ...posts]);
+    setPosts([{ id: "d" + Date.now(), title: draftTitle, category: draftCat, ...draftFields, date: draftFields.date || new Date().toISOString().slice(0, 10), author: draftFields.author || "Yewtod", readTime: draftFields.readTime || "—", tags: [], tone: T.green, statut: draftStatus }, ...posts]);
     setDraftTitle("");
     setDraftFields(emptyContentFields(draftCat));
+    setDraftStatus("Brouillon");
     setIsPostComposerOpen(false);
   }
 
@@ -81,7 +118,10 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
 
   function saveBook(e) {
     e.preventDefault();
-    setBooks(books.some(book => book.id === editingBook.id) ? books.map(book => book.id === editingBook.id ? editingBook : book) : [editingBook, ...books]);
+    const normalizedBook = { ...editingBook, difficulty: editingBook.difficultyLevel || editingBook.difficulty || "Accessible", similar: editingBook.similar || editingBook.similarBooks || "" };
+    const nextBooks = books.some(book => book.id === normalizedBook.id) ? books.map(book => book.id === normalizedBook.id ? normalizedBook : book) : [normalizedBook, ...books];
+    setBooks(nextBooks);
+    updateBooks?.(nextBooks);
     setEditingBook(null);
   }
 
@@ -131,7 +171,8 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
           <div><span className="ytd-admin-kicker">Yewtod SS / CMS</span><strong>{tabs.find(([key]) => key === tab)?.[1]}</strong></div>
           <span className="ytd-admin-live"><span /> Système actif</span>
         </div>
-        {tab === "dashboard" && <AdminDashboard posts={posts} onNewPost={() => setTab("posts")} onViewPosts={() => setTab("posts")} onViewCollabs={() => setTab("collabs")} onViewBooks={() => setTab("books")} />}
+        {tab === "dashboard" && <AdminDashboard posts={posts} onNewPost={() => setTab("posts")} onViewPosts={() => setTab("posts")} onViewCollabs={() => setTab("collabs")} onViewBooks={() => setTab("books")} onViewPost={setPreviewPost} />}
+        {previewPost && <PublicationPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />}
         {tab === "__legacy-dashboard" && (
           <div className="ytd-admin-view ytd-admin-view-dashboard">
             <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Dashboard</h1>
@@ -211,31 +252,19 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
 
             <div className="ytd-admin-add-bar"><span>Ajouter un contenu éditorial</span><Btn variant="green" onClick={() => setIsPostComposerOpen(true)}><Plus size={15} /> Nouvelle publication</Btn></div>
 
-            {(isPostComposerOpen || editingPost) && <PostEditorModal post={editingPost} draftTitle={draftTitle} draftCat={draftCat} draftFields={draftFields} onChangePost={setEditingPost} onChangeDraft={setDraftTitle} onChangeDraftCat={setDraftCat} onChangeDraftFields={setDraftFields} onSave={editingPost ? savePost : addDraft} onClose={() => { setIsPostComposerOpen(false); setEditingPost(null); }} />}
+            {(isPostComposerOpen || editingPost) && <PostEditorModal post={editingPost} draftTitle={draftTitle} draftCat={draftCat} draftFields={draftFields} draftStatus={draftStatus} onChangePost={setEditingPost} onChangeDraft={setDraftTitle} onChangeDraftCat={setDraftCat} onChangeDraftFields={setDraftFields} onChangeDraftStatus={setDraftStatus} onSave={editingPost ? savePost : addDraft} onClose={() => { setIsPostComposerOpen(false); setEditingPost(null); }} />}
 
-            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid ${T.line}`, textAlign: "left" }}>
-                  {["Titre", "Catégorie", "Date", "Statut", ""].map(h => (
-                    <th key={h} style={{ padding: "10px 8px", fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft, textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {posts.map(p => (
-                  <tr key={p.id} className="ytd-table-row" style={{ borderBottom: `1px solid ${T.line}` }}>
-                    <td style={{ padding: "12px 8px" }}>{p.title}</td>
-                    <td style={{ padding: "12px 8px", color: T.inkSoft }}>{p.category}</td>
-                    <td style={{ padding: "12px 8px", color: T.inkSoft, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5 }}>{p.date}</td>
-                    <td style={{ padding: "12px 8px" }}><StatusPill statut={p.statut} /></td>
-                    <td style={{ padding: "12px 8px", textAlign: "right" }}>
-                      <Edit3 size={14} color={T.inkSoft} style={{ marginRight: 12, cursor: "pointer" }} onClick={() => setEditingPost({ ...p })} />
-                      <Trash2 size={14} color={T.inkSoft} style={{ cursor: "pointer" }} onClick={() => setPosts(posts.filter(x => x.id !== p.id))} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="ytd-admin-publication-grid">
+              {posts.map((post, index) => (
+                <article className="ytd-admin-publication-card" key={post.id} style={{ animationDelay: `${index * 55}ms` }}>
+                  <button type="button" className="ytd-admin-publication-cover" onClick={() => setPreviewPost(post)} aria-label={`Voir le détail de ${post.title}`}>
+                    <Cover tone={post.tone} label={post.category} title={post.title} image={post.coverImage} tall />
+                  </button>
+                  <div className="ytd-admin-publication-card-meta"><span>{post.date} · {post.readTime || "—"}</span><StatusPill statut={post.statut} /></div>
+                  <div className="ytd-admin-publication-card-actions"><button type="button" onClick={() => setPreviewPost(post)}>Voir le détail</button><button type="button" aria-label={`Modifier ${post.title}`} onClick={() => setEditingPost({ ...post })}><Edit3 size={14} /></button><button type="button" aria-label={`Supprimer ${post.title}`} onClick={() => setPosts(posts.filter(item => item.id !== post.id))}><Trash2 size={14} /></button></div>
+                </article>
+              ))}
+            </div>
           </div>
         )}
 
@@ -268,7 +297,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
                 }}>{s}</button>
               ))}
               <span style={{ flex: 1 }} />
-              <Btn variant="outline" style={{ fontSize: 12.5, padding: "8px 14px" }}><Archive size={13} /> Exporter</Btn>
+              <Btn variant="outline" onClick={exportCollabs} style={{ fontSize: 12.5, padding: "8px 14px" }}><Archive size={13} /> Exporter</Btn>
             </div>
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 14 }}>
               <thead>
@@ -295,7 +324,8 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
                 <div><span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: T.green, textTransform: "uppercase" }}>Fiche de collaboration</span><h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, margin: "7px 0 4px" }}>{selectedCollab.nom}</h2><p style={{ margin: 0, color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>{selectedCollab.org} · {selectedCollab.type} · {selectedCollab.date}</p></div>
                 <button onClick={() => setSelectedCollab(null)} style={{ border: 0, background: "none", cursor: "pointer", color: T.inkSoft }}>Fermer</button>
               </div>
-              <p style={{ fontFamily: "'Newsreader', serif", fontSize: 18, lineHeight: 1.55, marginBottom: 0 }}>Cette demande peut maintenant être consultée depuis l'administration. Les notes internes et les prochaines étapes pourront être ajoutées ici.</p>
+              <p style={{ fontFamily: "'Newsreader', serif", fontSize: 18, lineHeight: 1.55, marginBottom: 18 }}>{selectedCollab.description || "Cette demande peut maintenant être consultée depuis l'administration. Les notes internes et les prochaines étapes pourront être ajoutées ici."}</p>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}><label style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}>Statut</label><select value={selectedCollab.statut} onChange={event => updateCollabStatus(selectedCollab.id, event.target.value)} style={inputStyle}><option>Nouveau</option><option>En cours</option><option>Archivé</option></select></div>
             </div>}
           </div>
         )}
@@ -304,7 +334,7 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
           <div className="ytd-admin-view">
             <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "0 0 6px" }}>Médias</h1>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: T.inkSoft, marginBottom: 28 }}>Bibliothèque d'images, PDF, vidéos et documents réutilisables dans les publications.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12 }} className="ytd-media-grid">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12 }} className="ytd-media-grid">
               {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} style={{ aspectRatio: "1", border: `1px solid ${T.line}`, background: T.paperAlt, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ImageIcon size={18} color={T.inkSoft} />
@@ -318,7 +348,8 @@ export default function Admin({ exitAdmin, visitorReviews = {} }) {
         {tab === "settings" && (
           <div className="ytd-admin-view ytd-admin-settings">
             <div className="ytd-admin-section-heading"><div><span className="ytd-admin-kicker">Configuration du projet</span><h1>Paramètres</h1><p>Organiser l’identité du site, ses accès et les responsabilités de l’équipe.</p></div></div>
-            <section className="ytd-admin-settings-card"><div className="ytd-admin-settings-card-heading"><div><span>Identité éditoriale</span><h2>Informations du site</h2></div><span className="ytd-admin-settings-index">01</span></div><div className="ytd-admin-settings-fields"><Field label="Nom du site"><input value={siteName} onChange={e => setSiteName(e.target.value)} style={inputStyle} /></Field><Field label="Description SEO"><textarea rows={3} value={siteDescription} onChange={e => setSiteDescription(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field><Field label="Réseaux sociaux"><input placeholder="X, LinkedIn, YouTube…" style={inputStyle} /></Field></div><Btn type="button" variant="green" style={{ alignSelf: "flex-start" }}>Enregistrer les paramètres</Btn></section>
+            <section className="ytd-admin-settings-card"><div className="ytd-admin-settings-card-heading"><div><span>Identité éditoriale</span><h2>Informations du site</h2></div><span className="ytd-admin-settings-index">01</span></div><div className="ytd-admin-settings-fields"><Field label="Nom du site"><input value={siteName} onChange={e => setSiteName(e.target.value)} style={inputStyle} /></Field><Field label="Description SEO"><textarea rows={3} value={siteDescription} onChange={e => setSiteDescription(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field><Field label="Titre SEO par défaut"><input value={seoTitle} onChange={e => setSeoTitle(e.target.value)} style={inputStyle} /></Field><Field label="Réseaux sociaux"><input value={socialLinks} onChange={e => setSocialLinks(e.target.value)} placeholder="Un lien par ligne" style={inputStyle} /></Field><Field label="Menu de navigation"><input value={menuItems} onChange={e => setMenuItems(e.target.value)} style={inputStyle} /></Field><Field label="Logo"><input type="url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="URL du logo" style={inputStyle} /></Field><Field label="Favicon"><input type="url" value={faviconUrl} onChange={e => setFaviconUrl(e.target.value)} placeholder="URL du favicon" style={inputStyle} /></Field></div><Btn type="button" variant="green" onClick={saveSettings} style={{ alignSelf: "flex-start" }}>Enregistrer les paramètres</Btn></section>
+            <section className="ytd-admin-settings-card"><div className="ytd-admin-settings-card-heading"><div><span>Audience</span><h2>Newsletter</h2></div><span className="ytd-admin-settings-index">02</span></div><label style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Inter', sans-serif", fontSize: 14 }}><input type="checkbox" checked={newsletterEnabled} onChange={e => setNewsletterEnabled(e.target.checked)} /> Activer la newsletter côté administration</label><Field label="Contenu par défaut"><textarea rows={3} value={newsletterContent} onChange={e => setNewsletterContent(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field><p style={{ color: T.inkSoft, fontSize: 13 }}>12 abonnés de démonstration · le formulaire public reste informatif tant que la diffusion n'est pas activée.</p></section>
             <div>
               <section className="ytd-admin-team-section">
                 <div className="ytd-admin-team-heading"><div><span className="ytd-admin-kicker">Organisation</span><h2>Équipe et accès</h2><p>Inviter des collaborateurs et contrôler les actions disponibles selon leur rôle.</p></div><span className="ytd-admin-team-count">{teamMembers.length} membre{teamMembers.length > 1 ? "s" : ""}</span></div>
