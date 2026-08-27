@@ -23,13 +23,23 @@ function routeFor(page, item) {
 export default function useAppNavigation(works = WORKS, books = BOOKS) {
   const [route, setRoute] = useState(() => readRoute(works, books));
   const navigationDepth = useRef(0);
+  const scrollPositions = useRef({});
+  const pendingNavigation = useRef(null);
+  const lastHandledHash = useRef("");
+  const previousRoute = useRef("");
 
   useEffect(() => {
     if (!window.location.hash) window.history.replaceState({}, "", "#/home");
     const handleRouteChange = () => {
+      const nextHash = window.location.hash || "#/home";
+      if (lastHandledHash.current === nextHash) return;
+      lastHandledHash.current = nextHash;
+      const navigationType = pendingNavigation.current;
+      pendingNavigation.current = null;
       setRoute(readRoute(works, books));
       navigationDepth.current = Math.max(0, navigationDepth.current - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const nextScroll = navigationType === "back" || !navigationType ? scrollPositions.current[nextHash] : 0;
+      window.requestAnimationFrame(() => window.scrollTo({ top: nextScroll || 0, behavior: "smooth" }));
     };
     window.addEventListener("hashchange", handleRouteChange);
     window.addEventListener("popstate", handleRouteChange);
@@ -42,6 +52,10 @@ export default function useAppNavigation(works = WORKS, books = BOOKS) {
   function navigate(page, item) {
     const nextHash = routeFor(page, item);
     if (window.location.hash === nextHash) return;
+    const currentHash = window.location.hash || "#/home";
+    scrollPositions.current[currentHash] = window.scrollY;
+    if (page === "work-detail" || page === "book-detail" || page === "collab-detail") previousRoute.current = currentHash;
+    pendingNavigation.current = "forward";
     navigationDepth.current += 1;
     window.location.hash = nextHash.slice(1);
   }
@@ -63,8 +77,11 @@ export default function useAppNavigation(works = WORKS, books = BOOKS) {
   }
 
   function back() {
-    if (navigationDepth.current > 0) {
-      window.history.back();
+    if (previousRoute.current) {
+      pendingNavigation.current = "back";
+      const targetHash = previousRoute.current;
+      previousRoute.current = "";
+      window.location.hash = targetHash.slice(1);
       return;
     }
     navigate("home");
