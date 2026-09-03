@@ -1,16 +1,37 @@
 import React, { useState } from "react";
 import { ArrowRight, Image as ImageIcon, Check, ArrowUpRight, FlaskConical, Mic2, PenLine } from "lucide-react";
 import { T } from "../theme.js";
-import { COLLAB_TYPES } from "../data.js";
+import { COLLAB_TYPES } from "../lib/contentTypes.js";
+import { useCollaborationSubmit } from "../hooks/useCollaborations.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import NodeMark from "../components/NodeMark.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Btn from "../components/Btn.jsx";
 import Field, { inputStyle } from "../components/Field.jsx";
 
 export default function Collaborations() {
+  useDocumentMeta("Collaborations", "Proposer une recherche, un article, une intervention ou un partenariat à Yewtod SS.");
   const [form, setForm] = useState({ nom: "", org: "", email: "", sujet: "", type: COLLAB_TYPES[0], description: "" });
   const [sent, setSent] = useState(false);
+  const { submit, submitting, error } = useCollaborationSubmit();
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      await submit({
+        name: form.nom,
+        organization: form.org,
+        email: form.email,
+        subject: form.sujet,
+        type: form.type,
+        description: form.description,
+      });
+      setSent(true);
+    } catch {
+      /* error surfaced below via hook state */
+    }
+  }
 
   return (
     <div className="ytd-collab-page" style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 110px" }}>
@@ -46,7 +67,7 @@ export default function Collaborations() {
           </div>
         </div>
       ) : (
-        <Reveal as="form" className="ytd-collab-form" style={{ display: "flex", flexDirection: "column", gap: 22 }} onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+        <Reveal as="form" className="ytd-collab-form" style={{ display: "flex", flexDirection: "column", gap: 22 }} onSubmit={handleSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="ytd-form-row">
             <Field label="Nom"><input required value={form.nom} onChange={set("nom")} style={inputStyle} /></Field>
             <Field label="Organisation"><input value={form.org} onChange={set("org")} style={inputStyle} /></Field>
@@ -65,10 +86,11 @@ export default function Collaborations() {
           </Field>
           <Field label="Pièces jointes">
             <div style={{ ...inputStyle, color: T.inkSoft, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span>Glisser un fichier ou cliquer pour parcourir</span><ImageIcon size={16} />
+              <span>Glisser un fichier ou cliquer pour parcourir (bientôt disponible)</span><ImageIcon size={16} />
             </div>
           </Field>
-          <div><Btn type="submit" variant="green">Envoyer la demande <ArrowRight size={15} /></Btn></div>
+          {error && <p style={{ color: T.red, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>Une erreur est survenue, merci de réessayer.</p>}
+          <div><Btn type="submit" variant="green" style={{ opacity: submitting ? 0.7 : 1 }}>Envoyer la demande <ArrowRight size={15} /></Btn></div>
         </Reveal>
       )}
       </div>

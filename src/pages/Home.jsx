@@ -1,7 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Mail, Check, Compass, Network, Lightbulb } from "lucide-react";
 import { T } from "../theme.js";
-import { WORKS, fmtDate } from "../data.js";
+import { fmtDate } from "../lib/contentTypes.js";
+import { PATHS, workPath } from "../lib/paths.js";
+import { useWorks } from "../hooks/useWorks.js";
+import { useSiteSettings } from "../hooks/useSiteSettings.js";
+import { useNewsletterSubscribe } from "../hooks/useNewsletter.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import NodeMark from "../components/NodeMark.jsx";
 import Divider from "../components/Divider.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -10,14 +16,40 @@ import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
 import Btn from "../components/Btn.jsx";
 
-export default function Home({ setPage, openWork, works = WORKS }) {
+export default function Home() {
+  const navigate = useNavigate();
+  const { works, loading } = useWorks();
+  const { settings } = useSiteSettings();
+  const { subscribe, submitting } = useNewsletterSubscribe();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const publishedWorks = works.filter(work => work.statut !== "Brouillon" && work.statut !== "Programmé");
-  const latest = publishedWorks[0];
-  const report = publishedWorks.find(w => w.category === "Rapports");
-  const video = publishedWorks.find(w => w.category === "Séries documentaires");
-  const featured = publishedWorks.slice(1, 5);
+  useDocumentMeta(null, settings.seo_description || "Yewtod SS, média personnel de réflexion sur les sciences sociales, les systèmes complexes, l'économie, la politique publique et l'intelligence artificielle.");
+
+  const openWork = work => navigate(workPath(work.routeSlug, work.slug));
+  const latest = works[0];
+  const report = works.find(w => w.category === "Rapports");
+  const video = works.find(w => w.category === "Séries documentaires");
+  const featured = works.slice(1, 5);
+  const reflection = settings.reflection_of_week;
+
+  async function handleSubscribe(e) {
+    e.preventDefault();
+    if (!email) return;
+    try { await subscribe(email); setSent(true); } catch { /* surfaced via hook error state */ }
+  }
+
+  if (loading) {
+    return <div style={{ maxWidth: 1120, margin: "0 auto", padding: "120px 24px", color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</div>;
+  }
+
+  if (!latest) {
+    return (
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "120px 24px 100px" }}>
+        <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(34px, 4.5vw, 48px)", fontWeight: 500 }}>Des idées claires pour comprendre un monde complexe.</h1>
+        <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft, fontSize: 16, maxWidth: 560 }}>Les premières publications de Yewtod SS arrivent bientôt.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="ytd-home-page">
@@ -35,14 +67,14 @@ export default function Home({ setPage, openWork, works = WORKS }) {
             Yewtod SS est une plateforme indépendante qui rend accessibles les sciences sociales, l'économie, les politiques publiques, les systèmes complexes et l'intelligence artificielle. Nous transformons la recherche en repères utiles pour mieux comprendre, décider et agir.
           </p>
           <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
-            <Btn variant="green" onClick={() => setPage("works")}>Explorer les travaux <ArrowRight size={16} /></Btn>
-            <Btn variant="outline" onClick={() => setPage("meet")}>Découvrir le projet</Btn>
+            <Btn variant="green" onClick={() => navigate(PATHS.works)}>Explorer les travaux <ArrowRight size={16} /></Btn>
+            <Btn variant="outline" onClick={() => navigate(PATHS.meet)}>Découvrir le projet</Btn>
           </div>
         </div>
         <div className="ytd-hero-visual" style={{ position: "relative", minHeight: 360 }}>
           <div style={{ position: "absolute", inset: "12px 0 0 36px", background: T.greenDeep, transform: "rotate(3deg)" }} />
           <div onClick={() => openWork(latest)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && openWork(latest)} style={{ position: "relative", background: T.paperAlt, padding: 12, border: `1px solid ${T.line}`, transform: "rotate(-3deg)", cursor: "pointer" }}>
-            <Cover tone={latest.tone} label={latest.category} tall />
+            <Cover tone={latest.tone} label={latest.category} image={latest.coverImage} tall />
             <div style={{ padding: "14px 8px 4px" }}>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: T.green, textTransform: "uppercase" }}>À lire maintenant</span>
               <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, lineHeight: 1.15, margin: "7px 0 0", color: T.ink }}>{latest.title}</p>
@@ -78,18 +110,18 @@ export default function Home({ setPage, openWork, works = WORKS }) {
         <SectionLabel>À la une</SectionLabel>
         <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 48 }} className="ytd-hero-grid">
           <div onClick={() => openWork(latest)} className="ytd-card" style={{ cursor: "pointer" }}>
-            <Cover tone={latest.tone} label={latest.category} tall />
+            <Cover tone={latest.tone} label={latest.category} image={latest.coverImage} tall />
             <div style={{ marginTop: 18 }}>
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: T.inkSoft }}>{fmtDate(latest.date)} · {latest.readTime}</span>
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: T.inkSoft }}>{fmtDate(latest.date)}{latest.readTime ? ` · ${latest.readTime}` : ""}</span>
               <h2 style={{ fontFamily: "'Newsreader', serif", fontSize: 30, fontWeight: 500, margin: "10px 0 10px", lineHeight: 1.2 }}>{latest.title}</h2>
               <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, lineHeight: 1.6 }}>{latest.excerpt}</p>
             </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            {[["Dernier rapport", report], ["Dernière vidéo", video]].map(([label, item]) => (
+            {[["Dernier rapport", report], ["Dernière vidéo", video]].filter(([, item]) => item).map(([label, item]) => (
               <div key={label} onClick={() => openWork(item)} className="ytd-card" style={{ cursor: "pointer", display: "flex", gap: 16 }}>
-                <div style={{ width: 120, flexShrink: 0 }}><Cover tone={item.tone} label={item.category} /></div>
+                <div style={{ width: 120, flexShrink: 0 }}><Cover tone={item.tone} label={item.category} image={item.coverImage} /></div>
                 <div>
                   <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: T.green, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</span>
                   <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 18, fontWeight: 600, margin: "6px 0 6px", lineHeight: 1.25 }}>{item.title}</h3>
@@ -98,30 +130,35 @@ export default function Home({ setPage, openWork, works = WORKS }) {
               </div>
             ))}
 
-            {/* Citation de la semaine */}
-            <div style={{ background: T.paperAlt, border: `1px solid ${T.line}`, padding: 24, borderLeft: `3px solid ${T.red}` }}>
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: T.red, textTransform: "uppercase", letterSpacing: "0.06em" }}>Réflexion de la semaine</span>
-              <p style={{ fontFamily: "'Newsreader', serif", fontStyle: "italic", fontSize: 18, lineHeight: 1.5, margin: "10px 0 0" }}>
-                « Un système n'échoue jamais au hasard : il échoue exactement là où personne ne regardait. »
-              </p>
-            </div>
+            {/* Réflexion de la semaine — éditable depuis le dashboard (Paramètres) */}
+            {reflection?.text && (
+              <div style={{ background: T.paperAlt, border: `1px solid ${T.line}`, padding: 24, borderLeft: `3px solid ${T.red}` }}>
+                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: T.red, textTransform: "uppercase", letterSpacing: "0.06em" }}>Réflexion de la semaine</span>
+                <p style={{ fontFamily: "'Newsreader', serif", fontStyle: "italic", fontSize: 18, lineHeight: 1.5, margin: "10px 0 0" }}>
+                  « {reflection.text} »
+                </p>
+                {reflection.author && <span style={{ display: "block", marginTop: 10, fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>— {reflection.author}</span>}
+              </div>
+            )}
           </div>
         </div>
       </Reveal>
 
       {/* TRAVAUX MIS EN AVANT */}
-      <Reveal as="section" className="ytd-editorial-section ytd-editorial-section-tinted" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
-        <SectionLabel>Travaux mis en avant</SectionLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 28 }} className="ytd-grid-4">
-          {featured.map((w, i) => (
-            <div key={w.id} onClick={() => openWork(w)} className="ytd-card" style={{ cursor: "pointer", transitionDelay: `${i * 60}ms` }}>
-              <Cover tone={w.tone} label={w.category} />
-              <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 17, fontWeight: 600, margin: "14px 0 8px", lineHeight: 1.28 }}>{w.title}</h3>
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>{fmtDate(w.date)} · {w.readTime}</span>
-            </div>
-          ))}
-        </div>
-      </Reveal>
+      {featured.length > 0 && (
+        <Reveal as="section" className="ytd-editorial-section ytd-editorial-section-tinted" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
+          <SectionLabel>Travaux mis en avant</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 28 }} className="ytd-grid-4">
+            {featured.map((w, i) => (
+              <div key={w.id} onClick={() => openWork(w)} className="ytd-card" style={{ cursor: "pointer", transitionDelay: `${i * 60}ms` }}>
+                <Cover tone={w.tone} label={w.category} image={w.coverImage} />
+                <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 17, fontWeight: 600, margin: "14px 0 8px", lineHeight: 1.28 }}>{w.title}</h3>
+                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>{fmtDate(w.date)}{w.readTime ? ` · ${w.readTime}` : ""}</span>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      )}
 
       <Divider margin="0 0 72px" />
 
@@ -129,7 +166,7 @@ export default function Home({ setPage, openWork, works = WORKS }) {
       <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
         <SectionLabel>Dernières publications</SectionLabel>
         <div>
-          {publishedWorks.slice(0, 6).map((w, i) => (
+          {works.slice(0, 6).map((w, i) => (
             <div key={w.id} onClick={() => openWork(w)} className="ytd-row" style={{
               cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "20px 0", borderTop: i === 0 ? `1px solid ${T.line}` : "none", borderBottom: `1px solid ${T.line}`, gap: 20,
@@ -150,16 +187,16 @@ export default function Home({ setPage, openWork, works = WORKS }) {
           <div style={{ maxWidth: 460 }}>
             <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 26, color: "#fff", margin: "0 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, color: "#D9E4E2", margin: 0, lineHeight: 1.6 }}>
-              Un e-mail occasionnel, sans bruit, quand un nouvel article ou rapport est publié. Pas encore active — laissez votre adresse pour être prévenu·e au lancement.
+              Un e-mail occasionnel, sans bruit, quand un nouvel article ou rapport est publié.
             </p>
           </div>
           {sent ? (
             <div style={{ fontFamily: "'Inter', sans-serif", color: "#fff", display: "flex", alignItems: "center", gap: 8 }}><Check size={18} /> Merci, vous serez prévenu·e.</div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); if (email) setSent(true); }} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com"
                 style={{ padding: "13px 16px", border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 14, minWidth: 240, outline: "none" }} />
-              <Btn type="submit" variant="solid" style={{ background: "#fff", color: T.greenDeep, border: "none" }}>S'inscrire <Mail size={15} /></Btn>
+              <Btn type="submit" variant="solid" style={{ background: "#fff", color: T.greenDeep, border: "none", opacity: submitting ? 0.7 : 1 }}>S'inscrire <Mail size={15} /></Btn>
             </form>
           )}
         </div>

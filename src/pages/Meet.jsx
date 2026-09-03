@@ -5,8 +5,10 @@ import Reveal from "../components/Reveal.jsx";
 import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
 import { ArrowDownRight, BookOpen, Network, Target } from "lucide-react";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Meet() {
+  useDocumentMeta("Meet Yewtod", "Pourquoi Yewtod SS existe, sa méthode de travail et le parcours de son fondateur.");
   const qa = [
     ["Pourquoi Yewtod SS ?", "Parce que les grands problèmes contemporains — inégalités, gouvernance, transition numérique — se comprennent rarement en une phrase, et méritent un espace d'écriture longue plutôt que des formats jetables."],
     ["Quelle est la vision ?", "Faire des sciences sociales appliquées un outil de décision aussi rigoureux que les sciences dures, sans en perdre l'accessibilité."],

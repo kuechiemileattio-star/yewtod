@@ -1,12 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
-import { WORKS, CATEGORIES } from "../data.js";
+import { CATEGORIES } from "../lib/contentTypes.js";
+import { workPath } from "../lib/paths.js";
+import { useWorks } from "../hooks/useWorks.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
 
-export default function Works({ openWork, works = WORKS }) {
+export default function Works() {
+  const navigate = useNavigate();
+  const { works, loading } = useWorks();
+  useDocumentMeta("Works", "Articles, rapports, études, notes de recherche, séries documentaires, expérimentations et visualisations de données publiés par Yewtod SS.");
   const [cat, setCat] = useState(() => sessionStorage.getItem("yewtod-works-filter") || "Toutes");
-  const filtered = (cat === "Toutes" ? works : works.filter(w => w.category === cat)).filter(w => w.statut !== "Brouillon" && w.statut !== "Programmé");
+  const filtered = cat === "Toutes" ? works : works.filter(w => w.category === cat);
+  const openWork = work => navigate(workPath(work.routeSlug, work.slug));
 
   return (
     <div style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 100px" }}>
@@ -27,16 +35,20 @@ export default function Works({ openWork, works = WORKS }) {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }} className="ytd-grid-3">
-        {filtered.map((w, i) => (
-          <Reveal key={w.id} delay={(i % 3) * 80} as="div">
-          <article onClick={() => openWork(w)} onKeyDown={event => event.key === "Enter" && openWork(w)} className="ytd-card ytd-work-card" style={{ cursor: "pointer" }} role="link" tabIndex={0} aria-label={`Voir le détail de ${w.title}`}>
-            <Cover tone={w.tone} label={w.category} title={w.title} tall image={w.coverImage} />
-          </article>
-          </Reveal>
-        ))}
-      </div>
-      {filtered.length === 0 && <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>Aucun travail dans cette catégorie pour le moment.</p>}
+      {loading ? (
+        <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>Chargement…</p>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }} className="ytd-grid-3">
+          {filtered.map((w, i) => (
+            <Reveal key={w.id} delay={(i % 3) * 80} as="div">
+              <article onClick={() => openWork(w)} onKeyDown={event => event.key === "Enter" && openWork(w)} className="ytd-card ytd-work-card" style={{ cursor: "pointer" }} role="link" tabIndex={0} aria-label={`Voir le détail de ${w.title}`}>
+                <Cover tone={w.tone} label={w.category} title={w.title} tall image={w.coverImage} />
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      )}
+      {!loading && filtered.length === 0 && <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>Aucun travail dans cette catégorie pour le moment.</p>}
     </div>
   );
 }

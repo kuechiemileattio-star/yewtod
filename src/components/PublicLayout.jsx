@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "./NavBar.jsx";
 import Footer from "./Footer.jsx";
 
-export default function PublicLayout({ page, setPage, transitionKey, children }) {
+export default function PublicLayout() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }, [location.pathname]);
+
   return (
     <>
-      <NavBar page={page} setPage={setPage} />
-      <main key={transitionKey || page} className="ytd-page-anim">
-        {children}
+      <NavBar />
+      <main key={location.pathname} className="ytd-page-anim">
+        <Outlet />
       </main>
-      <Footer setPage={setPage} />
+      <Footer />
     </>
   );
 }
