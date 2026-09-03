@@ -1,13 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
 import { PATHS } from "../lib/paths.js";
+import { useSocialLinks } from "../hooks/useSiteSettings.js";
 import BrandLogo from "./BrandLogo.jsx";
-import { ArrowUpRight, Mail, MoveUpRight } from "lucide-react";
+import { ArrowUpRight, ArrowUp, Mail, MoveUpRight, Linkedin, Twitter, Youtube, Instagram, Facebook, Link2 } from "lucide-react";
+
+const PLATFORM_ICONS = [
+  [/linkedin/i, Linkedin],
+  [/twitter|\bx\b/i, Twitter],
+  [/youtube/i, Youtube],
+  [/instagram/i, Instagram],
+  [/facebook/i, Facebook],
+];
+
+function iconFor(platform) {
+  const match = PLATFORM_ICONS.find(([pattern]) => pattern.test(platform));
+  return match ? match[1] : Link2;
+}
 
 export default function Footer() {
   const navigate = useNavigate();
+  const socialLinks = useSocialLinks();
+  const [showToTop, setShowToTop] = useState(false);
   const siteLinks = [[PATHS.home, "Home"], [PATHS.works, "Works"], [PATHS.meet, "Meet Yewtod"], [PATHS.books, "Books"], [PATHS.collab, "Collaborations"]];
+
+  useEffect(() => {
+    const onScroll = () => setShowToTop(window.scrollY > 900);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  function goToNewsletter() {
+    navigate(`${PATHS.home}#newsletter`);
+  }
+
   return (
     <footer className="ytd-footer">
       <div className="ytd-footer-cta">
@@ -28,12 +56,31 @@ export default function Footer() {
           </p>
         </div>
         <div><div className="ytd-footer-heading">Explorer</div>{siteLinks.map(([to, label]) => <button key={to} onClick={() => navigate(to)} className="ytd-footer-link">{label}<MoveUpRight size={12} /></button>)}</div>
-        <div><div className="ytd-footer-heading">Suivre</div>{["Newsletter", "X / Twitter", "LinkedIn", "YouTube"].map(l => <button key={l} className="ytd-footer-link">{l}<MoveUpRight size={12} /></button>)}</div>
+        <div>
+          <div className="ytd-footer-heading">Suivre</div>
+          <button onClick={goToNewsletter} className="ytd-footer-link"><Mail size={13} style={{ marginRight: 2 }} />Newsletter<MoveUpRight size={12} /></button>
+          {socialLinks.map(link => {
+            const Icon = iconFor(link.platform);
+            return (
+              <a key={link.id} href={link.url} target="_blank" rel="noreferrer" className="ytd-footer-link">
+                <Icon size={13} style={{ marginRight: 2 }} />{link.platform}<MoveUpRight size={12} />
+              </a>
+            );
+          })}
+        </div>
       </div>
       </div>
       <div className="ytd-footer-legal" style={{ borderTop: `1px solid ${T.paper}22`, padding: "18px 24px", margin: 0, background: T.ink, textAlign: "center", fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5, color: `${T.paper}88` }}>
         © 2026 Yewtod SS — Tous droits réservés
       </div>
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Retour en haut de page"
+        className="ytd-to-top"
+        style={{ opacity: showToTop ? 1 : 0, pointerEvents: showToTop ? "auto" : "none" }}
+      >
+        <ArrowUp size={17} />
+      </button>
     </footer>
   );
 }

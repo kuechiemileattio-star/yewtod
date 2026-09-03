@@ -7,6 +7,7 @@ import { useAdminBooks } from "../../hooks/useAdminBooks.js";
 import Btn from "../../components/Btn.jsx";
 import Field, { inputStyle } from "../../components/Field.jsx";
 import StatusPill from "../../components/StatusPill.jsx";
+import MediaField from "../../components/dashboard/MediaField.jsx";
 
 const STATUS_LABELS = { draft: "Brouillon", published: "Publié", scheduled: "Programmé" };
 const DIFFICULTY_OPTIONS = Object.entries(BOOK_DIFFICULTY_LABELS);
@@ -40,7 +41,7 @@ function BookEditor({ book, onChange, onSave, onClose, saving }) {
         <Field label="Avis personnel"><textarea required rows={5} value={book.personalReview || ""} onChange={update("personalReview")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
         <Field label="Citations favorites (une par ligne)"><textarea rows={3} value={book.favoriteQuotes || ""} onChange={update("favoriteQuotes")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
         <Field label="Ouvrages similaires (un par ligne)"><textarea rows={3} value={book.similarBooks || ""} onChange={update("similarBooks")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
-        <Field label="Couverture (URL)"><input type="url" value={book.coverImage || ""} onChange={update("coverImage")} style={inputStyle} /></Field>
+        <Field label="Couverture"><MediaField kind="image" bucket="covers" accept="image/*" value={book.coverImage} onChange={url => onChange({ ...book, coverImage: url })} /></Field>
         <Field label="Lien d'achat ou de consultation"><input type="url" value={book.purchaseOrReadLink || ""} onChange={update("purchaseOrReadLink")} style={inputStyle} /></Field>
         <Field label="Statut"><select value={book.status} onChange={update("status")} style={inputStyle}>{Object.entries(STATUS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
         <div className="ytd-admin-book-editor-actions">

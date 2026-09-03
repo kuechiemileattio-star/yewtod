@@ -15,10 +15,12 @@ import Login from "./pages/Login.jsx";
 import Onboarding from "./pages/Onboarding.jsx";
 import DashboardShell from "./features/dashboard/DashboardShell.jsx";
 import Overview from "./features/dashboard/Overview.jsx";
+import PublicationsPanel from "./features/dashboard/PublicationsPanel.jsx";
 import BooksPanel from "./features/dashboard/BooksPanel.jsx";
 import CollaborationsPanel from "./features/dashboard/CollaborationsPanel.jsx";
 import SettingsPanel from "./features/dashboard/SettingsPanel.jsx";
 import UsersRolesPanel from "./features/dashboard/UsersRolesPanel.jsx";
+import ProfilePanel from "./features/dashboard/ProfilePanel.jsx";
 import { GLOBAL_STYLES } from "./styles/globalStyles.js";
 import { PATHS } from "./lib/paths.js";
 
@@ -44,10 +46,12 @@ export default function YewtodSS() {
 
             <Route path={PATHS.dashboard} element={<RequireAuth><DashboardShell /></RequireAuth>}>
               <Route index element={<Overview />} />
+              <Route path="publications" element={<RequireAuth permission="manage_articles"><PublicationsPanel /></RequireAuth>} />
               <Route path="books" element={<RequireAuth permission="manage_books"><BooksPanel /></RequireAuth>} />
               <Route path="collaborations" element={<RequireAuth permission="manage_collaborations"><CollaborationsPanel /></RequireAuth>} />
               <Route path="settings" element={<RequireAuth permission="manage_settings"><SettingsPanel /></RequireAuth>} />
               <Route path="users" element={<RequireAuth permission="manage_users"><UsersRolesPanel /></RequireAuth>} />
+              <Route path="profile" element={<ProfilePanel />} />
             </Route>
 
             <Route path="*" element={<Navigate to={PATHS.home} replace />} />

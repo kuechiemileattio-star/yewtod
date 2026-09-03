@@ -96,7 +96,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-page-anim { animation: ytdFadeUp .65s cubic-bezier(.16,1,.3,1) both; position: relative; z-index: 1; }
   .ytd-page-anim, .ytd-home-page, .ytd-collab-page, .ytd-meet-page, .ytd-book-detail-page { min-width: 0; }
   .ytd-scroll-progress { position: absolute; left: 0; top: 0; height: 3px; z-index: 2; background: ${T.lime}; animation: ytdBarPulse 2.4s ease-in-out infinite; transition: width .12s ease-out; }
-  .ytd-navbar { box-shadow: 0 10px 30px -26px ${T.greenDeep}; }
+  .ytd-navbar { box-shadow: 0 10px 30px -26px ${T.greenDeep}00; transition: box-shadow .35s ease; }
+  .ytd-navbar-scrolled { box-shadow: 0 14px 32px -22px ${T.greenDeep}55; }
   .ytd-navbar .ytd-nav-link-active { box-shadow: inset 0 -3px 0 ${T.green}; }
   .ytd-mobile-menu { max-height: 0; opacity: 0; overflow: hidden; padding-top: 0 !important; padding-bottom: 0 !important; transition: max-height .4s cubic-bezier(.16,1,.3,1), opacity .25s ease, padding .4s ease; }
   .ytd-mobile-menu-open { max-height: 360px; opacity: 1; padding-top: 12px !important; padding-bottom: 20px !important; animation: ytdMenuIn .4s cubic-bezier(.16,1,.3,1) both; }
@@ -527,9 +528,11 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-footer-cta::before { content: ""; position: absolute; width: 280px; height: 280px; right: 8%; top: -160px; border: 1px solid ${T.lime}66; border-radius: 50%; box-shadow: 0 0 0 24px ${T.lime}12, 0 0 0 48px ${T.lime}08; animation: ytdFloat 6s ease-in-out infinite; }
   .ytd-footer-cta-button { transition: transform .25s ease, background .25s ease, box-shadow .25s ease; }
   .ytd-footer-cta-button:hover { transform: translateY(-4px) rotate(-1deg); background: ${T.paper} !important; box-shadow: 0 12px 24px -12px #0008; }
-  .ytd-footer-link { display: block; padding: 0; border: 0; background: none; text-align: left; transition: color .2s ease, transform .2s ease; }
+  .ytd-footer-link { display: block; padding: 0; border: 0; background: none; text-align: left; text-decoration: none; transition: color .2s ease, transform .2s ease; }
   .ytd-footer-link:hover { color: ${T.green} !important; transform: translateX(6px); }
   .ytd-footer-brand { animation: ytdAdminIn .7s .15s both; }
+  .ytd-to-top { position: fixed; right: 22px; bottom: 22px; z-index: 50; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid ${T.line}; border-radius: 50%; color: ${T.ink}; background: ${T.paper}; cursor: pointer; box-shadow: ${T.shadowCard}; transition: opacity .3s ease, transform .25s cubic-bezier(.16,1,.3,1), background .25s ease, color .25s ease, border-color .25s ease; }
+  .ytd-to-top:hover { transform: translateY(-4px); background: ${T.greenDeep}; border-color: ${T.greenDeep}; color: ${T.paper}; }
   .ytd-hero-visual { animation: ytdFadeUp .9s .18s cubic-bezier(.16,1,.3,1) both; }
   .ytd-editorial-hero .ytd-hero-visual::before, .ytd-editorial-hero .ytd-hero-visual::after { content: ''; position: absolute; z-index: -1; border: 1px solid ${T.red}55; border-radius: 50%; pointer-events: none; }
   .ytd-editorial-hero .ytd-hero-visual::before { inset: -18px 22px 20px -18px; animation: ytdOrbit 12s linear infinite; }

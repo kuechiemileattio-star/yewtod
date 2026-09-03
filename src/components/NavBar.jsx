@@ -9,6 +9,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const links = [
     [PATHS.home, "Home", true],
     [PATHS.works, "Works", false],
@@ -20,6 +21,7 @@ export default function NavBar() {
     const updateProgress = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? (window.scrollY / max) * 100 : 0);
+      setScrolled(window.scrollY > 8);
     };
     window.addEventListener("scroll", updateProgress, { passive: true });
     updateProgress();
@@ -31,7 +33,7 @@ export default function NavBar() {
     padding: "10px 13px", position: "relative", textDecoration: "none", display: "inline-block",
   });
   return (
-    <div className="ytd-navbar" style={{ position: "sticky", top: 0, zIndex: 40, background: `${T.paper}F2`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${T.line}` }}>
+    <div className={`ytd-navbar ${scrolled ? "ytd-navbar-scrolled" : ""}`} style={{ position: "sticky", top: 0, zIndex: 40, background: `${T.paper}F2`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${T.line}` }}>
       <div className="ytd-scroll-progress" style={{ width: `${progress}%` }} />
       <div style={{ maxWidth: 1180, margin: "0 auto", padding: "15px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 28 }}>
         <button onClick={() => navigate(PATHS.home)} className="ytd-logo-btn" style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>

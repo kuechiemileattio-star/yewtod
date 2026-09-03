@@ -5,6 +5,7 @@ export const FONTS = `
 export const T = {
   paper: "#F7F3EC",
   paperAlt: "#E8EEF3",
+  paperDeep: "#EFE7D8",
   ink: "#172238",
   inkSoft: "#657286",
   line: "#CAD5DF",
@@ -12,4 +13,6 @@ export const T = {
   greenDeep: "#172A46",
   red: "#2E91A1",
   lime: "#F5B94D",
+  shadowCard: "0 22px 40px -30px rgba(23, 34, 56, 0.35)",
+  shadowLift: "0 30px 54px -28px rgba(23, 34, 56, 0.45)",
 };

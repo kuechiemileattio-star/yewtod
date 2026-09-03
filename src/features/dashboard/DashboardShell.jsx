@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutGrid, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft } from "lucide-react";
+import { LayoutGrid, FileText, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft, User } from "lucide-react";
 import { T } from "../../theme.js";
 import { PATHS } from "../../lib/paths.js";
 import { useAuth } from "../../contexts/AuthContext.jsx";
@@ -8,10 +8,12 @@ import BrandLogo from "../../components/BrandLogo.jsx";
 
 const MODULES = [
   { to: "", label: "Vue d'ensemble", icon: LayoutGrid, permission: null, end: true },
+  { to: "publications", label: "Publications", icon: FileText, permission: "manage_articles" },
   { to: "books", label: "Livres", icon: BookOpen, permission: "manage_books" },
   { to: "collaborations", label: "Collaborations", icon: Handshake, permission: "manage_collaborations" },
   { to: "settings", label: "Paramètres", icon: Settings, permission: "manage_settings" },
   { to: "users", label: "Utilisateurs & rôles", icon: Users, permission: "manage_users" },
+  { to: "profile", label: "Mon profil", icon: User, permission: null },
 ];
 
 export default function DashboardShell() {
@@ -54,7 +56,12 @@ export default function DashboardShell() {
             <span className="ytd-admin-kicker">Yewtod SS / CMS</span>
             <strong>{profile?.full_name || profile?.email}</strong>
           </div>
-          <span className="ytd-admin-live"><span /> {profile?.role?.name || "Membre"}</span>
+          <button onClick={() => navigate("profile")} style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "none", cursor: "pointer" }} aria-label="Voir mon profil">
+            <span className="ytd-admin-live"><span /> {profile?.role?.name || "Membre"}</span>
+            {profile?.avatar_url
+              ? <img src={profile.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: `1px solid ${T.line}` }} />
+              : <span style={{ display: "grid", placeItems: "center", width: 30, height: 30, borderRadius: "50%", background: T.greenDeep, color: T.paper, fontSize: 12, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{(profile?.full_name || profile?.email || "?").slice(0, 1).toUpperCase()}</span>}
+          </button>
         </div>
         <Outlet />
       </main>

@@ -4,7 +4,7 @@
    listes = chaînes séparées par des retours à la ligne).
 ============================================================= */
 
-const ARRAY_FIELDS = new Set([
+export const ARRAY_FIELDS = new Set([
   "quotes", "images", "embeddedVideos", "references", "tags", "coAuthors",
   "charts", "tables", "appendices", "bibliography", "authors", "diagrams",
   "usefulLinks", "videos", "guests", "additionalResources", "speakers",
@@ -12,7 +12,7 @@ const ARRAY_FIELDS = new Set([
   "favoriteQuotes", "illustrations", "relatedDocuments", "attachments",
 ]);
 
-const JSON_LIST_FIELDS = new Set(["relatedContent", "relatedArticles", "similarBooks"]);
+export const JSON_LIST_FIELDS = new Set(["relatedContent", "relatedArticles", "similarBooks"]);
 
 export function snakeToCamel(str) {
   return str.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
@@ -56,7 +56,15 @@ export function uiToRow(ui) {
       out[snakeKey] = value.split("\n").map(s => s.trim()).filter(Boolean);
       continue;
     }
-    out[snakeKey] = value;
+    if (JSON_LIST_FIELDS.has(key) && value === "") {
+      // These jsonb columns are NOT NULL DEFAULT '[]' — an explicit null
+      // would override the default and violate the constraint.
+      out[snakeKey] = [];
+      continue;
+    }
+    // Empty strings are invalid for date/timestamp/numeric columns (e.g. an
+    // untouched "Date de publication" field) — Postgres wants null instead.
+    out[snakeKey] = value === "" ? null : value;
   }
   return out;
 }

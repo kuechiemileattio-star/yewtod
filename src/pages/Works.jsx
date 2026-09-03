@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
-import { CATEGORIES } from "../lib/contentTypes.js";
+import { CATEGORIES, fmtDate } from "../lib/contentTypes.js";
 import { workPath } from "../lib/paths.js";
 import { useWorks } from "../hooks/useWorks.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
+import Tag from "../components/Tag.jsx";
 
 export default function Works() {
   const navigate = useNavigate();
@@ -38,11 +39,31 @@ export default function Works() {
       {loading ? (
         <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>Chargement…</p>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }} className="ytd-grid-3">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "40px 32px" }} className="ytd-grid-3">
           {filtered.map((w, i) => (
-            <Reveal key={w.id} delay={(i % 3) * 80} as="div">
-              <article onClick={() => openWork(w)} onKeyDown={event => event.key === "Enter" && openWork(w)} className="ytd-card ytd-work-card" style={{ cursor: "pointer" }} role="link" tabIndex={0} aria-label={`Voir le détail de ${w.title}`}>
-                <Cover tone={w.tone} label={w.category} title={w.title} tall image={w.coverImage} />
+            <Reveal key={w.id} delay={(i % 3) * 80} as="div" style={{ height: "100%" }}>
+              <article
+                onClick={() => openWork(w)}
+                onKeyDown={event => event.key === "Enter" && openWork(w)}
+                className="ytd-card ytd-work-card"
+                style={{ cursor: "pointer", display: "flex", flexDirection: "column", height: "100%" }}
+                role="link" tabIndex={0} aria-label={`Voir le détail de ${w.title}`}
+              >
+                <Cover tone={w.tone} label={w.category} image={w.coverImage} tall />
+                <div style={{ marginTop: 16, display: "flex", flexDirection: "column", flex: 1 }}>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>
+                    {fmtDate(w.date)}{w.readTime ? ` · ${w.readTime}` : ""}
+                  </span>
+                  <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 19, fontWeight: 600, margin: "8px 0 8px", lineHeight: 1.28 }}>{w.title}</h3>
+                  {w.excerpt && (
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: T.inkSoft, lineHeight: 1.55, margin: "0 0 12px", flex: 1 }}>
+                      {w.excerpt.length > 130 ? `${w.excerpt.slice(0, 130).trimEnd()}…` : w.excerpt}
+                    </p>
+                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: "auto" }}>
+                    {(w.tags || "").split("\n").filter(Boolean).slice(0, 3).map(tag => <Tag key={tag}>{tag}</Tag>)}
+                  </div>
+                </div>
               </article>
             </Reveal>
           ))}

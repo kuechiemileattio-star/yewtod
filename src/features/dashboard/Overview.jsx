@@ -34,7 +34,9 @@ export default function Overview() {
   }, []);
 
   const cards = [
-    { label: "Publications (tous types)", value: stats?.totalWorks, icon: FileText },
+    hasPermission("manage_articles")
+      ? { label: "Publications (tous types)", value: stats?.totalWorks, icon: FileText, onClick: () => navigate("publications") }
+      : { label: "Publications (tous types)", value: stats?.totalWorks, icon: FileText },
     hasPermission("manage_books") && { label: "Livres référencés", value: stats?.books, icon: BookOpen, onClick: () => navigate("books") },
     hasPermission("manage_collaborations") && { label: "Collaborations reçues", value: stats?.collabsTotal, icon: Inbox, onClick: () => navigate("collaborations") },
     hasPermission("manage_collaborations") && { label: "À traiter", value: stats?.collabsNew, icon: TrendingUp, onClick: () => navigate("collaborations") },
@@ -61,7 +63,7 @@ export default function Overview() {
       </div>
 
       <p style={{ marginTop: 32, color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13, maxWidth: 560 }}>
-        La gestion détaillée des articles, rapports, études, notes de recherche, séries documentaires, expérimentations et visualisations de données arrive dans une prochaine itération — les livres et les collaborations sont déjà pleinement gérables.
+        La création et l'édition des articles, rapports, études, notes de recherche, séries documentaires, expérimentations et visualisations de données arrive dans une prochaine itération — vous pouvez déjà retrouver et consulter tout ce qui est publié ou en brouillon dans "Publications", et les livres et collaborations sont pleinement gérables.
       </p>
     </section>
   );

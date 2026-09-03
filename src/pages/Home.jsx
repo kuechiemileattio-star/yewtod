@@ -182,7 +182,7 @@ export default function Home() {
       </Reveal>
 
       {/* NEWSLETTER */}
-      <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px" }}>
+      <Reveal as="section" id="newsletter" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px", scrollMarginTop: 100 }}>
         <div className="ytd-newsletter-panel" style={{ background: T.greenDeep, padding: "56px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
           <div style={{ maxWidth: 460 }}>
             <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 26, color: "#fff", margin: "0 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>

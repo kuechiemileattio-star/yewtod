@@ -7,8 +7,15 @@ export default function PublicLayout() {
   const location = useLocation();
 
   useEffect(() => {
+    if (location.hash) {
+      const target = document.getElementById(location.hash.slice(1));
+      if (target) {
+        window.requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "start" }));
+        return;
+      }
+    }
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   return (
     <>

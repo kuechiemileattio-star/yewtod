@@ -30,3 +30,18 @@ export function useSiteSettings() {
 
   return { settings, loading };
 }
+
+/** Public, read-only access to `social_links`, ordered for display. */
+export function useSocialLinks() {
+  const [links, setLinks] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.from("social_links").select("*").order("display_order", { ascending: true }).then(({ data, error }) => {
+      if (!cancelled && !error) setLinks(data || []);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  return links;
+}
