@@ -94,11 +94,13 @@ export default function Home() {
             [Network, "Relier", "Des ponts entre données, institutions, économie, technologie et expériences de terrain."],
             [Lightbulb, "Expérimenter", "Des méthodes, des livres et des idées testées pour apprendre sans simplifier à outrance."],
           ].map(([Icon, title, text], index) => (
-            <article className="ytd-platform-pillar" key={title} style={{ animationDelay: `${index * 100}ms` }}>
-              <div className="ytd-platform-icon"><Icon size={20} /></div>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
+            <Reveal key={title} delay={index * 100}>
+              <article className="ytd-platform-pillar">
+                <div className="ytd-platform-icon"><Icon size={20} /></div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -183,20 +185,21 @@ export default function Home() {
 
       {/* NEWSLETTER */}
       <Reveal as="section" id="newsletter" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px", scrollMarginTop: 100 }}>
-        <div className="ytd-newsletter-panel" style={{ background: T.greenDeep, padding: "56px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
+        <div className="ytd-newsletter-panel" style={{ background: T.paper, borderLeft: `1px solid ${T.line}`, borderRight: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}`, borderTop: `4px solid ${T.green}`, padding: "48px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
           <div style={{ maxWidth: 460 }}>
-            <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 26, color: "#fff", margin: "0 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, color: "#D9E4E2", margin: 0, lineHeight: 1.6 }}>
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: T.green, textTransform: "uppercase", letterSpacing: "0.08em" }}>Rester informé·e</span>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, color: T.ink, margin: "8px 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, color: T.inkSoft, margin: 0, lineHeight: 1.6 }}>
               Un e-mail occasionnel, sans bruit, quand un nouvel article ou rapport est publié.
             </p>
           </div>
           {sent ? (
-            <div style={{ fontFamily: "'Inter', sans-serif", color: "#fff", display: "flex", alignItems: "center", gap: 8 }}><Check size={18} /> Merci, vous serez prévenu·e.</div>
+            <div style={{ fontFamily: "'Inter', sans-serif", color: T.green, display: "flex", alignItems: "center", gap: 8, fontWeight: 600 }}><Check size={18} /> Merci, vous serez prévenu·e.</div>
           ) : (
             <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com"
-                style={{ padding: "13px 16px", border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 14, minWidth: 240, outline: "none" }} />
-              <Btn type="submit" variant="solid" style={{ background: "#fff", color: T.greenDeep, border: "none", opacity: submitting ? 0.7 : 1 }}>S'inscrire <Mail size={15} /></Btn>
+                style={{ padding: "13px 16px", border: `1px solid ${T.line}`, background: "#fff", color: T.ink, fontFamily: "'Inter', sans-serif", fontSize: 14, minWidth: 240, outline: "none" }} />
+              <Btn type="submit" variant="green" style={{ opacity: submitting ? 0.7 : 1 }}>S'inscrire <Mail size={15} /></Btn>
             </form>
           )}
         </div>

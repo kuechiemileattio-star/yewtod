@@ -53,7 +53,9 @@ export default function Collaborations() {
       <aside className="ytd-collab-aside">
         <span className="ytd-collab-aside-label">Ce que nous pouvons construire</span>
         {[[FlaskConical, "Recherche", "Problème, terrain, données et méthode."], [PenLine, "Écriture", "Article, livre, note ou série éditoriale."], [Mic2, "Transmission", "Interview, intervention ou conversation publique."]].map(([Icon, title, text], index) => (
-          <div className="ytd-collab-type" key={title} style={{ animationDelay: `${index * 90}ms` }}><Icon size={18} /><div><strong>{title}</strong><span>{text}</span></div></div>
+          <Reveal key={title} delay={index * 90}>
+            <div className="ytd-collab-type"><Icon size={18} /><div><strong>{title}</strong><span>{text}</span></div></div>
+          </Reveal>
         ))}
       </aside>
       <div className="ytd-collab-form-wrap">

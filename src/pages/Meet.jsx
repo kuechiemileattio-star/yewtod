@@ -38,7 +38,9 @@ export default function Meet() {
         <SectionLabel>La manière de travailler</SectionLabel>
         <div className="ytd-meet-method-grid">
           {[[BookOpen, "Observer", "Lire largement, écouter les terrains et regarder les données avant de tirer des conclusions."], [Network, "Relier", "Mettre en relation les disciplines, les institutions et les expériences qui éclairent un même problème."], [Target, "Rendre utile", "Publier des analyses exigeantes, mais assez claires pour nourrir une décision ou une conversation."]].map(([Icon, title, text], index) => (
-            <article className="ytd-meet-method-card" key={title} style={{ animationDelay: `${index * 100}ms` }}><div><Icon size={20} /></div><h2>{title}</h2><p>{text}</p></article>
+            <Reveal key={title} delay={index * 100}>
+              <article className="ytd-meet-method-card"><div><Icon size={20} /></div><h2>{title}</h2><p>{text}</p></article>
+            </Reveal>
           ))}
         </div>
       </section>

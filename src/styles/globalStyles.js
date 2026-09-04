@@ -48,7 +48,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-collab-layout { display: grid; grid-template-columns: .72fr 1.28fr; gap: 24px; align-items: start; }
   .ytd-collab-aside { padding: 26px; color: ${T.paper}; background: ${T.greenDeep}; border-radius: 14px; animation: ytdDashboardRise .65s .12s cubic-bezier(.16,1,.3,1) both; }
   .ytd-collab-aside-label { display: block; margin-bottom: 22px; color: ${T.lime}; font: 10px 'JetBrains Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
-  .ytd-collab-type { display: flex; align-items: flex-start; gap: 12px; padding: 18px 0; border-top: 1px solid ${T.paper}22; opacity: 0; animation: ytdAdminSlide .55s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-collab-type { display: flex; align-items: flex-start; gap: 12px; padding: 18px 0; border-top: 1px solid ${T.paper}22; }
   .ytd-collab-type svg { flex: 0 0 auto; color: ${T.lime}; }
   .ytd-collab-type strong, .ytd-collab-type span { display: block; }
   .ytd-collab-type strong { margin-bottom: 5px; font: 500 20px 'Fraunces', serif; }
@@ -66,8 +66,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-meet-hero-mark span { text-align: center; font: 11px/1.5 'JetBrains Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
   .ytd-meet-method { padding: 0 0 86px; }
   .ytd-meet-method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .ytd-meet-method-card { min-height: 220px; padding: 24px; background: ${T.paper}; border: 1px solid ${T.line}; border-radius: 12px; opacity: 0; animation: ytdDashboardRise .65s cubic-bezier(.16,1,.3,1) both; transition: transform .3s ease, background .3s ease, box-shadow .3s ease; }
-  .ytd-meet-method-card:hover { transform: translateY(-8px); background: ${T.paperAlt}; box-shadow: 0 18px 30px -24px ${T.greenDeep}; }
+  .ytd-meet-method-card { min-height: 220px; padding: 24px; background: rgba(255,255,255,.55); backdrop-filter: blur(10px); border: 1px solid ${T.line}; border-radius: 12px; transition: transform .3s ease, background .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .ytd-meet-method-card:hover { transform: translateY(-8px); background: ${T.paper}; border-color: ${T.green}; box-shadow: 0 18px 30px -24px ${T.greenDeep}; }
   .ytd-meet-method-card > div { display: grid; place-items: center; width: 42px; height: 42px; color: ${T.paper}; background: ${T.red}; border-radius: 50%; transition: transform .35s ease; }
   .ytd-meet-method-card:hover > div { transform: rotate(12deg) scale(1.1); }
   .ytd-meet-method-card h2 { margin: 28px 0 8px; color: ${T.ink}; font: 500 24px 'Fraunces', serif; }
@@ -82,8 +82,8 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-platform-intro-heading > span { color: ${T.green}; font: 10px 'JetBrains Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
   .ytd-platform-intro-heading h2 { max-width: 700px; margin: 0; color: ${T.ink}; font: 400 clamp(28px, 4vw, 44px) 'Fraunces', serif; line-height: 1.04; letter-spacing: -.04em; }
   .ytd-platform-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .ytd-platform-pillar { min-height: 190px; padding: 22px; border: 1px solid ${T.line}; background: ${T.paper}; border-radius: 12px; opacity: 0; animation: ytdDashboardRise .65s cubic-bezier(.16,1,.3,1) both; transition: transform .3s ease, background .3s ease, box-shadow .3s ease; }
-  .ytd-platform-pillar:hover { transform: translateY(-6px); background: ${T.paperAlt}; box-shadow: 0 16px 28px -24px ${T.greenDeep}; }
+  .ytd-platform-pillar { min-height: 190px; padding: 22px; border: 1px solid ${T.line}; background: rgba(255,255,255,.55); backdrop-filter: blur(10px); border-radius: 12px; transition: transform .3s ease, background .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .ytd-platform-pillar:hover { transform: translateY(-6px); background: ${T.paper}; border-color: ${T.green}; box-shadow: 0 16px 28px -24px ${T.greenDeep}; }
   .ytd-platform-icon { display: grid; place-items: center; width: 40px; height: 40px; color: ${T.paper}; background: ${T.greenDeep}; border-radius: 50%; transition: transform .35s ease, background .35s ease; }
   .ytd-platform-pillar:hover .ytd-platform-icon { transform: rotate(12deg) scale(1.1); background: ${T.green}; }
   .ytd-platform-pillar h3 { margin: 22px 0 7px; color: ${T.ink}; font: 500 23px 'Fraunces', serif; }

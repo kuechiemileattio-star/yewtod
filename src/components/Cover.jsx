@@ -10,6 +10,7 @@ export default function Cover({ tone, label, tall, image, title }) {
     "Visualisations de données": "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=85",
     Expérimentations: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=85",
     "Séries documentaires": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=85",
+    "Épisodes documentaires": "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=1200&q=85",
   };
   return (
     <div
