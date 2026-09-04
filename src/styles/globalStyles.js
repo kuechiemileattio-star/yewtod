@@ -580,10 +580,12 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-collab-aside { order: 2; }
     .ytd-collab-form-wrap { order: 1; }
     .ytd-qa-row { grid-template-columns: 1fr !important; gap: 10px !important; }
-    .ytd-admin-sidebar { display: none; }
+    .ytd-admin-sidebar { position: fixed !important; z-index: 95; top: 0 !important; left: 0; bottom: 0; width: 78vw !important; max-width: 300px; height: 100vh !important; transform: translateX(-100%); transition: transform .3s cubic-bezier(.16,1,.3,1); box-shadow: 0 0 40px -10px rgba(0,0,0,.5); overflow-y: auto; }
+    .ytd-admin-sidebar-open { transform: translateX(0); }
+    .ytd-admin-sidebar-close { display: inline-flex !important; }
+    .ytd-admin-sidebar-backdrop { position: fixed; inset: 0; z-index: 90; background: rgba(15,20,35,.55); animation: ytdAdminFade .2s ease both; }
+    .ytd-admin-mobile-toggle { display: inline-flex !important; }
     .ytd-admin-main { padding: 24px 20px 54px !important; }
-    .ytd-admin-mobile-tabs { display: flex; gap: 8px; overflow-x: auto; margin: -4px 0 22px; padding: 2px 2px 8px; scrollbar-width: thin; }
-    .ytd-admin-topbar { align-items: flex-start; flex-direction: column; }
     .ytd-dashboard-stat-grid, .ytd-dashboard-grid { grid-template-columns: 1fr !important; }
     .ytd-dashboard-hero { align-items: flex-start; flex-direction: column; padding: 24px; }
     .ytd-dashboard-bar-row { grid-template-columns: 1fr 80px 18px; gap: 8px; font-size: 9px; }
