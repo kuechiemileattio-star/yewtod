@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { T } from "../theme.js";
 import { CATEGORIES, fmtDate } from "../lib/contentTypes.js";
 import { workPath } from "../lib/paths.js";
@@ -13,7 +13,16 @@ export default function Works() {
   const navigate = useNavigate();
   const { works, loading } = useWorks();
   useDocumentMeta("Works", "Articles, rapports, études, notes de recherche, séries documentaires, expérimentations et visualisations de données publiés par Yewtod SS.");
-  const [cat, setCat] = useState(() => sessionStorage.getItem("yewtod-works-filter") || "Toutes");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categorieParam = searchParams.get("categorie");
+  const [cat, setCat] = useState(() => (categorieParam && CATEGORIES.includes(categorieParam)) ? categorieParam : (sessionStorage.getItem("yewtod-works-filter") || "Toutes"));
+
+  function selectCategory(c) {
+    setCat(c);
+    sessionStorage.setItem("yewtod-works-filter", c);
+    setSearchParams(c === "Toutes" ? {} : { categorie: c }, { replace: true });
+  }
+
   const filtered = cat === "Toutes" ? works : works.filter(w => w.category === cat);
   const openWork = work => navigate(workPath(work.routeSlug, work.slug));
 
@@ -28,7 +37,7 @@ export default function Works() {
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 44 }}>
         {["Toutes", ...CATEGORIES].map(c => (
-          <button key={c} onClick={() => { setCat(c); sessionStorage.setItem("yewtod-works-filter", c); }} className="ytd-pill" style={{
+          <button key={c} onClick={() => selectCategory(c)} className="ytd-pill" style={{
             fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, padding: "8px 14px", cursor: "pointer",
             border: `1px solid ${cat === c ? T.ink : T.line}`, background: cat === c ? T.ink : "transparent",
             color: cat === c ? T.paper : T.inkSoft, borderRadius: 20,
