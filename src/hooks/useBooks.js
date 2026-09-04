@@ -86,5 +86,11 @@ export function useBookReviews(bookId) {
     await reload();
   }
 
-  return { reviews, loading, publishReview };
+  async function deleteReview(id) {
+    const { error } = await supabase.from("book_reviews").delete().eq("id", id);
+    if (error) throw error;
+    await reload();
+  }
+
+  return { reviews, loading, publishReview, deleteReview };
 }

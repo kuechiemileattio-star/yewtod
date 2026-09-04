@@ -11,6 +11,7 @@ import Cover from "../../components/Cover.jsx";
 import StatusPill from "../../components/StatusPill.jsx";
 import Btn from "../../components/Btn.jsx";
 import WorkEditor from "../../components/dashboard/WorkEditor.jsx";
+import WorkPreviewModal from "../../components/dashboard/WorkPreviewModal.jsx";
 
 const STATUS_LABELS = { draft: "Brouillon", published: "Publié", scheduled: "Programmé" };
 
@@ -23,6 +24,7 @@ export default function PublicationsPanel() {
   const [pickingType, setPickingType] = useState(false);
   const [editingWork, setEditingWork] = useState(null);
   const [editingType, setEditingType] = useState(null);
+  const [previewingWork, setPreviewingWork] = useState(null);
 
   const filtered = works.filter(w =>
     (category === "Toutes" || w.category === category) &&
@@ -62,7 +64,7 @@ export default function PublicationsPanel() {
         <div className="ytd-admin-publication-grid">
           {filtered.map((w, index) => (
             <article className="ytd-admin-publication-card" key={w.id} style={{ animationDelay: `${index * 40}ms` }}>
-              <button type="button" className="ytd-admin-publication-cover" onClick={() => startEdit(w)} aria-label={`Modifier ${w.title}`}>
+              <button type="button" className="ytd-admin-publication-cover" onClick={() => setPreviewingWork(w)} aria-label={`Aperçu de ${w.title}`}>
                 <Cover tone={T.green} label={w.category} title={w.title} image={w.coverImage} tall />
               </button>
               <div className="ytd-admin-publication-card-meta">
@@ -104,6 +106,14 @@ export default function PublicationsPanel() {
           work={editingWork}
           onClose={() => { setEditingType(null); setEditingWork(null); }}
           onSaved={async () => { setEditingType(null); setEditingWork(null); await reload(); }}
+        />
+      )}
+
+      {previewingWork && (
+        <WorkPreviewModal
+          work={previewingWork}
+          onEdit={() => { startEdit(previewingWork); setPreviewingWork(null); }}
+          onClose={() => setPreviewingWork(null)}
         />
       )}
     </div>

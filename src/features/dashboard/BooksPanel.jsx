@@ -8,6 +8,7 @@ import Btn from "../../components/Btn.jsx";
 import Field, { inputStyle } from "../../components/Field.jsx";
 import StatusPill from "../../components/StatusPill.jsx";
 import MediaField from "../../components/dashboard/MediaField.jsx";
+import BookPreviewModal from "../../components/dashboard/BookPreviewModal.jsx";
 
 const STATUS_LABELS = { draft: "Brouillon", published: "Publié", scheduled: "Programmé" };
 const DIFFICULTY_OPTIONS = Object.entries(BOOK_DIFFICULTY_LABELS);
@@ -59,6 +60,7 @@ export default function BooksPanel() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("Toutes");
   const [editing, setEditing] = useState(null);
+  const [previewing, setPreviewing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -101,7 +103,7 @@ export default function BooksPanel() {
       {loading ? <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</p> : (
         <div className="ytd-admin-books">
           {filtered.map((book, index) => (
-            <article key={book.id} className="ytd-admin-book-card" style={{ animationDelay: `${index * 55}ms` }}>
+            <article key={book.id} className="ytd-admin-book-card" style={{ animationDelay: `${index * 55}ms`, cursor: "pointer" }} onClick={() => setPreviewing(book)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && setPreviewing(book)}>
               <div className="ytd-admin-book-cover" style={{ background: `linear-gradient(145deg, ${T.green}, ${T.greenDeep})` }}>
                 {book.coverImage && <img src={book.coverImage} alt="" onError={e => { e.currentTarget.style.display = "none"; }} />}
                 <BookOpen size={22} />
@@ -116,8 +118,8 @@ export default function BooksPanel() {
                 <StatusPill statut={STATUS_LABELS[book.status]} />
               </div>
               <div style={{ position: "absolute", bottom: 12, right: 12, display: "flex", gap: 6 }}>
-                <button className="ytd-admin-icon-button" onClick={() => setEditing(book)} aria-label={`Modifier ${book.title}`}><Edit3 size={15} /></button>
-                <button className="ytd-admin-icon-button" onClick={() => handleDelete(book.id)} aria-label={`Supprimer ${book.title}`}><Trash2 size={15} /></button>
+                <button className="ytd-admin-icon-button" onClick={e => { e.stopPropagation(); setEditing(book); }} aria-label={`Modifier ${book.title}`}><Edit3 size={15} /></button>
+                <button className="ytd-admin-icon-button" onClick={e => { e.stopPropagation(); handleDelete(book.id); }} aria-label={`Supprimer ${book.title}`}><Trash2 size={15} /></button>
               </div>
             </article>
           ))}
@@ -126,6 +128,7 @@ export default function BooksPanel() {
       )}
 
       {editing && <BookEditor book={editing} onChange={setEditing} onSave={handleSave} onClose={() => setEditing(null)} saving={saving} />}
+      {previewing && <BookPreviewModal book={previewing} onEdit={() => { setEditing(previewing); setPreviewing(null); }} onClose={() => setPreviewing(null)} />}
     </div>
   );
 }
