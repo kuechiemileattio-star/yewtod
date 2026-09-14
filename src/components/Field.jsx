@@ -1,11 +1,12 @@
 import React from "react";
 import { T } from "../theme.js";
 
-export default function Field({ label, children }) {
+export default function Field({ label, hint, children }) {
   return (
-    <label style={{ display: "block" }}>
-      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: T.inkSoft, textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: 8 }}>{label}</span>
+    <label className="ytd-field" style={{ display: "block" }}>
+      <span className="ytd-field-label" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: T.inkSoft, textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: 8 }}>{label}</span>
       {children}
+      {hint && <span style={{ display: "block", marginTop: 6, color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 11.5 }}>{hint}</span>}
     </label>
   );
 }

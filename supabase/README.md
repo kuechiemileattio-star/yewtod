@@ -11,7 +11,9 @@ de `supabase/migrations/` **dans l'ordre**, puis `supabase/seed.sql` :
 4. `migrations/004_settings_media_newsletter_invitations.sql` — paramètres du site, pages éditables, réseaux sociaux, newsletter, médiathèque, invitations.
 5. `migrations/005_rls_policies.sql` — Row Level Security sur toutes les tables.
 6. `migrations/006_storage_buckets.sql` — buckets Storage (`covers`, `documents`, `media-library`, `avatars`) + policies.
-7. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
+7. `migrations/007_reports_pdf_metadata.sql` — colonnes `page_count` et `table_of_contents` sur `reports` (extraites automatiquement du PDF importé, voir §7).
+8. `migrations/008_articles_pdf.sql` — mêmes colonnes (+ `pdf_file`) sur `articles`, pour pouvoir aussi joindre un PDF à un article.
+9. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
 
 Si tu préfères la CLI Supabase (`supabase db push` / `supabase migration up`),
 les fichiers sont déjà nommés dans l'ordre attendu par la CLI.
@@ -97,3 +99,9 @@ permission `invite_users`. Cela appelle l'Edge Function `invite-user`, qui :
 Dashboard → module correspondant (Articles, Rapports, Études, …) → éditeur
 Markdown → choisir `draft` / `published` / `scheduled` et une date. Le contenu
 publié apparaît immédiatement sur le site public (`Works`, `Books`, `Home`).
+
+Pour un **Rapport** : au moment où le PDF est déposé dans le formulaire, le
+nombre de pages et le sommaire (table des matières) sont extraits
+automatiquement depuis le fichier lui-même (ses signets/outline PDF, quand le
+fichier en contient) — rien à saisir à la main. Un PDF sans signets ne produit
+simplement pas de sommaire.

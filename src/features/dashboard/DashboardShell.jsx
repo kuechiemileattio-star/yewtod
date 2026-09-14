@@ -1,20 +1,33 @@
 import React, { useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutGrid, FileText, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft, User, Menu, X } from "lucide-react";
+import { LayoutGrid, FileText, FileBarChart2, Newspaper, BarChart3, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft, User, Menu, X } from "lucide-react";
 import { T } from "../../theme.js";
 import { PATHS } from "../../lib/paths.js";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import BrandLogo from "../../components/BrandLogo.jsx";
 
-const MODULES = [
-  { to: "", label: "Vue d'ensemble", icon: LayoutGrid, permission: null, end: true },
-  { to: "publications", label: "Publications", icon: FileText, permission: "manage_articles" },
-  { to: "books", label: "Livres", icon: BookOpen, permission: "manage_books" },
-  { to: "collaborations", label: "Collaborations", icon: Handshake, permission: "manage_collaborations" },
-  { to: "settings", label: "Paramètres", icon: Settings, permission: "manage_settings" },
-  { to: "users", label: "Utilisateurs & rôles", icon: Users, permission: "manage_users" },
-  { to: "profile", label: "Mon profil", icon: User, permission: null },
+const NAV_GROUPS = [
+  { label: null, items: [
+    { to: "", label: "Vue d'ensemble", icon: LayoutGrid, permission: null, end: true },
+  ] },
+  { label: "Contenu", items: [
+    { to: "rapports", label: "Rapports", icon: FileBarChart2, permission: "manage_articles" },
+    { to: "articles", label: "Articles", icon: Newspaper, permission: "manage_articles" },
+    { to: "visualisations", label: "Visualisations", icon: BarChart3, permission: "manage_articles" },
+    { to: "books", label: "Livres", icon: BookOpen, permission: "manage_books" },
+    { to: "publications", label: "Autres publications", icon: FileText, permission: "manage_articles" },
+    { to: "collaborations", label: "Collaborations", icon: Handshake, permission: "manage_collaborations" },
+  ] },
+  { label: "Administration", items: [
+    { to: "users", label: "Utilisateurs & rôles", icon: Users, permission: "manage_users" },
+    { to: "settings", label: "Paramètres", icon: Settings, permission: "manage_settings" },
+  ] },
+  { label: null, items: [
+    { to: "profile", label: "Mon profil", icon: User, permission: null },
+  ] },
 ];
+
+const MODULES = NAV_GROUPS.flatMap(g => g.items);
 
 export default function DashboardShell() {
   const { profile, hasPermission, signOut } = useAuth();
@@ -46,15 +59,24 @@ export default function DashboardShell() {
           <BrandLogo dark />
           <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9.5, color: T.lime, border: `1px solid ${T.lime}66`, padding: "2px 6px", borderRadius: 10 }}>CMS</span>
         </div>
-        {visibleModules.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to || "overview"} to={to} end={end} onClick={() => setMobileNavOpen(false)} className="ytd-admin-tab" style={({ isActive }) => ({
-            width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", marginBottom: 4,
-            background: isActive ? T.lime : "transparent", border: "none", borderLeft: isActive ? `3px solid ${T.paper}` : "3px solid transparent", borderRadius: 4, textDecoration: "none",
-            fontFamily: "'Manrope', sans-serif", fontSize: 13, color: isActive ? T.ink : `${T.paper}BB`, fontWeight: isActive ? 800 : 600,
-          })}>
-            <Icon size={16} /> {label}
-          </NavLink>
-        ))}
+        {NAV_GROUPS.map((group, groupIndex) => {
+          const items = group.items.filter(m => !m.permission || hasPermission(m.permission));
+          if (!items.length) return null;
+          return (
+            <div key={group.label || `group-${groupIndex}`} style={{ marginBottom: 10 }}>
+              {group.label && <span style={{ display: "block", padding: "10px 12px 6px", fontFamily: "'Space Mono', monospace", fontSize: 9.5, color: `${T.paper}77`, textTransform: "uppercase", letterSpacing: "0.1em" }}>{group.label}</span>}
+              {items.map(({ to, label, icon: Icon, end }) => (
+                <NavLink key={to || "overview"} to={to} end={end} onClick={() => setMobileNavOpen(false)} className="ytd-admin-tab" style={({ isActive }) => ({
+                  width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", marginBottom: 4,
+                  background: isActive ? T.lime : "transparent", border: "none", borderLeft: isActive ? `3px solid ${T.paper}` : "3px solid transparent", borderRadius: 4, textDecoration: "none",
+                  fontFamily: "'Manrope', sans-serif", fontSize: 13, color: isActive ? T.ink : `${T.paper}BB`, fontWeight: isActive ? 800 : 600,
+                })}>
+                  <Icon size={16} /> {label}
+                </NavLink>
+              ))}
+            </div>
+          );
+        })}
         <button onClick={handleSignOut} className="ytd-admin-tab" style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", marginTop: 24, background: "transparent", border: "none", borderTop: `1px solid ${T.paper}22`, borderRadius: 4, cursor: "pointer", fontFamily: "'Manrope', sans-serif", fontSize: 13, color: `${T.paper}99`, fontWeight: 600 }}>
           <LogOut size={16} /> Se déconnecter
         </button>
@@ -71,7 +93,7 @@ export default function DashboardShell() {
               <strong style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentModule?.label}</strong>
             </div>
           </div>
-          <button onClick={() => navigate("profile")} style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "none", cursor: "pointer", flexShrink: 0 }} aria-label="Voir mon profil">
+          <button onClick={() => navigate("profile")} className="ytd-topbar-profile" style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "none", cursor: "pointer", flexShrink: 0 }} aria-label="Voir mon profil">
             <span className="ytd-admin-live"><span /> {profile?.role?.name || "Membre"}</span>
             {profile?.avatar_url
               ? <img src={profile.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: `1px solid ${T.line}` }} />

@@ -1,6 +1,6 @@
 import React from "react";
 import { T } from "../../theme.js";
-import { Section, FieldList, QuoteStack } from "./shared.jsx";
+import { Section, FieldList, QuoteStack, TableOfContents } from "./shared.jsx";
 import MediaDisplay, { extractMediaUrls } from "../MediaDisplay.jsx";
 
 export default function ArticleDetail({ work }) {
@@ -8,9 +8,9 @@ export default function ArticleDetail({ work }) {
   const videos = extractMediaUrls(work.embeddedVideos);
   return (
     <>
-      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: 21, lineHeight: 1.5, color: T.ink, margin: "0 0 34px", paddingBottom: 26, borderBottom: `1px solid ${T.line}` }}>
-        {work.subtitle || work.excerpt}
-      </p>
+      {work.subtitle && !work.summary && <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: 21, lineHeight: 1.5, color: T.ink, margin: "0 0 34px", paddingBottom: 26, borderBottom: `1px solid ${T.line}` }}>{work.subtitle}</p>}
+      <Section title="Résumé">{work.summary}</Section>
+      <TableOfContents items={work.tableOfContents} />
       <Section title="Contenu">{work.content}</Section>
       <QuoteStack value={work.quotes} />
       {(images.length > 0 || videos.length > 0) && (

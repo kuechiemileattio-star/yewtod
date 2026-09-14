@@ -1,16 +1,13 @@
 import React from "react";
-import { T } from "../../theme.js";
 import { fmtDate } from "../../lib/contentTypes.js";
-import { Section, FieldList, FactRow, LinkAction } from "./shared.jsx";
+import { Section, FieldList, FactRow, TableOfContents } from "./shared.jsx";
 
 export default function ReportDetail({ work }) {
   return (
     <>
-      <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: 21, lineHeight: 1.5, color: T.ink, margin: "0 0 6px", paddingBottom: 26, borderBottom: `1px solid ${T.line}` }}>
-        {work.executiveSummary}
-      </p>
+      <Section title="Résumé">{work.executiveSummary}</Section>
       <FactRow facts={[["Version", work.version], ["Auteurs", work.authors], ["Publié le", fmtDate(work.date)]]} />
-      {work.pdfFile && <div style={{ marginBottom: 30 }}><LinkAction href={work.pdfFile} download>Télécharger le rapport (PDF)</LinkAction></div>}
+      <TableOfContents items={work.tableOfContents} />
 
       <Section title="Problématique">{work.problemStatement}</Section>
       <Section title="Contexte">{work.context}</Section>

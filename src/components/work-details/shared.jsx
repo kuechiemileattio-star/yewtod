@@ -2,6 +2,25 @@ import React from "react";
 import { ArrowUpRight, Download } from "lucide-react";
 import { T } from "../../theme.js";
 
+/** Numbered table of contents (from a PDF's auto-extracted outline/bookmarks). */
+export function TableOfContents({ items }) {
+  if (!items?.length) return null;
+  return (
+    <section className="ytd-work-detail-section">
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 500, margin: "0 0 6px", color: T.greenDeep }}>Sommaire</h2>
+      <ol className="ytd-toc-list">
+        {items.map((item, i) => (
+          <li key={i}>
+            <span className="ytd-toc-index">{String(i + 1).padStart(2, "0")}</span>
+            <span className="ytd-toc-title">{item.title}</span>
+            {item.page != null && <span className="ytd-toc-page">p. {item.page}</span>}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 /** A titled prose block — the workhorse of every detail layout. */
 export function Section({ title, children, tight }) {
   if (!children) return null;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Check } from "lucide-react";
 import { T } from "../../theme.js";
 import { useAdminSettings } from "../../hooks/useAdminSettings.js";
 import Field, { inputStyle } from "../../components/Field.jsx";
@@ -65,9 +65,9 @@ export default function SettingsPanel() {
         <div><span className="ytd-admin-kicker">Configuration du projet</span><h1>Paramètres</h1><p>Identité du site, réflexion de la semaine et réseaux sociaux — tout est lu en direct par le site public.</p></div>
       </div>
 
-      {saved && <p style={{ color: T.green, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>{saved}</p>}
+      {saved && <p className="ytd-form-message" style={{ color: T.green, fontSize: 13, marginBottom: 18 }}><Check size={14} /> {saved}</p>}
 
-      <section className="ytd-admin-settings-card">
+      <section className="ytd-admin-settings-card" style={{ animationDelay: "0ms" }}>
         <div className="ytd-admin-settings-card-heading"><div><span>Identité éditoriale</span><h2>Informations du site</h2></div><span className="ytd-admin-settings-index">01</span></div>
         <form onSubmit={saveIdentity} style={{ display: "grid", gap: 18 }}>
           <div className="ytd-admin-settings-fields">
@@ -80,7 +80,7 @@ export default function SettingsPanel() {
         </form>
       </section>
 
-      <section className="ytd-admin-settings-card">
+      <section className="ytd-admin-settings-card" style={{ animationDelay: "70ms" }}>
         <div className="ytd-admin-settings-card-heading"><div><span>Home</span><h2>Réflexion de la semaine</h2></div><span className="ytd-admin-settings-index">02</span></div>
         <form onSubmit={saveReflection} style={{ display: "grid", gap: 18 }}>
           <Field label="Citation"><textarea rows={3} value={reflectionText} onChange={e => setReflectionText(e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>
@@ -89,11 +89,11 @@ export default function SettingsPanel() {
         </form>
       </section>
 
-      <section className="ytd-admin-settings-card">
+      <section className="ytd-admin-settings-card" style={{ animationDelay: "140ms" }}>
         <div className="ytd-admin-settings-card-heading"><div><span>Audience</span><h2>Réseaux sociaux</h2></div><span className="ytd-admin-settings-index">03</span></div>
         <div style={{ display: "grid", gap: 8 }}>
           {socialLinks.map(link => (
-            <div key={link.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1px solid ${T.line}`, background: T.paperAlt }}>
+            <div key={link.id} className="ytd-social-link-row" style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1px solid ${T.line}`, background: T.paperAlt }}>
               <strong style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, minWidth: 100 }}>{link.platform}</strong>
               <span style={{ flex: 1, color: T.inkSoft, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link.url}</span>
               <button onClick={() => removeSocialLink(link.id)} aria-label={`Retirer ${link.platform}`} style={{ border: 0, background: "none", color: T.inkSoft, cursor: "pointer" }}><Trash2 size={15} /></button>

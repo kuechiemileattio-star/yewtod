@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2, ExternalLink } from "lucide-react";
 import { T } from "../../theme.js";
-import { CATEGORIES, CONTENT_TYPES, getTypeByTable, fmtDate } from "../../lib/contentTypes.js";
+import { CONTENT_TYPES, getTypeByTable, fmtDate } from "../../lib/contentTypes.js";
 import { workPath } from "../../lib/paths.js";
 import { useAdminWorks } from "../../hooks/useAdminWorks.js";
 import { useWorkMutations } from "../../hooks/useWorkMutations.js";
@@ -14,6 +14,13 @@ import WorkEditor from "../../components/dashboard/WorkEditor.jsx";
 import WorkPreviewModal from "../../components/dashboard/WorkPreviewModal.jsx";
 
 const STATUS_LABELS = { draft: "Brouillon", published: "Publié", scheduled: "Programmé" };
+
+// Rapports, Articles et Visualisations de données ont leur propre section
+// dédiée dans le dashboard (voir SimpleTypePanel.jsx) — cette page ne gère
+// donc plus que les 5 types de contenu restants.
+const OTHER_TABLES = new Set(["studies", "research_notes", "documentary_series", "documentary_episodes", "experiments"]);
+const OTHER_TYPES = CONTENT_TYPES.filter(t => OTHER_TABLES.has(t.table));
+const OTHER_CATEGORIES = OTHER_TYPES.map(t => t.label);
 
 export default function PublicationsPanel() {
   const navigate = useNavigate();
@@ -27,6 +34,7 @@ export default function PublicationsPanel() {
   const [previewingWork, setPreviewingWork] = useState(null);
 
   const filtered = works.filter(w =>
+    OTHER_TABLES.has(w.table) &&
     (category === "Toutes" || w.category === category) &&
     (status === "Tous" || STATUS_LABELS[w.status] === status)
   );
@@ -51,12 +59,12 @@ export default function PublicationsPanel() {
   return (
     <div className="ytd-admin-view">
       <div className="ytd-admin-section-heading">
-        <div><span className="ytd-admin-kicker">Toutes catégories</span><h1>Publications</h1><p>Créer et gérer articles, rapports, études, notes de recherche, séries et épisodes documentaires, expérimentations et visualisations de données.</p></div>
+        <div><span className="ytd-admin-kicker">Autres types de contenu</span><h1>Autres publications</h1><p>Créer et gérer études, notes de recherche, séries et épisodes documentaires et expérimentations.</p></div>
         <Btn variant="green" onClick={() => setPickingType(true)}><Plus size={15} /> Nouvelle publication</Btn>
       </div>
 
       <div className="ytd-admin-book-toolbar">
-        <div className="ytd-admin-filter-scroll">{["Toutes", ...CATEGORIES].map(c => <button key={c} onClick={() => setCategory(c)} className={category === c ? "is-active" : ""}>{c}</button>)}</div>
+        <div className="ytd-admin-filter-scroll">{["Toutes", ...OTHER_CATEGORIES].map(c => <button key={c} onClick={() => setCategory(c)} className={category === c ? "is-active" : ""}>{c}</button>)}</div>
         <div className="ytd-admin-filter-scroll">{["Tous", "Publié", "Brouillon", "Programmé"].map(s => <button key={s} onClick={() => setStatus(s)} className={status === s ? "is-active" : ""}>{s}</button>)}</div>
       </div>
 
@@ -88,7 +96,7 @@ export default function PublicationsPanel() {
             <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, margin: "0 0 6px" }}>Quel type de publication ?</h2>
             <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13, margin: "0 0 18px" }}>Le formulaire s'adapte ensuite aux champs propres à ce type.</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {CONTENT_TYPES.map(type => (
+              {OTHER_TYPES.map(type => (
                 <button key={type.table} onClick={() => startCreate(type)} style={{ padding: "14px 12px", border: `1px solid ${T.line}`, background: T.paper, color: T.ink, cursor: "pointer", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13.5, borderRadius: 6, transition: "transform .2s ease, border-color .2s ease" }} onMouseEnter={e => { e.currentTarget.style.borderColor = T.green; e.currentTarget.style.transform = "translateY(-2px)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = T.line; e.currentTarget.style.transform = "none"; }}>
                   {type.label}
                 </button>

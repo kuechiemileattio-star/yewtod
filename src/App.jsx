@@ -16,6 +16,8 @@ import Onboarding from "./pages/Onboarding.jsx";
 import DashboardShell from "./features/dashboard/DashboardShell.jsx";
 import Overview from "./features/dashboard/Overview.jsx";
 import PublicationsPanel from "./features/dashboard/PublicationsPanel.jsx";
+import SimpleTypePanel from "./features/dashboard/SimpleTypePanel.jsx";
+import SimpleWorkForm from "./components/dashboard/SimpleWorkForm.jsx";
 import BooksPanel from "./features/dashboard/BooksPanel.jsx";
 import CollaborationsPanel from "./features/dashboard/CollaborationsPanel.jsx";
 import SettingsPanel from "./features/dashboard/SettingsPanel.jsx";
@@ -46,6 +48,15 @@ export default function YewtodSS() {
 
             <Route path={PATHS.dashboard} element={<RequireAuth><DashboardShell /></RequireAuth>}>
               <Route index element={<Overview />} />
+              <Route path="rapports" element={<RequireAuth permission="manage_articles"><SimpleTypePanel tableKey="reports" /></RequireAuth>} />
+              <Route path="rapports/nouveau" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="reports" /></RequireAuth>} />
+              <Route path="rapports/:id" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="reports" /></RequireAuth>} />
+              <Route path="articles" element={<RequireAuth permission="manage_articles"><SimpleTypePanel tableKey="articles" /></RequireAuth>} />
+              <Route path="articles/nouveau" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="articles" /></RequireAuth>} />
+              <Route path="articles/:id" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="articles" /></RequireAuth>} />
+              <Route path="visualisations" element={<RequireAuth permission="manage_articles"><SimpleTypePanel tableKey="data_visualizations" /></RequireAuth>} />
+              <Route path="visualisations/nouveau" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="data_visualizations" /></RequireAuth>} />
+              <Route path="visualisations/:id" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="data_visualizations" /></RequireAuth>} />
               <Route path="publications" element={<RequireAuth permission="manage_articles"><PublicationsPanel /></RequireAuth>} />
               <Route path="books" element={<RequireAuth permission="manage_books"><BooksPanel /></RequireAuth>} />
               <Route path="collaborations" element={<RequireAuth permission="manage_collaborations"><CollaborationsPanel /></RequireAuth>} />

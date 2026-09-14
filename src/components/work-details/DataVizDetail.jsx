@@ -24,11 +24,11 @@ export default function DataVizDetail({ work }) {
       <Section title="Légende">{work.legend}</Section>
       <Section title="Analyse">{work.analysis}</Section>
 
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
-        {work.csvFile && <LinkAction href={work.csvFile} download>Télécharger les données (CSV)</LinkAction>}
-        {work.imageFile && <LinkAction href={work.imageFile} download>Télécharger l'image</LinkAction>}
-        {work.sourceCodeUrl && <LinkAction href={work.sourceCodeUrl}>Code source</LinkAction>}
-      </div>
+      {work.sourceCodeUrl && (
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
+          <LinkAction href={work.sourceCodeUrl}>Code source</LinkAction>
+        </div>
+      )}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Mail, X, ShieldCheck } from "lucide-react";
+import { Plus, Mail, X, ShieldCheck, AlertCircle, Check, Loader2 } from "lucide-react";
 import { T } from "../../theme.js";
 import { useRolesAdmin } from "../../hooks/useRolesAdmin.js";
 import { fmtDate } from "../../lib/contentTypes.js";
@@ -65,7 +65,9 @@ export default function UsersRolesPanel() {
         <div style={{ display: "grid", gap: 8 }}>
           {profiles.map(p => (
             <div key={p.id} className="ytd-admin-member" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div className="ytd-admin-member-avatar">{(p.full_name || p.email || "?").slice(0, 1).toUpperCase()}</div>
+              <div className="ytd-admin-member-avatar">
+                {p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.full_name || p.email || "?").slice(0, 1).toUpperCase()}
+              </div>
               <div className="ytd-admin-member-main" style={{ flex: 1, minWidth: 0 }}>
                 <strong>{p.full_name || "(sans nom)"}</strong>
                 <small>{p.email}</small>
@@ -75,12 +77,15 @@ export default function UsersRolesPanel() {
                 {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
               <StatusPill statut={PROFILE_STATUS_LABELS[p.status]} />
-              <button
-                onClick={() => updateProfile(p.id, { status: p.status === "suspended" ? "active" : "suspended" })}
-                style={{ border: `1px solid ${T.line}`, background: "transparent", color: T.inkSoft, cursor: "pointer", fontSize: 11, padding: "6px 10px", fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                {p.status === "suspended" ? "Réactiver" : "Suspendre"}
-              </button>
+              <label className="ytd-switch" title={p.status === "suspended" ? "Réactiver ce membre" : "Suspendre ce membre"}>
+                <input
+                  type="checkbox"
+                  checked={p.status !== "suspended"}
+                  onChange={e => updateProfile(p.id, { status: e.target.checked ? "active" : "suspended" })}
+                  aria-label={p.status === "suspended" ? "Réactiver" : "Suspendre"}
+                />
+                <span className="ytd-switch-track"><span className="ytd-switch-thumb" /></span>
+              </label>
             </div>
           ))}
           {profiles.length === 0 && <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>Aucun membre pour le moment.</p>}
@@ -154,10 +159,12 @@ export default function UsersRolesPanel() {
               {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
           </Field>
-          <Btn type="submit" variant="green" style={{ opacity: inviting ? 0.7 : 1 }}><Plus size={14} /> {inviting ? "Envoi…" : "Inviter"}</Btn>
+          <Btn type="submit" variant="green" style={{ opacity: inviting ? 0.7 : 1 }}>
+            {inviting ? <Loader2 size={14} className="ytd-spin" /> : <Plus size={14} />} {inviting ? "Envoi…" : "Inviter"}
+          </Btn>
         </form>
-        {inviteError && <p style={{ color: T.red, fontFamily: "'Inter', sans-serif", fontSize: 12.5, marginTop: 10 }}>{inviteError}</p>}
-        {inviteSuccess && <p style={{ color: T.green, fontFamily: "'Inter', sans-serif", fontSize: 12.5, marginTop: 10 }}>{inviteSuccess}</p>}
+        {inviteError && <p className="ytd-form-message" style={{ color: T.red, fontSize: 12.5, marginTop: 10 }}><AlertCircle size={14} /> {inviteError}</p>}
+        {inviteSuccess && <p className="ytd-form-message" style={{ color: T.green, fontSize: 12.5, marginTop: 10 }}><Check size={14} /> {inviteSuccess}</p>}
 
         <div style={{ marginTop: 20 }}>
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: T.inkSoft, textTransform: "uppercase" }}>Invitations</span>
