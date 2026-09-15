@@ -4,9 +4,9 @@ import { CONTENT_TYPES } from "../lib/contentTypes.js";
 import { rowToUi } from "../lib/adapters.js";
 
 async function fetchAll(type) {
-  const { data, error } = await supabase.from(type.table).select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from(type.table).select("*, author_profile:profiles!created_by(full_name)").order("created_at", { ascending: false });
   if (error) return [];
-  return (data || []).map(row => ({ ...rowToUi(row), table: type.table, category: type.label, routeSlug: type.routeSlug }));
+  return (data || []).map(row => ({ ...rowToUi(row), table: type.table, category: type.label, routeSlug: type.routeSlug, authorName: row.author_profile?.full_name || "" }));
 }
 
 /** Every row across the 8 content tables, any status — for the dashboard's Publications list. */

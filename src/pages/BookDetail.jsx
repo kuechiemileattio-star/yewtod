@@ -5,6 +5,7 @@ import { T } from "../theme.js";
 import { bookPath, PATHS } from "../lib/paths.js";
 import { useBook, useBooks, useBookReviews } from "../hooks/useBooks.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
+import useLogView from "../hooks/useLogView.js";
 import Btn from "../components/Btn.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 
@@ -18,6 +19,7 @@ export default function BookDetail() {
   const [reviewText, setReviewText] = useState("");
 
   useDocumentMeta(book?.title, book?.summary || book?.personalReview);
+  useLogView("books", book?.id);
 
   if (loading) return <div style={{ maxWidth: 1080, margin: "0 auto", padding: "120px 24px", color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</div>;
 

@@ -60,7 +60,7 @@ export default function SettingsPanel() {
   if (loading) return <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</p>;
 
   return (
-    <div className="ytd-admin-view ytd-admin-settings">
+    <div className="ytd-dashboard-new ytd-admin-view ytd-admin-settings">
       <div className="ytd-admin-section-heading">
         <div><span className="ytd-admin-kicker">Configuration du projet</span><h1>Paramètres</h1><p>Identité du site, réflexion de la semaine et réseaux sociaux — tout est lu en direct par le site public.</p></div>
       </div>

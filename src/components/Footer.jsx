@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
-import { PATHS, workPath } from "../lib/paths.js";
+import { PATHS } from "../lib/paths.js";
 import { CONTENT_TYPES } from "../lib/contentTypes.js";
 import { useSocialLinks } from "../hooks/useSiteSettings.js";
 import { useNewsletterSubscribe } from "../hooks/useNewsletter.js";
@@ -87,7 +87,7 @@ export default function Footer() {
             ) : (
               <form onSubmit={handleSubscribe} className="ytd-footer-newsletter-form">
                 <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" />
-                <button type="submit" aria-label="S'inscrire" disabled={submitting}><Send size={14} /></button>
+                <button type="submit" disabled={submitting}><Send size={14} /> {submitting ? "Envoi…" : "S'inscrire"}</button>
               </form>
             )}
             {socialLinks.length > 0 && (
@@ -101,13 +101,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="ytd-footer-marquee" aria-hidden="true">
-          <span>SCIENCES SOCIALES&nbsp;&nbsp;/&nbsp;&nbsp;SYSTÈMES COMPLEXES&nbsp;&nbsp;/&nbsp;&nbsp;POLITIQUES PUBLIQUES&nbsp;&nbsp;/&nbsp;&nbsp;INTELLIGENCE ARTIFICIELLE&nbsp;&nbsp;/&nbsp;&nbsp;INNOVATION</span>
-          <span>SCIENCES SOCIALES&nbsp;&nbsp;/&nbsp;&nbsp;SYSTÈMES COMPLEXES&nbsp;&nbsp;/&nbsp;&nbsp;POLITIQUES PUBLIQUES&nbsp;&nbsp;/&nbsp;&nbsp;INTELLIGENCE ARTIFICIELLE&nbsp;&nbsp;/&nbsp;&nbsp;INNOVATION</span>
-        </div>
-
         <div className="ytd-footer-legal">
-          <span>© 2026 Yewtod SS — Tous droits réservés</span>
+          <div className="ytd-footer-legal-left">
+            <span>© 2026 Yewtod SS — Tous droits réservés</span>
+            <span aria-hidden="true">·</span>
+            <span>Sciences sociales</span>
+            <span aria-hidden="true">·</span>
+            <span>Systèmes complexes</span>
+            <span aria-hidden="true">·</span>
+            <span>Politiques publiques</span>
+          </div>
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Retour en haut ↑</button>
         </div>
       </div>

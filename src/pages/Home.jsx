@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Mail, Check, Compass, Network, Lightbulb } from "lucide-react";
+import { ArrowRight, Compass, Network, Lightbulb } from "lucide-react";
 import { T } from "../theme.js";
 import { fmtDate } from "../lib/contentTypes.js";
 import { PATHS, workPath } from "../lib/paths.js";
 import { useWorks } from "../hooks/useWorks.js";
 import { useSiteSettings } from "../hooks/useSiteSettings.js";
-import { useNewsletterSubscribe } from "../hooks/useNewsletter.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import NodeMark from "../components/NodeMark.jsx";
 import Divider from "../components/Divider.jsx";
@@ -20,9 +19,6 @@ export default function Home() {
   const navigate = useNavigate();
   const { works, loading } = useWorks();
   const { settings } = useSiteSettings();
-  const { subscribe, submitting } = useNewsletterSubscribe();
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
   useDocumentMeta(null, settings.seo_description || "Yewtod SS, média personnel de réflexion sur les sciences sociales, les systèmes complexes, l'économie, la politique publique et l'intelligence artificielle.");
 
   const openWork = work => navigate(workPath(work.routeSlug, work.slug));
@@ -31,12 +27,6 @@ export default function Home() {
   const video = works.find(w => w.category === "Séries documentaires");
   const featured = works.slice(1, 5);
   const reflection = settings.reflection_of_week;
-
-  async function handleSubscribe(e) {
-    e.preventDefault();
-    if (!email) return;
-    try { await subscribe(email); setSent(true); } catch { /* surfaced via hook error state */ }
-  }
 
   if (loading) {
     return <div style={{ maxWidth: 1120, margin: "0 auto", padding: "120px 24px", color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</div>;
@@ -61,10 +51,10 @@ export default function Home() {
             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Média de recherche appliquée</span>
           </div>
           <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5.5vw, 62px)", lineHeight: 1.06, fontWeight: 500, color: T.ink, letterSpacing: "-0.015em", margin: 0 }}>
-            Des idées claires pour comprendre un monde complexe.
+            Comprendre le monde sans le simplifier.
           </h1>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 18, lineHeight: 1.65, color: T.inkSoft, marginTop: 24, maxWidth: 620 }}>
-            Yewtod SS est une plateforme indépendante qui rend accessibles les sciences sociales, l'économie, les politiques publiques, les systèmes complexes et l'intelligence artificielle. Nous transformons la recherche en repères utiles pour mieux comprendre, décider et agir.
+            J'écris ici sur les sciences sociales, l'économie, les politiques publiques et l'intelligence artificielle — des sujets que je trouve rarement traités avec la rigueur qu'ils méritent. Pas de plateforme d'entreprise, pas de calendrier éditorial : juste des travaux publiés quand ils sont prêts.
           </p>
           <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
             <Btn variant="green" onClick={() => navigate(PATHS.works)}>Explorer les travaux <ArrowRight size={16} /></Btn>
@@ -85,14 +75,14 @@ export default function Home() {
 
       <section className="ytd-platform-intro" style={{ maxWidth: 1120, margin: "0 auto", padding: "10px 24px 72px" }}>
         <div className="ytd-platform-intro-heading">
-          <span>Ce que vous trouverez ici</span>
-          <h2>Une plateforme pour prendre du recul, puis passer à l'action.</h2>
+          <span>Ce qu'on trouve ici</span>
+          <h2>Pas de raccourcis, mais pas non plus de jargon inutile.</h2>
         </div>
         <div className="ytd-platform-pillars">
           {[
-            [Compass, "Comprendre", "Des articles et des analyses pour décoder les forces qui transforment nos sociétés."],
-            [Network, "Relier", "Des ponts entre données, institutions, économie, technologie et expériences de terrain."],
-            [Lightbulb, "Expérimenter", "Des méthodes, des livres et des idées testées pour apprendre sans simplifier à outrance."],
+            [Compass, "Des analyses", "Sur ce qui change vraiment — pas sur ce qui fait le plus de clics."],
+            [Network, "Du terrain", "Des entretiens, des données croisées, et l'aveu quand une hypothèse ne tient pas."],
+            [Lightbulb, "Des lectures", "Une bibliothèque de livres qui m'ont fait changer d'avis, avec l'avis en question."],
           ].map(([Icon, title, text], index) => (
             <Reveal key={title} delay={index * 100}>
               <article className="ytd-platform-pillar">
@@ -180,28 +170,6 @@ export default function Home() {
               <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: T.inkSoft, flexShrink: 0 }}>{fmtDate(w.date)}</span>
             </div>
           ))}
-        </div>
-      </Reveal>
-
-      {/* NEWSLETTER */}
-      <Reveal as="section" id="newsletter" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 20px", scrollMarginTop: 100 }}>
-        <div className="ytd-newsletter-panel" style={{ background: T.paper, borderLeft: `1px solid ${T.line}`, borderRight: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}`, borderTop: `4px solid ${T.green}`, padding: "48px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 28 }}>
-          <div style={{ maxWidth: 460 }}>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: T.green, textTransform: "uppercase", letterSpacing: "0.08em" }}>Rester informé·e</span>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, color: T.ink, margin: "8px 0 10px", fontWeight: 500 }}>Recevoir les nouvelles publications</h3>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, color: T.inkSoft, margin: 0, lineHeight: 1.6 }}>
-              Un e-mail occasionnel, sans bruit, quand un nouvel article ou rapport est publié.
-            </p>
-          </div>
-          {sent ? (
-            <div style={{ fontFamily: "'Inter', sans-serif", color: T.green, display: "flex", alignItems: "center", gap: 8, fontWeight: 600 }}><Check size={18} /> Merci, vous serez prévenu·e.</div>
-          ) : (
-            <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com"
-                style={{ padding: "13px 16px", border: `1px solid ${T.line}`, background: "#fff", color: T.ink, fontFamily: "'Inter', sans-serif", fontSize: 14, minWidth: 240, outline: "none" }} />
-              <Btn type="submit" variant="green" style={{ opacity: submitting ? 0.7 : 1 }}>S'inscrire <Mail size={15} /></Btn>
-            </form>
-          )}
         </div>
       </Reveal>
     </div>

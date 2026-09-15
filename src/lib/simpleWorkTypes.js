@@ -1,10 +1,11 @@
 /* ============================================================
-   Config for the 3 content types that get their own dashboard
-   section (Rapports, Articles, Visualisations) with a simplified
-   creation page: Titre, Catégorie, Date, Résumé, fichier, image.
-   Livres has its own richer editor (see BooksPanel.jsx) and the
-   5 remaining content types stay under "Autres publications"
-   (see PublicationsPanel.jsx).
+   Config for every "Works" content type except books: all 8 share
+   the same simplified creation page (Titre, Catégorie, Date,
+   Résumé, fichier facultatif, image). Livres keeps its own richer
+   editor (see BooksPanel.jsx) since it isn't a "Works" table.
+   SIMPLE_WORK_ORDER only lists the 3 types with their own sidebar
+   section — that's what the in-page type-switch tabs offer; the
+   other 5 stay reachable from "Autres publications".
 ============================================================= */
 
 export const SIMPLE_WORK_TYPES = {
@@ -46,6 +47,50 @@ export const SIMPLE_WORK_TYPES = {
     fileAccept: ".csv",
     fileBucket: "documents",
   },
+  studies: {
+    table: "studies",
+    adminPath: "etudes",
+    singular: "Étude",
+    plural: "Études",
+    summaryField: "context",
+    summaryLabel: "Résumé",
+  },
+  research_notes: {
+    table: "research_notes",
+    adminPath: "notes-de-recherche",
+    singular: "Note de recherche",
+    plural: "Notes de recherche",
+    summaryField: "mainIdea",
+    summaryLabel: "Résumé",
+  },
+  documentary_series: {
+    table: "documentary_series",
+    adminPath: "series-documentaires",
+    singular: "Série documentaire",
+    plural: "Séries documentaires",
+    summaryField: "description",
+    summaryLabel: "Résumé",
+  },
+  documentary_episodes: {
+    table: "documentary_episodes",
+    adminPath: "episodes-documentaires",
+    singular: "Épisode documentaire",
+    plural: "Épisodes documentaires",
+    summaryField: "summary",
+    summaryLabel: "Résumé",
+  },
+  experiments: {
+    table: "experiments",
+    adminPath: "experimentations",
+    singular: "Expérimentation",
+    plural: "Expérimentations",
+    summaryField: "objective",
+    summaryLabel: "Résumé",
+  },
 };
 
+// Only the 3 types with their own dedicated sidebar section get the
+// in-page type-switch tabs — the other 5 are reached via "Autres publications".
 export const SIMPLE_WORK_ORDER = ["reports", "articles", "data_visualizations"];
+
+export const OTHER_SIMPLE_WORK_KEYS = ["studies", "research_notes", "documentary_series", "documentary_episodes", "experiments"];

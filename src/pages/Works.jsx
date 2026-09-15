@@ -38,9 +38,9 @@ export default function Works() {
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 44 }}>
         {["Toutes", ...CATEGORIES].map(c => (
           <button key={c} onClick={() => selectCategory(c)} className="ytd-pill" style={{
-            fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, padding: "8px 14px", cursor: "pointer",
-            border: `1px solid ${cat === c ? T.ink : T.line}`, background: cat === c ? T.ink : "transparent",
-            color: cat === c ? T.paper : T.inkSoft, borderRadius: 20,
+            fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, fontWeight: 600, padding: "8px 14px", cursor: "pointer",
+            border: `1px solid ${cat === c ? T.ink : T.inkSoft}`, background: cat === c ? T.ink : "transparent",
+            color: cat === c ? T.paper : T.ink, borderRadius: 20,
           }}>{c}</button>
         ))}
       </div>

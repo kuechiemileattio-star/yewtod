@@ -75,8 +75,15 @@ export function useRolesAdmin() {
     await reload();
   }
 
+  /** Calls the `delete-member` Edge Function — removes the auth account, which cascades to the profile. */
+  async function deleteMember(userId) {
+    const { error } = await supabase.functions.invoke("delete-member", { body: { user_id: userId } });
+    if (error) throw error;
+    await reload();
+  }
+
   return {
     roles, permissions, rolePermissions, profiles, invitations, loading,
-    roleHasPermission, createRole, deleteRole, togglePermission, updateProfile, inviteMember, revokeInvitation, reload,
+    roleHasPermission, createRole, deleteRole, togglePermission, updateProfile, inviteMember, revokeInvitation, deleteMember, reload,
   };
 }

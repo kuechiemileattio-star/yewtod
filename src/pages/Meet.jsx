@@ -10,13 +10,12 @@ import useDocumentMeta from "../hooks/useDocumentMeta.js";
 export default function Meet() {
   useDocumentMeta("Meet Yewtod", "Pourquoi Yewtod SS existe, sa méthode de travail et le parcours de son fondateur.");
   const qa = [
-    ["Pourquoi Yewtod SS ?", "Parce que les grands problèmes contemporains — inégalités, gouvernance, transition numérique — se comprennent rarement en une phrase, et méritent un espace d'écriture longue plutôt que des formats jetables."],
-    ["Quelle est la vision ?", "Faire des sciences sociales appliquées un outil de décision aussi rigoureux que les sciences dures, sans en perdre l'accessibilité."],
-    ["Quels sujets sont étudiés ?", "Systèmes complexes, économie du développement, politique publique, intelligence artificielle et innovation, avec un ancrage particulier sur l'Afrique de l'Ouest."],
-    ["Quelle est la méthode de travail ?", "Lecture large, entretiens de terrain, modélisation quand c'est possible, et publication systématique — y compris des hypothèses qui ne se confirment pas."],
-    ["Quels sont les projets futurs ?", "Une série documentaire annuelle, un programme de bourses de recherche pour jeunes chercheurs, et l'ouverture progressive de la plateforme à des contributeurs invités."],
+    ["Pourquoi ce site ?", "Parce que je passais mon temps à prendre des notes de lecture pour moi-même, et qu'à un moment j'ai trouvé bête de ne pas les rendre publiques."],
+    ["C'est un média ou un journal perso ?", "Un peu des deux, honnêtement. Le format est celui d'un média, mais je n'ai pas de rédaction ni de ligne éditoriale imposée — juste ce qui m'occupe l'esprit ce mois-ci."],
+    ["Quels sujets reviennent le plus ?", "Systèmes complexes, économie du développement, politiques publiques et IA, avec un biais assumé pour l'Afrique de l'Ouest, la région que je connais le mieux."],
+    ["Comment tu travailles ?", "Je lis beaucoup, je parle à des gens qui savent des choses que je ne sais pas, et je modélise quand ça a du sens. Ce qui ne tient pas la route finit publié quand même, avec les limites indiquées."],
+    ["Et après ?", "J'aimerais lancer une série documentaire, ouvrir la plateforme à d'autres contributeurs, et un jour financer de petites bourses de recherche. Rien n'est encore acté."],
   ];
-  const values = ["Rigueur", "Curiosité", "Transparence", "Utilité publique", "Humilité intellectuelle"];
 
   return (
     <div className="ytd-meet-page" style={{ maxWidth: 1060, margin: "0 auto", padding: "72px 24px 110px" }}>
@@ -27,17 +26,17 @@ export default function Meet() {
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Meet Yewtod</span>
       </div>
       <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 64px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 20px" }}>
-        Une recherche qui aide à voir plus loin.
+        Un carnet de recherche, pas un magazine.
       </h1>
-      <p className="ytd-meet-lead">Yewtod SS transforme des sujets complexes en idées lisibles, vérifiables et utiles pour celles et ceux qui veulent comprendre le monde autrement.</p>
+      <p className="ytd-meet-lead">Je publie ici ce que je lis, ce que je vérifie et ce que je n'ai pas encore complètement compris — dans cet ordre-là, souvent.</p>
       </div>
       <div className="ytd-meet-hero-mark"><NodeMark size={22} color={T.paper} /><span>Recherche<br />appliquée</span><ArrowDownRight size={22} /></div>
       </header>
 
       <section className="ytd-meet-method">
-        <SectionLabel>La manière de travailler</SectionLabel>
+        <SectionLabel>Comment je travaille</SectionLabel>
         <div className="ytd-meet-method-grid">
-          {[[BookOpen, "Observer", "Lire largement, écouter les terrains et regarder les données avant de tirer des conclusions."], [Network, "Relier", "Mettre en relation les disciplines, les institutions et les expériences qui éclairent un même problème."], [Target, "Rendre utile", "Publier des analyses exigeantes, mais assez claires pour nourrir une décision ou une conversation."]].map(([Icon, title, text], index) => (
+          {[[BookOpen, "Je lis avant d'écrire", "Souvent trop, d'ailleurs — un article me prend en général plus de temps en lecture qu'en rédaction."], [Network, "Je croise les sources", "Un chiffre seul ne veut rien dire ; je préfère trois sources qui se contredisent un peu à une seule qui semble trop nette."], [Target, "Je publie même quand ce n'est pas parfait", "Une analyse utile aujourd'hui vaut mieux qu'une analyse parfaite dans six mois."]].map(([Icon, title, text], index) => (
             <Reveal key={title} delay={index * 100}>
               <article className="ytd-meet-method-card"><div><Icon size={20} /></div><h2>{title}</h2><p>{text}</p></article>
             </Reveal>
@@ -67,12 +66,12 @@ export default function Meet() {
         <div>
           <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, fontWeight: 600, margin: "0 0 16px" }}>Yewtod</h3>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, lineHeight: 1.7, margin: "0 0 16px" }}>
-            Fondateur de Yewtod SS. Un parcours entre économie du développement, science des données et politiques publiques, nourri par plusieurs années de travail de terrain en Afrique de l'Ouest et par une pratique régulière de la modélisation de systèmes complexes.
+            J'ai travaillé quelques années entre économie du développement et science des données, dont pas mal de terrain en Afrique de l'Ouest. C'est de là que vient l'obsession pour les systèmes complexes — on ne comprend pas grand-chose en isolant une seule variable.
           </p>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, lineHeight: 1.7, margin: "0 0 20px" }}>
-            Domaines d'intérêt : gouvernance des données, économie institutionnelle, IA appliquée aux politiques publiques. Ambition : faire de Yewtod SS un pont durable entre recherche académique et décision publique.
+            En ce moment, je passe le plus clair de mon temps sur la gouvernance des données et l'usage de l'IA dans les politiques publiques — deux sujets où la théorie et la pratique se parlent encore trop peu.
           </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{values.map(v => <Tag key={v}>{v}</Tag>)}</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{["Économie du développement", "Gouvernance des données", "Systèmes complexes", "IA & politiques publiques"].map(v => <Tag key={v}>{v}</Tag>)}</div>
         </div>
       </div></Reveal>
     </div>

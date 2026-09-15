@@ -10,6 +10,8 @@ export function useWorkMutations() {
     setSaving(true);
     try {
       const row = uiToRow(uiFields);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) row.created_by = user.id;
       const { error } = await supabase.from(table).insert(row);
       if (error) throw error;
     } finally {

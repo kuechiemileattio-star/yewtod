@@ -58,6 +58,12 @@ export default function YewtodSS() {
               <Route path="visualisations/nouveau" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="data_visualizations" /></RequireAuth>} />
               <Route path="visualisations/:id" element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey="data_visualizations" /></RequireAuth>} />
               <Route path="publications" element={<RequireAuth permission="manage_articles"><PublicationsPanel /></RequireAuth>} />
+              {[["etudes", "studies"], ["notes-de-recherche", "research_notes"], ["series-documentaires", "documentary_series"], ["episodes-documentaires", "documentary_episodes"], ["experimentations", "experiments"]].map(([path, tableKey]) => (
+                <React.Fragment key={path}>
+                  <Route path={`${path}/nouveau`} element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey={tableKey} /></RequireAuth>} />
+                  <Route path={`${path}/:id`} element={<RequireAuth permission="manage_articles"><SimpleWorkForm tableKey={tableKey} /></RequireAuth>} />
+                </React.Fragment>
+              ))}
               <Route path="books" element={<RequireAuth permission="manage_books"><BooksPanel /></RequireAuth>} />
               <Route path="collaborations" element={<RequireAuth permission="manage_collaborations"><CollaborationsPanel /></RequireAuth>} />
               <Route path="settings" element={<RequireAuth permission="manage_settings"><SettingsPanel /></RequireAuth>} />

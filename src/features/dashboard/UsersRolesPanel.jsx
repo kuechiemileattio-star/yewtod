@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Plus, Mail, X, ShieldCheck, AlertCircle, Check, Loader2 } from "lucide-react";
+import { Plus, Mail, X, ShieldCheck, AlertCircle, Check, Loader2, Trash2 } from "lucide-react";
 import { T } from "../../theme.js";
 import { useRolesAdmin } from "../../hooks/useRolesAdmin.js";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 import { fmtDate } from "../../lib/contentTypes.js";
 import Field, { inputStyle } from "../../components/Field.jsx";
 import Btn from "../../components/Btn.jsx";
@@ -13,8 +14,9 @@ const INVITATION_STATUS_LABELS = { pending: "En attente", accepted: "Acceptée",
 export default function UsersRolesPanel() {
   const {
     roles, permissions, profiles, invitations, loading,
-    roleHasPermission, createRole, deleteRole, togglePermission, updateProfile, inviteMember, revokeInvitation,
+    roleHasPermission, createRole, deleteRole, togglePermission, updateProfile, inviteMember, revokeInvitation, deleteMember,
   } = useRolesAdmin();
+  const { profile: currentProfile } = useAuth();
 
   const [newRoleName, setNewRoleName] = useState("");
   const [newRoleDescription, setNewRoleDescription] = useState("");
@@ -23,8 +25,23 @@ export default function UsersRolesPanel() {
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
 
   if (loading) return <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</p>;
+
+  async function handleDeleteMember(member) {
+    setDeleteError("");
+    if (!window.confirm(`Supprimer définitivement "${member.full_name || member.email}" ? Son profil, son accès et ses droits sur la plateforme seront retirés — action irréversible.`)) return;
+    setDeletingId(member.id);
+    try {
+      await deleteMember(member.id);
+    } catch (err) {
+      setDeleteError(err.message || "La suppression a échoué.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function handleCreateRole(e) {
     e.preventDefault();
@@ -55,13 +72,14 @@ export default function UsersRolesPanel() {
   }
 
   return (
-    <div className="ytd-admin-view">
+    <div className="ytd-dashboard-new ytd-admin-view">
       <div className="ytd-admin-section-heading">
         <div><span className="ytd-admin-kicker">Organisation</span><h1>Utilisateurs & rôles</h1><p>Membres, rôles personnalisés et invitations — le menu du dashboard s'adapte automatiquement aux permissions de chacun.</p></div>
       </div>
 
-      <section className="ytd-admin-settings-card" style={{ marginBottom: 24 }}>
+      <section className="ytd-admin-settings-card">
         <div className="ytd-admin-settings-card-heading"><div><span>Équipe</span><h2>Membres</h2></div><span className="ytd-admin-settings-index">{profiles.length}</span></div>
+        {deleteError && <p className="ytd-form-message" style={{ color: T.red, fontSize: 12.5, margin: "0 0 12px" }}><AlertCircle size={14} /> {deleteError}</p>}
         <div style={{ display: "grid", gap: 8 }}>
           {profiles.map(p => (
             <div key={p.id} className="ytd-admin-member" style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -86,21 +104,30 @@ export default function UsersRolesPanel() {
                 />
                 <span className="ytd-switch-track"><span className="ytd-switch-thumb" /></span>
               </label>
+              {p.id !== currentProfile?.id && (
+                <button
+                  type="button" onClick={() => handleDeleteMember(p)} disabled={deletingId === p.id}
+                  aria-label={`Supprimer ${p.full_name || p.email}`} title="Supprimer ce membre"
+                  style={{ border: 0, background: "none", color: T.inkSoft, cursor: deletingId === p.id ? "wait" : "pointer", padding: 4, display: "grid", placeItems: "center" }}
+                >
+                  {deletingId === p.id ? <Loader2 size={15} className="ytd-spin" /> : <Trash2 size={15} />}
+                </button>
+              )}
             </div>
           ))}
           {profiles.length === 0 && <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>Aucun membre pour le moment.</p>}
         </div>
       </section>
 
-      <section className="ytd-admin-settings-card" style={{ marginBottom: 24 }}>
+      <section className="ytd-admin-settings-card">
         <div className="ytd-admin-settings-card-heading"><div><span>Accès</span><h2>Rôles & permissions</h2></div><ShieldCheck size={18} color={T.green} /></div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", minWidth: 640, borderCollapse: "collapse", fontFamily: "'Inter', sans-serif", fontSize: 12.5 }}>
+        <div className="ytd-admin-table-scroll">
+          <table className="ytd-admin-table" style={{ minWidth: 640 }}>
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: "8px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: T.inkSoft, textTransform: "uppercase" }}>Permission</th>
+                <th>Permission</th>
                 {roles.map(r => (
-                  <th key={r.id} style={{ padding: "8px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: T.inkSoft, textTransform: "uppercase", textAlign: "center" }}>
+                  <th key={r.id} style={{ textAlign: "center" }}>
                     {r.name}{r.is_system_role && <span title="Rôle système" style={{ marginLeft: 4 }}>★</span>}
                   </th>
                 ))}
@@ -108,8 +135,8 @@ export default function UsersRolesPanel() {
             </thead>
             <tbody>
               {permissions.map(perm => (
-                <tr key={perm.id} style={{ borderTop: `1px solid ${T.line}` }}>
-                  <td style={{ padding: "8px 10px" }}>
+                <tr key={perm.id}>
+                  <td style={{ whiteSpace: "normal" }}>
                     <strong style={{ display: "block" }}>{perm.label}</strong>
                     <small style={{ color: T.inkSoft }}>{perm.key}</small>
                   </td>
@@ -117,7 +144,7 @@ export default function UsersRolesPanel() {
                     const checked = roleHasPermission(role.id, perm.id);
                     const lockGrant = perm.key === "invite_users";
                     return (
-                      <td key={role.id} style={{ padding: "8px 10px", textAlign: "center" }}>
+                      <td key={role.id} style={{ textAlign: "center" }}>
                         <input
                           type="checkbox"
                           checked={checked}

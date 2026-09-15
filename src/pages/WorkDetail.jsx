@@ -6,6 +6,7 @@ import { fmtDate, getTypeByRouteSlug } from "../lib/contentTypes.js";
 import { workPath, PATHS } from "../lib/paths.js";
 import { useWork, useWorks } from "../hooks/useWorks.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
+import useLogView from "../hooks/useLogView.js";
 import Divider from "../components/Divider.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
@@ -26,6 +27,7 @@ export default function WorkDetail() {
   const [downloading, setDownloading] = useState(false);
 
   useDocumentMeta(work?.title, work?.excerpt);
+  useLogView(work?.table, work?.id);
 
   // A plain <a download> is silently ignored by browsers when the file is
   // cross-origin (Supabase Storage is a different domain from the site) —

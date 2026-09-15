@@ -17,14 +17,17 @@ function emptyForm(config) {
   return {
     title: "", coverImage: "", status: "draft", publishedAt: new Date().toISOString().slice(0, 10),
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
+    ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
   };
 }
 
 function SimpleWorkFormInner({ tableKey, id }) {
   const config = SIMPLE_WORK_TYPES[tableKey];
+  const isEpisode = config.table === "documentary_episodes";
   const navigate = useNavigate();
   const { createWork, updateWork, saving } = useWorkMutations();
   const [form, setForm] = useState(() => emptyForm(config));
+  const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState("");
   const [pdfNotice, setPdfNotice] = useState("");
@@ -42,6 +45,13 @@ function SimpleWorkFormInner({ tableKey, id }) {
     });
     return () => { active = false; };
   }, [id, config.table]);
+
+  // Every episode must belong to a series (NOT NULL in the database) — the
+  // only field this simplified form can't drop, unlike the other rich fields.
+  useEffect(() => {
+    if (!isEpisode) return;
+    supabase.from("documentary_series").select("id, title").order("title").then(({ data }) => setSeries(data || []));
+  }, [isEpisode]);
 
   function set(key, value) {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -68,6 +78,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
   async function save(nextStatus) {
     if (anyUploading) {
       setError("Merci d'attendre la fin de l'envoi du fichier avant d'enregistrer.");
+      return;
+    }
+    if (isEpisode && !form.seriesId) {
+      setError("Choisis la série à laquelle cet épisode appartient.");
       return;
     }
     setError("");
@@ -115,7 +129,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
         <Link to={`/dashboard/${config.adminPath}`}>{config.plural}</Link> / <strong>{id ? "Modifier" : `Nouveau ${config.singular.toLowerCase()}`}</strong>
       </p>
 
-      {!id && (
+      {!id && SIMPLE_WORK_ORDER.includes(tableKey) && (
         <div className="ytd-admin-type-tabs">
           {SIMPLE_WORK_ORDER.map(key => {
             const t = SIMPLE_WORK_TYPES[key];
@@ -132,6 +146,15 @@ function SimpleWorkFormInner({ tableKey, id }) {
       <div className="ytd-admin-editor-page">
         <div className="ytd-admin-editor-form">
           <Field label="Titre"><input required value={form.title} onChange={e => set("title", e.target.value)} style={inputStyle} /></Field>
+
+          {isEpisode && (
+            <Field label="Série">
+              <select required value={form.seriesId || ""} onChange={e => set("seriesId", e.target.value)} style={inputStyle}>
+                <option value="" disabled>Choisir une série…</option>
+                {series.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+              </select>
+            </Field>
+          )}
 
           <div className="ytd-admin-meta-fields" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <Field label="Catégorie"><input value={config.plural} disabled style={{ ...inputStyle, color: T.inkSoft, background: T.paperAlt }} /></Field>

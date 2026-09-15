@@ -13,6 +13,7 @@ function normalize(row) {
     statut: { nouveau: "Nouveau", en_cours: "En cours", archive: "Archivé" }[row.status] || row.status,
     statusKey: row.status,
     date: row.created_at,
+    attachments: row.attachments || [],
   };
 }
 

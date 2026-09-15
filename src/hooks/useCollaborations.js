@@ -6,7 +6,7 @@ export function useCollaborationSubmit() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  async function submit({ name, organization, email, subject, type, description }) {
+  async function submit({ name, organization, email, subject, type, description, attachments = [] }) {
     setSubmitting(true);
     setError(null);
     const { error: err } = await supabase.from("collaborations").insert({
@@ -16,6 +16,7 @@ export function useCollaborationSubmit() {
       subject,
       type,
       description,
+      attachments,
     });
     setSubmitting(false);
     if (err) { setError(err); throw err; }

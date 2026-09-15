@@ -10,24 +10,29 @@ export function extractMediaUrls(value = "") {
   return String(value).match(/https?:\/\/[^\s]+/g)?.map(url => url.replace(/[),.;]+$/, "")) || [];
 }
 
-function youtubeEmbedUrl(url) {
+function getYoutubeId(url) {
   try {
     const parsed = new URL(url);
-    const videoId = parsed.hostname.includes("youtu.be") ? parsed.pathname.slice(1) : parsed.searchParams.get("v");
-    return videoId ? `https://www.youtube.com/embed/${videoId}?start=0&end=120&rel=0` : url;
+    return parsed.hostname.includes("youtu.be") ? parsed.pathname.slice(1) : parsed.searchParams.get("v");
   } catch {
-    return url;
+    return null;
   }
 }
 
+function youtubeEmbedUrl(url) {
+  const videoId = getYoutubeId(url);
+  return videoId ? `https://www.youtube.com/embed/${videoId}?start=0&end=120&rel=0` : url;
+}
+
 function youtubeWatchUrl(url) {
-  try {
-    const parsed = new URL(url);
-    const videoId = parsed.hostname.includes("youtu.be") ? parsed.pathname.slice(1) : parsed.searchParams.get("v");
-    return videoId ? `https://www.youtube.com/watch?v=${videoId}` : url;
-  } catch {
-    return url;
-  }
+  const videoId = getYoutubeId(url);
+  return videoId ? `https://www.youtube.com/watch?v=${videoId}` : url;
+}
+
+/** The video's YouTube thumbnail (maxresdefault, falling back to hqdefault via onError). */
+export function youtubeThumbnail(url) {
+  const videoId = getYoutubeId(url);
+  return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
 }
 
 export default function MediaDisplay({ type, url, imageUrl, videoUrl, alt = "", className = "", compact = false }) {

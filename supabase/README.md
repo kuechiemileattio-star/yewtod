@@ -13,7 +13,9 @@ de `supabase/migrations/` **dans l'ordre**, puis `supabase/seed.sql` :
 6. `migrations/006_storage_buckets.sql` — buckets Storage (`covers`, `documents`, `media-library`, `avatars`) + policies.
 7. `migrations/007_reports_pdf_metadata.sql` — colonnes `page_count` et `table_of_contents` sur `reports` (extraites automatiquement du PDF importé, voir §7).
 8. `migrations/008_articles_pdf.sql` — mêmes colonnes (+ `pdf_file`) sur `articles`, pour pouvoir aussi joindre un PDF à un article.
-9. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
+9. `migrations/009_content_views.sql` — suivi des vues (table `content_views`, vue `content_index`, fonction `get_top_viewed`) pour le widget "Le plus consulté" du tableau de bord.
+10. `migrations/010_collaboration_attachments_bucket.sql` — bucket Storage public pour les pièces jointes du formulaire de collaboration.
+11. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
 
 Si tu préfères la CLI Supabase (`supabase db push` / `supabase migration up`),
 les fichiers sont déjà nommés dans l'ordre attendu par la CLI.
@@ -93,6 +95,10 @@ permission `invite_users`. Cela appelle l'Edge Function `invite-user`, qui :
 3. Le trigger `on_auth_user_created` crée le profil (`status = 'invited'`).
 4. La personne invitée clique sur le lien, définit son mot de passe, complète
    son profil → `status` passe à `active` → accès au dashboard limité à son rôle.
+
+## 6bis. Supprimer un membre
+
+Dashboard → **Utilisateurs & rôles**, icône corbeille à côté d'un membre (indisponible sur son propre compte). Réservé à la permission `manage_users` (Super Admin l'a par défaut). Appelle l'Edge Function `delete-member`, qui supprime le compte via `supabase.auth.admin.deleteUser` — le profil (`on delete cascade`) et donc tous les droits/accès du membre disparaissent immédiatement. Action irréversible.
 
 ## 7. Publier un contenu
 

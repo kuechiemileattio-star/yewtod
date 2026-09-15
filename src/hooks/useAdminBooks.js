@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { rowToUi, uiToRow } from "../lib/adapters.js";
 
 function normalize(row) {
-  return rowToUi(row);
+  return { ...rowToUi(row), authorName: row.author_profile?.full_name || "" };
 }
 
 /** Admin view of `books` — sees every status, can create/update/delete. */
@@ -14,7 +14,7 @@ export function useAdminBooks() {
 
   const reload = useCallback(async () => {
     setLoading(true);
-    const { data, error: err } = await supabase.from("books").select("*").order("created_at", { ascending: false });
+    const { data, error: err } = await supabase.from("books").select("*, author_profile:profiles!created_by(full_name)").order("created_at", { ascending: false });
     if (err) setError(err); else setBooks((data || []).map(normalize));
     setLoading(false);
   }, []);
@@ -23,6 +23,8 @@ export function useAdminBooks() {
 
   async function createBook(uiFields) {
     const row = uiToRow(uiFields);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) row.created_by = user.id;
     const { error: err } = await supabase.from("books").insert(row);
     if (err) throw err;
     await reload();

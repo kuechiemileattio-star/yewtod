@@ -3,22 +3,23 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2, ExternalLink } from "lucide-react";
 import { T } from "../../theme.js";
-import { CONTENT_TYPES, getTypeByTable, fmtDate } from "../../lib/contentTypes.js";
+import { CONTENT_TYPES, fmtDate } from "../../lib/contentTypes.js";
 import { workPath } from "../../lib/paths.js";
+import { SIMPLE_WORK_TYPES, OTHER_SIMPLE_WORK_KEYS } from "../../lib/simpleWorkTypes.js";
 import { useAdminWorks } from "../../hooks/useAdminWorks.js";
 import { useWorkMutations } from "../../hooks/useWorkMutations.js";
 import Cover from "../../components/Cover.jsx";
 import StatusPill from "../../components/StatusPill.jsx";
 import Btn from "../../components/Btn.jsx";
-import WorkEditor from "../../components/dashboard/WorkEditor.jsx";
 import WorkPreviewModal from "../../components/dashboard/WorkPreviewModal.jsx";
 
 const STATUS_LABELS = { draft: "Brouillon", published: "Publié", scheduled: "Programmé" };
 
 // Rapports, Articles et Visualisations de données ont leur propre section
 // dédiée dans le dashboard (voir SimpleTypePanel.jsx) — cette page ne gère
-// donc plus que les 5 types de contenu restants.
-const OTHER_TABLES = new Set(["studies", "research_notes", "documentary_series", "documentary_episodes", "experiments"]);
+// donc plus que les 5 types de contenu restants, avec le même formulaire
+// simplifié (voir SimpleWorkForm.jsx) qu'eux.
+const OTHER_TABLES = new Set(OTHER_SIMPLE_WORK_KEYS);
 const OTHER_TYPES = CONTENT_TYPES.filter(t => OTHER_TABLES.has(t.table));
 const OTHER_CATEGORIES = OTHER_TYPES.map(t => t.label);
 
@@ -29,8 +30,6 @@ export default function PublicationsPanel() {
   const [category, setCategory] = useState("Toutes");
   const [status, setStatus] = useState("Tous");
   const [pickingType, setPickingType] = useState(false);
-  const [editingWork, setEditingWork] = useState(null);
-  const [editingType, setEditingType] = useState(null);
   const [previewingWork, setPreviewingWork] = useState(null);
 
   const filtered = works.filter(w =>
@@ -40,14 +39,12 @@ export default function PublicationsPanel() {
   );
 
   function startCreate(type) {
-    setEditingType(type);
-    setEditingWork(null);
     setPickingType(false);
+    navigate(`/dashboard/${SIMPLE_WORK_TYPES[type.table].adminPath}/nouveau`);
   }
 
   function startEdit(work) {
-    setEditingType(getTypeByTable(work.table));
-    setEditingWork(work);
+    navigate(`/dashboard/${SIMPLE_WORK_TYPES[work.table].adminPath}/${work.id}`);
   }
 
   async function handleDelete(work) {
@@ -106,15 +103,6 @@ export default function PublicationsPanel() {
           </div>
         </div>,
         document.body
-      )}
-
-      {editingType && (
-        <WorkEditor
-          type={editingType}
-          work={editingWork}
-          onClose={() => { setEditingType(null); setEditingWork(null); }}
-          onSaved={async () => { setEditingType(null); setEditingWork(null); await reload(); }}
-        />
       )}
 
       {previewingWork && (
