@@ -17,6 +17,7 @@ function emptyForm(config) {
   return {
     title: "", coverImage: "", status: "draft", publishedAt: new Date().toISOString().slice(0, 10),
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
+    ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
   };
 }
@@ -57,16 +58,38 @@ function SimpleWorkFormInner({ tableKey, id }) {
     setForm(prev => ({ ...prev, [key]: value }));
   }
 
-  async function handlePdfSelected(file) {
-    setPdfNotice("Analyse du PDF…");
+  async function analyzePdf(fileOrBlob) {
+    setPdfNotice("Analyse du PDF… (page 1)");
     try {
-      const { pageCount, tableOfContents } = await extractPdfMetadata(file);
+      const { pageCount, tableOfContents } = await extractPdfMetadata(fileOrBlob, (current, total) => {
+        setPdfNotice(`Analyse du PDF… (page ${current} / ${total} — texte et images de chaque page)`);
+      });
       setForm(prev => ({ ...prev, pageCount, tableOfContents }));
       setPdfNotice(tableOfContents.length
-        ? `Sommaire extrait automatiquement (${tableOfContents.length} entrées, ${pageCount} pages).`
+        ? `Sommaire extrait automatiquement (${tableOfContents.length} entrées, ${pageCount} pages, avec le texte et les images de chaque page).`
         : `${pageCount} pages détectées — ce PDF n'a pas de sommaire intégré (signets).`);
     } catch {
       setPdfNotice("Impossible d'analyser ce PDF (nombre de pages et sommaire non disponibles).");
+    }
+  }
+
+  async function handlePdfSelected(file) {
+    await analyzePdf(file);
+  }
+
+  // A pasted PDF link (no local File object) has to be fetched before it can
+  // be analyzed the same way — this is what makes Description/Synthèse
+  // dynamic even when the PDF was imported "depuis en ligne" instead of
+  // dropped from disk.
+  async function handlePdfUrlPasted(url) {
+    setPdfNotice("Téléchargement du PDF pour analyse…");
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("download failed");
+      const blob = await res.blob();
+      await analyzePdf(blob);
+    } catch {
+      setPdfNotice("Ce lien n'a pas pu être téléchargé pour en extraire automatiquement le sommaire (le serveur distant bloque peut-être l'accès direct) — la Description et la Synthèse resteront basées sur les champs saisis manuellement.");
     }
   }
 
@@ -163,12 +186,30 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
           <Field label={config.summaryLabel}><textarea rows={4} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>
 
+          {config.urlField && (
+            <Field label={config.urlLabel} hint="Sur le site, un aperçu de 2 minutes se lit directement sur la page ; au-delà, un bouton renvoie vers YouTube pour la suite.">
+              <input type="url" placeholder="https://www.youtube.com/watch?v=…" value={form[config.urlField] || ""} onChange={e => set(config.urlField, e.target.value)} style={inputStyle} />
+            </Field>
+          )}
+
           {config.fileField && (
             <Field label={config.fileLabel} hint={pdfNotice || undefined}>
               <DropzoneField
                 kind="file" bucket={config.fileBucket} accept={config.fileAccept} value={form[config.fileField]}
-                onChange={v => set(config.fileField, v)}
+                onChange={v => {
+                  // Removing (or replacing via pasted URL) the PDF must drop
+                  // its extracted Sommaire too — otherwise the Description/
+                  // Synthèse on the public page keep showing the old PDF's
+                  // content even once that file is gone.
+                  if (config.fileField === "pdfFile") {
+                    setForm(prev => ({ ...prev, pdfFile: v, pageCount: v ? prev.pageCount : null, tableOfContents: v ? prev.tableOfContents : [] }));
+                    if (!v) setPdfNotice("");
+                  } else {
+                    set(config.fileField, v);
+                  }
+                }}
                 onFile={config.fileField === "pdfFile" ? handlePdfSelected : undefined}
+                onUrl={config.fileField === "pdfFile" ? handlePdfUrlPasted : undefined}
                 onUploadingChange={setFileUploading}
               />
             </Field>

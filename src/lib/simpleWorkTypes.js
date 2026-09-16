@@ -70,6 +70,8 @@ export const SIMPLE_WORK_TYPES = {
     plural: "Séries documentaires",
     summaryField: "description",
     summaryLabel: "Résumé",
+    urlField: "trailerUrl",
+    urlLabel: "Lien de la bande-annonce (YouTube)",
   },
   documentary_episodes: {
     table: "documentary_episodes",
@@ -78,6 +80,8 @@ export const SIMPLE_WORK_TYPES = {
     plural: "Épisodes documentaires",
     summaryField: "summary",
     summaryLabel: "Résumé",
+    urlField: "videoUrl",
+    urlLabel: "Lien de la vidéo (YouTube)",
   },
   experiments: {
     table: "experiments",

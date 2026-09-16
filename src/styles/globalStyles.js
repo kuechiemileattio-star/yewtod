@@ -275,6 +275,11 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-dropzone-file { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 6px 10px; border: 1px solid ${T.line}; border-radius: 6px; background: ${T.paper}; color: ${T.ink}; font: 11.5px 'JetBrains Mono', monospace; }
   .ytd-dropzone-file button { display: grid; place-items: center; border: 0; background: none; color: ${T.inkSoft}; cursor: pointer; }
   .ytd-dropzone-thumb { width: 100%; max-width: 200px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid ${T.line}; }
+  .ytd-dropzone-wrap { display: grid; gap: 8px; }
+  .ytd-dropzone-url-row { display: flex; align-items: center; gap: 8px; }
+  .ytd-dropzone-url-row span { flex-shrink: 0; color: ${T.inkSoft}; font: 12px 'Inter', sans-serif; }
+  .ytd-dropzone-url-row input { flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid ${T.line}; border-radius: 6px; background: ${T.paper}; color: ${T.ink}; font: 13px 'Inter', sans-serif; outline: none; transition: border-color .2s ease; }
+  .ytd-dropzone-url-row input:focus { border-color: ${T.green}; }
   .ytd-admin-modal-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 28px; overscroll-behavior: contain; background: ${T.ink}88; animation: ytdAdminFade .25s ease both; }
   .ytd-admin-book-modal { width: min(700px, 100%); min-height: 0; max-height: min(88dvh, 820px); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: auto; border: 1px solid ${T.line}; border-radius: 14px; box-shadow: 0 28px 70px -30px ${T.ink}; animation: ytdAdminModalIn .45s cubic-bezier(.16,1,.3,1) both; }
   .ytd-admin-book-preview { display: grid; align-content: start; gap: 12px; padding: 28px; color: ${T.ink}; background: ${T.paper}; }
@@ -332,6 +337,32 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-toc-index { color: ${T.green}; font: 600 12px 'JetBrains Mono', monospace; flex-shrink: 0; }
   .ytd-toc-title { flex: 1; color: ${T.ink}; font: 15px 'Plus Jakarta Sans', sans-serif; }
   .ytd-toc-page { color: ${T.inkSoft}; font: 12px 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .ytd-report-tabs { display: flex; gap: 24px; margin-bottom: 30px; border-bottom: 1px solid ${T.line}; }
+  .ytd-report-tabs button { padding: 12px 2px; border: 0; border-bottom: 2px solid transparent; background: none; color: ${T.inkSoft}; cursor: pointer; font: 600 14px 'Plus Jakarta Sans', sans-serif; transition: color .2s ease, border-color .2s ease; }
+  .ytd-report-tabs button:hover { color: ${T.ink}; }
+  .ytd-report-tabs button.is-active { color: ${T.green}; border-color: ${T.green}; }
+  .ytd-report-read-link { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 30px; border: 0; background: none; padding: 0; color: ${T.green}; cursor: pointer; font: 700 15px 'Plus Jakarta Sans', sans-serif; }
+  .ytd-report-read-link:hover { text-decoration: underline; }
+  .ytd-synthese-list { display: grid; gap: 2px; margin: 0 0 30px; padding: 0; list-style: none; }
+  .ytd-synthese-list button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 0; border: 0; border-top: 1px solid ${T.line}; background: none; color: ${T.ink}; text-align: left; cursor: pointer; font: 15px 'Plus Jakarta Sans', sans-serif; transition: color .2s ease, padding-left .2s ease; }
+  .ytd-synthese-list button:hover { color: ${T.green}; padding-left: 6px; }
+  .ytd-synthese-list button svg { flex-shrink: 0; color: ${T.green}; }
+  .ytd-report-reader { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
+  .ytd-report-toc { display: grid; gap: 0; padding-right: 16px; border-right: 1px solid ${T.line}; max-height: 80vh; overflow-y: auto; }
+  .ytd-report-toc button { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 4px; border: 0; border-left: 2px solid transparent; background: none; color: ${T.inkSoft}; text-align: left; cursor: pointer; font: 13.5px 'Plus Jakarta Sans', sans-serif; line-height: 1.35; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+  .ytd-report-toc button:hover { color: ${T.ink}; background: ${T.paperAlt}; }
+  .ytd-report-toc button.is-active { color: ${T.green}; border-color: ${T.green}; background: ${T.green}0D; font-weight: 600; }
+  .ytd-report-toc button svg { flex-shrink: 0; }
+  .ytd-report-chapter { min-width: 0; }
+  .ytd-report-chapter h2 { margin: 0 0 16px; color: ${T.greenDeep}; font: 500 26px 'Fraunces', serif; }
+  .ytd-report-chapter-text { color: ${T.ink}; font-size: 16.5px; line-height: 1.8; white-space: pre-line; }
+  .ytd-report-chapter-source { display: inline-flex; align-items: center; gap: 6px; margin-top: 22px; color: ${T.green}; font: 600 13px 'Plus Jakarta Sans', sans-serif; text-decoration: none; }
+  .ytd-report-chapter-source:hover { text-decoration: underline; }
+  .ytd-report-chapter-images { display: grid; gap: 16px; margin-top: 26px; }
+  .ytd-report-chapter-images-embedded { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .ytd-report-chapter-images-embedded img { width: 100%; height: 180px; object-fit: contain; background: ${T.paperAlt}; }
+  .ytd-report-chapter-images-label { display: block; margin-bottom: -6px; color: ${T.inkSoft}; font: 600 11px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .05em; }
+  .ytd-report-chapter-images img { width: 100%; border: 1px solid ${T.line}; border-radius: 6px; }
   .ytd-work-card { outline: none; transition: transform .28s cubic-bezier(.16,1,.3,1), border-color .28s ease; }
   .ytd-work-card:hover, .ytd-work-card:focus-visible { transform: translateY(-6px); }
   .ytd-work-card:focus-visible { box-shadow: 0 0 0 3px ${T.lime}; }
@@ -728,8 +759,12 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-work-detail-index { align-self: flex-end; }
     .ytd-collab-detail-hero { grid-template-columns: 1fr 170px; gap: 24px; }
     .ytd-collab-detail-info { grid-template-columns: 1fr; }
-    .ytd-footer-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 30px !important; }
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 30px !important; text-align: center; }
+    .ytd-footer-grid > div { display: flex; flex-direction: column; align-items: center; }
     .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; max-width: none !important; }
+    .ytd-footer-link, .ytd-footer-signature, .ytd-footer-social-row { justify-content: center; }
+    .ytd-footer-grid > div:last-child { grid-column: 1 / -1; }
+    .ytd-footer-grid > div:last-child .ytd-footer-newsletter-form { max-width: 340px; margin: 0 auto; }
     .ytd-profile-hero { flex-direction: column; align-items: flex-start; padding: 28px 24px; }
     .ytd-profile-hero-actions { width: 100%; }
     .ytd-profile-hero-actions .ytd-btn { flex: 1; justify-content: center; }
@@ -739,9 +774,14 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-footer { margin: 0; }
     .ytd-footer-cta-inner { gap: 24px !important; }
     .ytd-footer-cta-button { width: 100%; justify-content: center; }
-    .ytd-footer-grid { grid-template-columns: 1fr !important; gap: 26px !important; }
+    .ytd-footer-grid { grid-template-columns: 1fr !important; gap: 26px !important; text-align: center; }
     .ytd-footer-brand, .ytd-footer-brand p { max-width: 100% !important; }
-    .ytd-footer-legal { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 18px !important; line-height: 1.5; }
+    .ytd-footer-grid > div { display: flex; flex-direction: column; align-items: center; }
+    .ytd-footer-link { justify-content: center; }
+    .ytd-footer-signature, .ytd-footer-social-row { justify-content: center; }
+    .ytd-footer-newsletter-form { width: 100%; max-width: 340px; }
+    .ytd-footer-legal { flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 16px 18px !important; line-height: 1.5; }
+    .ytd-footer-legal-left { justify-content: center; }
     .ytd-app-shell { background-size: 240% 240% !important; animation-duration: 40s; }
     .ytd-app-shell::after { animation-duration: 22s; opacity: .45; }
     .ytd-navbar > div:not(.ytd-scroll-progress) { padding-left: 16px !important; padding-right: 16px !important; }
@@ -784,6 +824,9 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-media-gallery-image, .ytd-media-gallery .ytd-media-embed, .ytd-media-gallery .ytd-media-video { height: 280px; }
     .ytd-work-detail-body { margin-top: 28px; }
     .ytd-work-detail-attributes { grid-template-columns: 1fr; gap: 0; }
+    .ytd-report-reader { grid-template-columns: 1fr; }
+    .ytd-report-toc { max-height: 260px; border-right: 0; border-bottom: 1px solid ${T.line}; padding-right: 0; padding-bottom: 12px; }
+    .ytd-report-chapter-text { font-size: 15.5px; }
     .ytd-work-detail-attributes .ytd-detail-attribute-content, .ytd-work-detail-attributes .ytd-detail-attribute-executiveSummary, .ytd-work-detail-attributes .ytd-detail-attribute-description, .ytd-work-detail-attributes .ytd-detail-attribute-mainIdea, .ytd-work-detail-attributes .ytd-detail-attribute-summary, .ytd-work-detail-attributes .ytd-detail-attribute-conclusion { grid-column: auto; }
     .ytd-work-detail-body > p:first-child, .ytd-collab-detail-copy p:first-child { font-size: 20px !important; }
     .ytd-work-detail-media-grid { grid-template-columns: 1fr; }
@@ -878,5 +921,15 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-editor-page { grid-template-columns: 1fr; }
     .ytd-admin-editor-preview { position: static; }
     .ytd-admin-type-tabs { flex-wrap: nowrap; overflow-x: auto; }
+  }
+  /* The Explorer/Travaux two-column tablet layout (see the 860px block above)
+     gets cramped well before 640px, once "Travaux"'s longer labels have no
+     room left — stack everything a bit earlier instead. Kept as its own
+     query (rather than raising the shared 640px breakpoint) so it only
+     affects the footer. */
+  @media (max-width: 700px) {
+    .ytd-footer-grid { grid-template-columns: 1fr !important; gap: 26px !important; text-align: center; }
+    .ytd-footer-grid > div:last-child { grid-column: auto; }
+    .ytd-footer-newsletter-form { width: 100%; max-width: 340px; }
   }
 `;

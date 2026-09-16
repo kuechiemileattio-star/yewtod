@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { UploadCloud, Image as ImageIcon, X } from "lucide-react";
+import { UploadCloud, Image as ImageIcon, Link2, X } from "lucide-react";
 import { T } from "../../theme.js";
 import { useStorageUpload } from "../../hooks/useStorageUpload.js";
 
@@ -22,7 +22,7 @@ function formatSize(bytes) {
  * look and behave identically. Shows the original filename + size picked
  * locally (Supabase Storage renames the file, so that info isn't in the URL).
  */
-export default function DropzoneField({ value, onChange, bucket, accept, kind = "file", hint, onFile, onUploadingChange }) {
+export default function DropzoneField({ value, onChange, bucket, accept, kind = "file", hint, onFile, onUrl, onUploadingChange }) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [fileMeta, setFileMeta] = useState(null);
@@ -49,33 +49,49 @@ export default function DropzoneField({ value, onChange, bucket, accept, kind = 
     setFileMeta(null);
   }
 
+  function pasteUrl(url) {
+    setFileMeta(null);
+    onChange(url);
+    // A pasted link skips the upload flow entirely (no local File object
+    // ever exists), so anything that piggybacks on onFile — like PDF
+    // metadata extraction — needs its own hook here to still run.
+    if (url) onUrl?.(url);
+  }
+
   const displayName = fileMeta?.name || (value ? filenameFromUrl(value) : "");
   const displaySize = fileMeta ? formatSize(fileMeta.size) : "";
   const noun = kind === "image" ? "une image" : "un fichier";
 
   return (
-    <div
-      className={`ytd-dropzone ${dragOver ? "is-dragover" : ""}`}
-      onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
-      onClick={() => inputRef.current?.click()}
-      onKeyDown={e => e.key === "Enter" && inputRef.current?.click()}
-      role="button" tabIndex={0}
-    >
-      {kind === "image" && value
-        ? <img src={value} alt="" className="ytd-dropzone-thumb" />
-        : (kind === "image" ? <ImageIcon size={20} color={T.inkSoft} /> : <UploadCloud size={20} color={T.inkSoft} />)}
-      <p>{uploading ? "Envoi…" : <>Glissez {noun} ici, ou <span className="ytd-dropzone-browse">parcourez</span></>}</p>
-      {hint && <span className="ytd-dropzone-hint">{hint}</span>}
-      {displayName && (
-        <div className="ytd-dropzone-file">
-          <span>{displayName}{displaySize && ` · ${displaySize}`}</span>
-          <button type="button" onClick={remove} aria-label="Retirer le fichier"><X size={13} /></button>
-        </div>
-      )}
-      {error && <span className="ytd-dropzone-error">Échec de l'envoi : {error.message}</span>}
-      <input ref={inputRef} type="file" accept={accept} onChange={e => { handleFiles(e.target.files); e.target.value = ""; }} style={{ display: "none" }} />
+    <div className="ytd-dropzone-wrap">
+      <div
+        className={`ytd-dropzone ${dragOver ? "is-dragover" : ""}`}
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
+        onClick={() => inputRef.current?.click()}
+        onKeyDown={e => e.key === "Enter" && inputRef.current?.click()}
+        role="button" tabIndex={0}
+      >
+        {kind === "image" && value
+          ? <img src={value} alt="" className="ytd-dropzone-thumb" />
+          : (kind === "image" ? <ImageIcon size={20} color={T.inkSoft} /> : <UploadCloud size={20} color={T.inkSoft} />)}
+        <p>{uploading ? "Envoi…" : <>Glissez {noun} ici, ou <span className="ytd-dropzone-browse">parcourez</span></>}</p>
+        {hint && <span className="ytd-dropzone-hint">{hint}</span>}
+        {displayName && (
+          <div className="ytd-dropzone-file">
+            <span>{displayName}{displaySize && ` · ${displaySize}`}</span>
+            <button type="button" onClick={remove} aria-label="Retirer le fichier"><X size={13} /></button>
+          </div>
+        )}
+        {error && <span className="ytd-dropzone-error">Échec de l'envoi : {error.message}</span>}
+        <input ref={inputRef} type="file" accept={accept} onChange={e => { handleFiles(e.target.files); e.target.value = ""; }} style={{ display: "none" }} />
+      </div>
+      <label className="ytd-dropzone-url-row">
+        <Link2 size={13} color={T.inkSoft} />
+        <span>ou coller un lien</span>
+        <input type="url" placeholder="https://…" value={!fileMeta && value ? value : ""} onChange={e => pasteUrl(e.target.value)} onClick={e => e.stopPropagation()} />
+      </label>
     </div>
   );
 }

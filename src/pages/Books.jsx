@@ -98,7 +98,7 @@ export default function Books() {
             <div className="ytd-books-hero" style={{ gridTemplateColumns: sideList.length ? "1.6fr 2px 1fr" : "1fr", marginBottom: 56, paddingBottom: 48, borderBottom: `1px solid ${T.line}` }}>
               <Reveal>
                 <article onClick={() => openBook(hero)} onKeyDown={e => e.key === "Enter" && openBook(hero)} role="button" tabIndex={0} style={{ cursor: "pointer" }}>
-                  <Cover book={hero} height={480} />
+                  <Cover book={hero} height="clamp(260px, 38vw, 480px)" />
                   <div style={{ paddingTop: 18 }}>
                     <span style={CATEGORY_TAG}>{hero.category}</span>
                     <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 800, color: T.ink, margin: "10px 0 10px", lineHeight: 1.05 }}>{hero.title}</h2>

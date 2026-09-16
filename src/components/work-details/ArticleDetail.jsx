@@ -1,18 +1,19 @@
 import React from "react";
-import { T } from "../../theme.js";
-import { Section, FieldList, QuoteStack, TableOfContents } from "./shared.jsx";
+import { Section, LinkAction } from "./shared.jsx";
+import { findChapterText } from "../../lib/pdfMetadata.js";
 import MediaDisplay, { extractMediaUrls } from "../MediaDisplay.jsx";
 
 export default function ArticleDetail({ work }) {
+  const hasReader = !!work.pdfFile;
   const images = extractMediaUrls(work.images);
   const videos = extractMediaUrls(work.embeddedVideos);
+  const introduction = findChapterText(work.tableOfContents, ["introduction", "avant-propos"], "first");
+  const conclusion = findChapterText(work.tableOfContents, ["conclusion", "en résumé", "pour conclure"], "last");
+
   return (
     <>
-      {work.subtitle && !work.summary && <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: 21, lineHeight: 1.5, color: T.ink, margin: "0 0 34px", paddingBottom: 26, borderBottom: `1px solid ${T.line}` }}>{work.subtitle}</p>}
-      <Section title="Résumé">{work.summary}</Section>
-      <TableOfContents items={work.tableOfContents} />
-      <Section title="Contenu">{work.content}</Section>
-      <QuoteStack value={work.quotes} />
+      <Section title="Description" serif>{introduction || work.summary}</Section>
+      <Section title="Synthèse" serif>{conclusion}</Section>
       {(images.length > 0 || videos.length > 0) && (
         <section className="ytd-work-detail-media-section">
           <h2>Médias intégrés</h2>
@@ -22,7 +23,12 @@ export default function ArticleDetail({ work }) {
           </div>
         </section>
       )}
-      <FieldList title="Références bibliographiques" value={work.references} ordered />
+
+      {hasReader && (
+        <div style={{ marginTop: 30 }}>
+          <LinkAction href={work.pdfFile}>Lire l'article complet (PDF)</LinkAction>
+        </div>
+      )}
     </>
   );
 }

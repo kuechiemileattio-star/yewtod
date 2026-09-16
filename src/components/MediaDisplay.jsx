@@ -1,6 +1,7 @@
 import React from "react";
 import { ExternalLink, Image as ImageIcon, Play } from "lucide-react";
 import { T } from "../theme.js";
+import YoutubePreviewPlayer from "./YoutubePreviewPlayer.jsx";
 
 export function isVideoMedia(url = "") {
   return /\.(mp4|webm|ogg)(\?.*)?$/i.test(url) || /youtube\.com|youtu\.be|vimeo\.com/i.test(url);
@@ -17,11 +18,6 @@ function getYoutubeId(url) {
   } catch {
     return null;
   }
-}
-
-function youtubeEmbedUrl(url) {
-  const videoId = getYoutubeId(url);
-  return videoId ? `https://www.youtube.com/embed/${videoId}?start=0&end=120&rel=0` : url;
 }
 
 function youtubeWatchUrl(url) {
@@ -42,7 +38,17 @@ export default function MediaDisplay({ type, url, imageUrl, videoUrl, alt = "", 
   const renderVideo = media => {
     if (/youtube\.com|youtu\.be|vimeo\.com/i.test(media)) {
       const isYoutube = /youtube\.com|youtu\.be/i.test(media);
-      return <div className="ytd-media-player"><div className="ytd-media-embed"><iframe src={isYoutube ? youtubeEmbedUrl(media) : media} title={alt || "Vidéo de la publication"} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div>{isYoutube && <div className="ytd-media-player-footer"><span><Play size={13} /> Aperçu gratuit · 2 minutes</span><a href={youtubeWatchUrl(media)} target="_blank" rel="noreferrer">Continuer sur YouTube <ExternalLink size={13} /></a></div>}</div>;
+      const videoId = isYoutube ? getYoutubeId(media) : null;
+      return (
+        <div className="ytd-media-player">
+          <div className="ytd-media-embed">
+            {videoId
+              ? <YoutubePreviewPlayer videoId={videoId} title={alt || "Vidéo de la publication"} cutoffSeconds={120} />
+              : <iframe src={media} title={alt || "Vidéo de la publication"} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />}
+          </div>
+          {isYoutube && <div className="ytd-media-player-footer"><span><Play size={13} /> Aperçu gratuit · 2 minutes</span><a href={youtubeWatchUrl(media)} target="_blank" rel="noreferrer">Continuer sur YouTube <ExternalLink size={13} /></a></div>}
+        </div>
+      );
     }
     return <div className="ytd-media-player"><video className="ytd-media-video" src={media} controls preload="metadata" onTimeUpdate={event => { if (event.currentTarget.currentTime >= 120) { event.currentTarget.pause(); event.currentTarget.currentTime = 120; } }} /><div className="ytd-media-player-footer"><span><Play size={13} /> Aperçu gratuit · 2 minutes</span></div></div>;
   };

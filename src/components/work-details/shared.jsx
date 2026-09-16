@@ -21,13 +21,20 @@ export function TableOfContents({ items }) {
   );
 }
 
-/** A titled prose block — the workhorse of every detail layout. */
-export function Section({ title, children, tight }) {
+/** A titled prose block — the workhorse of every detail layout. `serif` switches
+ * the body copy to a reading-serif face, for long-form extracts (PDF intro/conclusion). */
+export function Section({ title, children, tight, serif }) {
   if (!children) return null;
   return (
     <section className="ytd-work-detail-section" style={tight ? { marginTop: 24 } : undefined}>
-      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 500, margin: "0 0 10px", color: T.greenDeep }}>{title}</h2>
-      <div style={{ color: T.ink, fontSize: 17, lineHeight: 1.7, whiteSpace: "pre-line" }}>{children}</div>
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 500, margin: "0 0 14px", color: T.greenDeep }}>{title}</h2>
+      <div style={{
+        color: T.ink,
+        fontFamily: serif ? "'Newsreader', serif" : "'Inter', sans-serif",
+        fontSize: serif ? 19 : 17,
+        lineHeight: serif ? 1.75 : 1.7,
+        whiteSpace: "pre-line",
+      }}>{children}</div>
     </section>
   );
 }
