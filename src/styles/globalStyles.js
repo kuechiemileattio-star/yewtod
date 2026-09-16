@@ -266,7 +266,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-editor-preview { position: sticky; top: 24px; display: grid; gap: 14px; padding: 20px; border: 1px solid ${T.line}; background: ${T.paperAlt}; border-radius: 12px; }
   .ytd-admin-editor-preview-actions { display: grid; gap: 8px; }
   .ytd-admin-editor-preview-actions .ytd-btn { width: 100%; justify-content: center; }
-  .ytd-dropzone { position: relative; display: grid; justify-items: center; gap: 6px; padding: 26px 16px; border: 1px dashed ${T.line}; border-radius: 8px; background: ${T.paperAlt}; text-align: center; cursor: pointer; transition: border-color .2s ease, background .2s ease; }
+  .ytd-dropzone { position: relative; display: grid; justify-items: center; align-content: center; gap: 6px; min-height: 148px; padding: 26px 16px; border: 1px dashed ${T.line}; border-radius: 8px; background: ${T.paperAlt}; text-align: center; cursor: pointer; transition: border-color .2s ease, background .2s ease; box-sizing: border-box; }
   .ytd-dropzone:hover, .ytd-dropzone.is-dragover { border-color: ${T.green}; background: ${T.green}0D; }
   .ytd-dropzone p { margin: 0; font: 13px 'Inter', sans-serif; color: ${T.inkSoft}; }
   .ytd-dropzone-browse { color: ${T.green}; font-weight: 600; text-decoration: underline; }
@@ -774,8 +774,9 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-footer { margin: 0; }
     .ytd-footer-cta-inner { gap: 24px !important; }
     .ytd-footer-cta-button { width: 100%; justify-content: center; }
-    .ytd-footer-grid { grid-template-columns: 1fr !important; gap: 26px !important; text-align: center; }
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; text-align: center; }
     .ytd-footer-brand, .ytd-footer-brand p { max-width: 100% !important; }
+    .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
     .ytd-footer-grid > div { display: flex; flex-direction: column; align-items: center; }
     .ytd-footer-link { justify-content: center; }
     .ytd-footer-signature, .ytd-footer-social-row { justify-content: center; }
@@ -922,14 +923,22 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-editor-preview { position: static; }
     .ytd-admin-type-tabs { flex-wrap: nowrap; overflow-x: auto; }
   }
-  /* The Explorer/Travaux two-column tablet layout (see the 860px block above)
-     gets cramped well before 640px, once "Travaux"'s longer labels have no
-     room left — stack everything a bit earlier instead. Kept as its own
-     query (rather than raising the shared 640px breakpoint) so it only
-     affects the footer. */
+  /* Even on the narrowest phones the Explorer/Travaux columns stay side by
+     side rather than collapsing into one long vertical stack — "Travaux"'s
+     longer labels (Séries documentaires, Visualisations de données…) just
+     get a smaller font and left-aligned text instead of full stacking, so
+     the footer still reads as two columns of part et d'autre. */
   @media (max-width: 700px) {
-    .ytd-footer-grid { grid-template-columns: 1fr !important; gap: 26px !important; text-align: center; }
-    .ytd-footer-grid > div:last-child { grid-column: auto; }
-    .ytd-footer-newsletter-form { width: 100%; max-width: 340px; }
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; text-align: center; }
+    .ytd-footer-grid > div:last-child { grid-column: 1 / -1; }
+    .ytd-footer-newsletter-form { width: 100%; max-width: 340px; margin: 0 auto; }
+    .ytd-footer-link { font-size: 12px !important; }
+  }
+  @media (max-width: 420px) {
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+    .ytd-footer-grid > div { align-items: flex-start !important; text-align: left !important; }
+    .ytd-footer-heading { text-align: left !important; }
+    .ytd-footer-link { justify-content: flex-start !important; font-size: 11.5px !important; }
+    .ytd-footer-link:hover { transform: none; }
   }
 `;
