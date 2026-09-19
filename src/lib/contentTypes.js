@@ -149,6 +149,31 @@ export const CONTENT_TYPES = [
 
 export const CATEGORIES = CONTENT_TYPES.map(t => t.label);
 
+// Editorial taxonomy for Articles — a flat list of themes an article can
+// belong to, several at once (like SCIRP's submission form, where an author
+// checks every relevant subject "Field" for one manuscript, not just one).
+// Finer sub-topic granularity is covered by the free-text `tags` field.
+export const ARTICLE_THEMES = [
+  "Économie",
+  "Sociologie",
+  "Science politique",
+  "Intelligence artificielle",
+  "Anthropologie",
+  "Environnement & société",
+  "Éducation",
+  "Idées & débats",
+];
+
+// Content type determines the article's display template, same idea as
+// actualité/dossier/définition/brève on an editorial site: short reactive
+// news vs. long-form deep dives vs. reference sheets vs. quick notes.
+export const ARTICLE_CONTENT_TYPES = [
+  { value: "actualite", label: "Actualité", hint: "Réactif et court — un fait récent commenté rapidement." },
+  { value: "dossier", label: "Dossier", hint: "Contenu long et approfondi." },
+  { value: "definition", label: "Définition", hint: "Fiche encyclopédique de référence." },
+  { value: "breve", label: "Brève", hint: "Quelques lignes, sans développement." },
+];
+
 export function getTypeByTable(table) {
   return CONTENT_TYPES.find(t => t.table === table);
 }

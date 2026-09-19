@@ -15,7 +15,11 @@ de `supabase/migrations/` **dans l'ordre**, puis `supabase/seed.sql` :
 8. `migrations/008_articles_pdf.sql` — mêmes colonnes (+ `pdf_file`) sur `articles`, pour pouvoir aussi joindre un PDF à un article.
 9. `migrations/009_content_views.sql` — suivi des vues (table `content_views`, vue `content_index`, fonction `get_top_viewed`) pour le widget "Le plus consulté" du tableau de bord.
 10. `migrations/010_collaboration_attachments_bucket.sql` — bucket Storage public pour les pièces jointes du formulaire de collaboration.
-11. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
+11. `migrations/011_articles_editorial_taxonomy.sql` — colonnes `theme`, `subtheme`, `content_type` (actualité/dossier/définition/brève) et `featured` sur `articles`.
+12. `migrations/012_scheduled_publish_visibility.sql` — un contenu au statut `scheduled` devient visible publiquement tout seul une fois sa `scheduled_at` passée (la policy RLS ne vérifiait auparavant que `status = 'published'`).
+13. `migrations/013_public_view_count.sql` — fonction RPC publique `get_public_view_count` pour afficher un compteur de vues sur chaque page (les lignes brutes de `content_views` restent réservées aux managers).
+14. `migrations/014_articles_multi_theme.sql` — remplace `theme`/`subtheme` (un seul thème) par `themes text[]` : un article peut appartenir à plusieurs thèmes à la fois (cases à cocher dans le formulaire, comme les "Fields" de SCIRP). Migre automatiquement les données existantes.
+15. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
 
 Si tu préfères la CLI Supabase (`supabase db push` / `supabase migration up`),
 les fichiers sont déjà nommés dans l'ordre attendu par la CLI.
@@ -111,3 +115,13 @@ nombre de pages et le sommaire (table des matières) sont extraits
 automatiquement depuis le fichier lui-même (ses signets/outline PDF, quand le
 fichier en contient) — rien à saisir à la main. Un PDF sans signets ne produit
 simplement pas de sommaire.
+
+## 8. Articles de démonstration (optionnel)
+
+`seed_demo_articles.sql` insère 10 articles d'exemple **au contenu original**
+(un par thème de la taxonomie éditoriale — Économie, Sociologie, Science
+politique, Intelligence artificielle, Anthropologie, Environnement & société,
+Éducation, Idées & débats — mélangeant dossier/définition/actualité/brève)
+pour tester le formulaire éditorial avec de vraies données une fois
+`011_articles_editorial_taxonomy.sql` appliquée. Purement optionnel, à
+supprimer ou modifier librement une fois le test fait.

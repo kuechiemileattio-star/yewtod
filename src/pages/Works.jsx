@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Search, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { T } from "../theme.js";
 import { CATEGORIES, fmtDate } from "../lib/contentTypes.js";
@@ -16,6 +17,7 @@ export default function Works() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categorieParam = searchParams.get("categorie");
   const [cat, setCat] = useState(() => (categorieParam && CATEGORIES.includes(categorieParam)) ? categorieParam : (sessionStorage.getItem("yewtod-works-filter") || "Toutes"));
+  const [query, setQuery] = useState("");
 
   function selectCategory(c) {
     setCat(c);
@@ -23,7 +25,11 @@ export default function Works() {
     setSearchParams(c === "Toutes" ? {} : { categorie: c }, { replace: true });
   }
 
-  const filtered = cat === "Toutes" ? works : works.filter(w => w.category === cat);
+  const byCategory = cat === "Toutes" ? works : works.filter(w => w.category === cat);
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? byCategory.filter(w => `${w.title} ${w.excerpt} ${w.tags || ""}`.toLowerCase().includes(q))
+    : byCategory;
   const openWork = work => navigate(workPath(work.routeSlug, work.slug));
 
   return (
@@ -34,6 +40,20 @@ export default function Works() {
           La bibliothèque des travaux publiés : articles, rapports, études, notes de recherche, séries documentaires, expérimentations et visualisations de données.
         </p>
       </Reveal>
+
+      <div className="ytd-works-search" style={{ position: "relative", maxWidth: 440, marginBottom: 24 }}>
+        <Search size={16} color={T.inkSoft} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
+        <input
+          type="search" value={query} onChange={e => setQuery(e.target.value)}
+          placeholder="Rechercher un titre, un mot-clé, un tag…"
+          style={{ width: "100%", boxSizing: "border-box", padding: "12px 40px", border: `1px solid ${T.line}`, borderRadius: 8, background: T.paper, color: T.ink, fontFamily: "'Inter', sans-serif", fontSize: 14, outline: "none" }}
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery("")} aria-label="Effacer la recherche" style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", border: 0, background: "none", cursor: "pointer", color: T.inkSoft, display: "grid", placeItems: "center" }}>
+            <X size={15} />
+          </button>
+        )}
+      </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 44 }}>
         {["Toutes", ...CATEGORIES].map(c => (
@@ -78,7 +98,11 @@ export default function Works() {
           ))}
         </div>
       )}
-      {!loading && filtered.length === 0 && <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>Aucun travail dans cette catégorie pour le moment.</p>}
+      {!loading && filtered.length === 0 && (
+        <p style={{ fontFamily: "'Inter', sans-serif", color: T.inkSoft }}>
+          {q ? `Aucun résultat pour « ${query.trim()} ».` : "Aucun travail dans cette catégorie pour le moment."}
+        </p>
+      )}
     </div>
   );
 }

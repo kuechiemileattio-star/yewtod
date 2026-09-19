@@ -261,8 +261,40 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-type-tabs button { padding: 9px 16px; border: 1px solid ${T.line}; border-radius: 20px; color: ${T.inkSoft}; background: ${T.paper}; cursor: pointer; font: 600 12.5px 'Plus Jakarta Sans', sans-serif; transition: all .2s ease; }
   .ytd-admin-type-tabs button.is-active { border-color: ${T.green}; color: #fff; background: ${T.green}; }
   .ytd-admin-type-tabs button:hover:not(.is-active) { border-color: ${T.green}; color: ${T.green}; }
+  .ytd-admin-content-type-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ytd-admin-content-type-picker button { padding: 8px 14px; border: 1px solid ${T.line}; border-radius: 20px; color: ${T.inkSoft}; background: ${T.paper}; cursor: pointer; font: 600 12px 'Plus Jakarta Sans', sans-serif; transition: all .2s ease; }
+  .ytd-admin-content-type-picker button.is-active { border-color: ${T.green}; color: #fff; background: ${T.green}; }
+  .ytd-admin-content-type-picker button:hover:not(.is-active) { border-color: ${T.green}; color: ${T.green}; }
+  .ytd-admin-theme-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+  .ytd-admin-theme-checklist label { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid ${T.line}; border-radius: 6px; font: 13px 'Inter', sans-serif; color: ${T.ink}; cursor: pointer; transition: border-color .2s ease, background .2s ease; }
+  .ytd-admin-theme-checklist label.is-checked { border-color: ${T.green}; background: ${T.green}0D; }
+  .ytd-admin-theme-checklist input { accent-color: ${T.green}; }
   .ytd-admin-editor-page { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
   .ytd-admin-editor-form { display: grid; gap: 18px; padding: 26px; border: 1px solid ${T.line}; background: ${T.paper}; border-radius: 12px; }
+
+  /* Mise en page "formulaire de soumission" façon SCIRP : chaque champ est
+     une ligne de tableau bordée, étiquette à gauche (fond légèrement teinté),
+     champ à droite — plutôt que des blocs empilés verticalement. Ciblé
+     uniquement dans le formulaire dashboard des "Works", sans toucher au
+     composant Field.jsx partagé par le reste du site (d'où les !important,
+     nécessaires pour dépasser ses styles inline). */
+  .ytd-admin-editor-form { display: block !important; padding: 0 !important; gap: 0 !important; overflow: hidden; }
+  .ytd-admin-editor-form .ytd-admin-meta-fields { display: contents !important; }
+  .ytd-admin-editor-form .ytd-field {
+    display: grid !important; grid-template-columns: 190px 1fr !important; gap: 18px !important;
+    align-items: start !important; margin: 0 !important; padding: 16px 22px !important;
+    border-bottom: 1px solid ${T.line} !important; background: none !important;
+  }
+  .ytd-admin-editor-form > *:last-child .ytd-field:last-child,
+  .ytd-admin-editor-form .ytd-field:last-child { border-bottom: 0 !important; }
+  .ytd-admin-editor-form .ytd-field-label {
+    margin: 0 !important; padding-top: 11px !important; text-align: right !important;
+    color: ${T.ink} !important; font: 600 13px 'Inter', sans-serif !important;
+    text-transform: none !important; letter-spacing: 0 !important;
+  }
+  .ytd-admin-editor-form .ytd-field-label.is-required::before { content: "* "; color: ${T.red}; }
+  .ytd-admin-editor-form > label:not(.ytd-field), .ytd-admin-editor-form > p { padding: 16px 22px; margin: 0 !important; border-bottom: 1px solid ${T.line}; }
+  .ytd-admin-editor-form > label:not(.ytd-field):last-child, .ytd-admin-editor-form > p:last-child { border-bottom: 0; }
   .ytd-admin-editor-preview { position: sticky; top: 24px; display: grid; gap: 14px; padding: 20px; border: 1px solid ${T.line}; background: ${T.paperAlt}; border-radius: 12px; }
   .ytd-admin-editor-preview-actions { display: grid; gap: 8px; }
   .ytd-admin-editor-preview-actions .ytd-btn { width: 100%; justify-content: center; }
@@ -408,6 +440,21 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-work-detail-attributes .ytd-work-detail-section { margin-top: 0; margin-bottom: 34px; padding: 24px 0 0 18px; border-top: 1px solid ${T.line}; border-left: 3px solid ${T.lime}; }
   .ytd-work-detail-attributes .ytd-detail-attribute-content, .ytd-work-detail-attributes .ytd-detail-attribute-executiveSummary, .ytd-work-detail-attributes .ytd-detail-attribute-description, .ytd-work-detail-attributes .ytd-detail-attribute-mainIdea, .ytd-work-detail-attributes .ytd-detail-attribute-summary, .ytd-work-detail-attributes .ytd-detail-attribute-conclusion { grid-column: 1 / -1; }
   .ytd-work-detail-section h2 { margin: 0 0 11px !important; color: ${T.greenDeep}; font-size: 25px !important; }
+  .ytd-article-taxonomy-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .ytd-article-subtitle { font-family: 'Fraunces', serif; font-weight: 500; font-size: 21px; line-height: 1.5; color: ${T.ink}; margin: 0 0 34px; padding-bottom: 26px; border-bottom: 1px solid ${T.line}; }
+  .ytd-article-abstract { margin: 0 0 32px; padding: 22px 26px; border: 1px solid ${T.line}; border-left: 3px solid ${T.green}; background: ${T.paperAlt}; border-radius: 4px; }
+  .ytd-article-abstract-label { display: block; margin-bottom: 8px; color: ${T.greenDeep}; font: 700 11px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+  .ytd-article-abstract p { margin: 0; color: ${T.ink}; font-family: 'Newsreader', serif; font-size: 18px; line-height: 1.65; font-style: italic; }
+  .ytd-article-keywords { margin: -14px 0 32px; color: ${T.ink}; font: 14px/1.6 'Inter', sans-serif; }
+  .ytd-article-keywords-label { font-weight: 700; margin-right: 6px; }
+  .ytd-article-keyword { color: ${T.green}; }
+  .ytd-cite-block { margin-top: 44px; padding: 20px 24px; border: 1px solid ${T.line}; border-radius: 8px; background: ${T.paperAlt}; }
+  .ytd-cite-block-label { display: block; margin-bottom: 12px; color: ${T.greenDeep}; font: 700 11px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+  .ytd-cite-block-share { display: flex; gap: 8px; margin-bottom: 14px; }
+  .ytd-cite-block-share button { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid ${T.line}; border-radius: 50%; background: ${T.paper}; color: ${T.ink}; cursor: pointer; transition: border-color .2s ease, color .2s ease, transform .2s ease; }
+  .ytd-cite-block-share button:hover { border-color: ${T.green}; color: ${T.green}; transform: translateY(-2px); }
+  .ytd-cite-block-text { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: ${T.ink}; font: 13.5px/1.6 'Inter', sans-serif; }
+  .ytd-cite-block-text svg { flex-shrink: 0; margin-top: 3px; color: ${T.inkSoft}; }
   .ytd-work-detail-media-section { margin-top: 42px; padding-top: 26px; border-top: 3px solid ${T.lime}; }
   .ytd-work-detail-media-section h2 { margin: 0 0 18px; color: ${T.greenDeep}; font: 500 25px 'Fraunces', serif; }
   .ytd-work-detail-media-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }

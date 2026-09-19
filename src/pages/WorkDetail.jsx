@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Download, Share2 } from "lucide-react";
+import { ArrowLeft, Download, Share2, Eye, Quote, Facebook, Linkedin, Twitter } from "lucide-react";
 import { T } from "../theme.js";
 import { fmtDate, getTypeByRouteSlug } from "../lib/contentTypes.js";
 import { workPath, PATHS } from "../lib/paths.js";
 import { useWork, useWorks } from "../hooks/useWorks.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
-import useLogView from "../hooks/useLogView.js";
+import useLogView, { useViewCount, useDownloadCount, logDownload } from "../hooks/useLogView.js";
 import Divider from "../components/Divider.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
@@ -28,6 +28,8 @@ export default function WorkDetail() {
 
   useDocumentMeta(work?.title, work?.excerpt);
   useLogView(work?.table, work?.id);
+  const viewCount = useViewCount(work?.table, work?.id);
+  const downloadCount = useDownloadCount(work?.table, work?.id);
 
   // A plain <a download> is silently ignored by browsers when the file is
   // cross-origin (Supabase Storage is a different domain from the site) —
@@ -49,6 +51,7 @@ export default function WorkDetail() {
       a.click();
       a.remove();
       URL.revokeObjectURL(blobUrl);
+      logDownload(work.table, work.id);
     } catch {
       window.open(url, "_blank");
     } finally {
@@ -64,6 +67,17 @@ export default function WorkDetail() {
     await navigator.clipboard.writeText(window.location.href);
     setShared(true);
     setTimeout(() => setShared(false), 2000);
+  }
+
+  function shareTo(network) {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(work.title);
+    const targets = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+    };
+    window.open(targets[network], "_blank", "noopener,noreferrer,width=600,height=500");
   }
 
   if (loading) return <div style={{ maxWidth: 1000, margin: "0 auto", padding: "120px 24px", color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</div>;
@@ -96,6 +110,8 @@ export default function WorkDetail() {
             <span>{work.author}</span><span>·</span><span>{fmtDate(work.date)}</span>
             {work.pageCount && <><span>·</span><span>{work.pageCount} pages</span></>}
             {work.readTime && <><span>·</span><span>{work.readTime}</span></>}
+            {viewCount != null && <><span>·</span><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Eye size={13} /> {viewCount} vue{viewCount === 1 ? "" : "s"}</span></>}
+            {downloadCount != null && downloadCount > 0 && <><span>·</span><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Download size={13} /> {downloadCount} téléchargement{downloadCount === 1 ? "" : "s"}</span></>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
             {downloadUrl && (
@@ -117,6 +133,19 @@ export default function WorkDetail() {
       {work.coverImage && <div className="ytd-work-detail-cover"><Cover tone={work.tone} label={work.category} tall image={work.coverImage} /></div>}
       <div className="ytd-work-detail-body" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         {BodyComponent ? <BodyComponent work={work} /> : <p style={{ color: T.inkSoft }}>Type de contenu non pris en charge.</p>}
+      </div>
+
+      <div className="ytd-cite-block">
+        <span className="ytd-cite-block-label">Partager et citer</span>
+        <div className="ytd-cite-block-share">
+          <button type="button" onClick={() => shareTo("facebook")} aria-label="Partager sur Facebook"><Facebook size={15} /></button>
+          <button type="button" onClick={() => shareTo("twitter")} aria-label="Partager sur X"><Twitter size={15} /></button>
+          <button type="button" onClick={() => shareTo("linkedin")} aria-label="Partager sur LinkedIn"><Linkedin size={15} /></button>
+          <button type="button" onClick={handleShare} aria-label="Copier le lien"><Share2 size={15} /></button>
+        </div>
+        <p className="ytd-cite-block-text">
+          <Quote size={13} /> {work.author} ({new Date(work.date || Date.now()).getFullYear()}). <em>{work.title}</em>. {work.category}, Yewtod SS.
+        </p>
       </div>
 
       <Divider margin="68px 0 40px" />

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Save, Send } from "lucide-react";
+import { Save, Send, Clock } from "lucide-react";
 import { T } from "../../theme.js";
 import { supabase } from "../../lib/supabaseClient.js";
 import { rowToUi } from "../../lib/adapters.js";
-import { fmtDate } from "../../lib/contentTypes.js";
+import { fmtDate, ARTICLE_THEMES, ARTICLE_CONTENT_TYPES } from "../../lib/contentTypes.js";
 import { SIMPLE_WORK_TYPES, SIMPLE_WORK_ORDER } from "../../lib/simpleWorkTypes.js";
 import { extractPdfMetadata } from "../../lib/pdfMetadata.js";
 import { useWorkMutations } from "../../hooks/useWorkMutations.js";
@@ -19,12 +19,30 @@ function emptyForm(config) {
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
+    ...(config.table === "articles" ? { themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "" } : {}),
   };
+}
+
+function toggleInList(value, item) {
+  const list = (value || "").split("\n").map(s => s.trim()).filter(Boolean);
+  const next = list.includes(item) ? list.filter(t => t !== item) : [...list, item];
+  return next.join("\n");
+}
+
+// `tags` is stored as a newline-joined string internally (same convention as
+// every other list field, see adapters.js ARRAY_FIELDS) but edited here as a
+// comma-separated list, which reads more naturally for tags specifically.
+function tagsToInput(tags) {
+  return (tags || "").split("\n").map(t => t.trim()).filter(Boolean).join(", ");
+}
+function inputToTags(value) {
+  return value.split(",").map(t => t.trim()).filter(Boolean).join("\n");
 }
 
 function SimpleWorkFormInner({ tableKey, id }) {
   const config = SIMPLE_WORK_TYPES[tableKey];
   const isEpisode = config.table === "documentary_episodes";
+  const isArticle = config.table === "articles";
   const navigate = useNavigate();
   const { createWork, updateWork, saving } = useWorkMutations();
   const [form, setForm] = useState(() => emptyForm(config));
@@ -107,8 +125,20 @@ function SimpleWorkFormInner({ tableKey, id }) {
       setError("Choisis la série à laquelle cet épisode appartient.");
       return;
     }
+    if (nextStatus === "scheduled" && !form.scheduledAt) {
+      setError("Choisis une date et une heure de publication pour programmer cet article.");
+      return;
+    }
     setError("");
     const payload = { ...form, status: nextStatus };
+    if (isArticle) {
+      payload.tags = inputToTags(form.tags);
+      if (nextStatus === "scheduled") {
+        payload.publishedAt = form.scheduledAt;
+      } else {
+        payload.scheduledAt = "";
+      }
+    }
     try {
       await trySave(config.table, payload);
       navigate(`/dashboard/${config.adminPath}`);
@@ -129,6 +159,20 @@ function SimpleWorkFormInner({ tableKey, id }) {
         try {
           await trySave(config.table, rest);
           navigate(`/dashboard/${config.adminPath}`, { state: { warning: `Enregistré, mais le sommaire automatique du PDF n'a pas pu être sauvegardé : exécute la migration ${config.migrationFile || "correspondante"} dans Supabase, puis redépose le PDF pour le récupérer.` } });
+          return;
+        } catch (err2) {
+          setError(err2.message || "Erreur lors de l'enregistrement.");
+          return;
+        }
+      }
+      // Same idea for the article taxonomy columns (theme/subtheme/content_type/
+      // featured) — added by 011_articles_editorial_taxonomy.sql — so publishing
+      // an article isn't blocked if that migration hasn't been run yet.
+      if (isArticle && /themes|content_type|featured/i.test(msg)) {
+        const { themes, contentType, featured, ...rest } = payload;
+        try {
+          await trySave(config.table, rest);
+          navigate(`/dashboard/${config.adminPath}`, { state: { warning: "Enregistré, mais le thème/type/mise en avant n'ont pas pu être sauvegardés : exécute les migrations 011_articles_editorial_taxonomy.sql et 014_articles_multi_theme.sql dans Supabase, puis réessaie." } });
           return;
         } catch (err2) {
           setError(err2.message || "Erreur lors de l'enregistrement.");
@@ -168,10 +212,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
       <div className="ytd-admin-editor-page">
         <div className="ytd-admin-editor-form">
-          <Field label="Titre"><input required value={form.title} onChange={e => set("title", e.target.value)} style={inputStyle} /></Field>
+          <Field label="Titre" required><input required value={form.title} onChange={e => set("title", e.target.value)} style={inputStyle} /></Field>
 
           {isEpisode && (
-            <Field label="Série">
+            <Field label="Série" required>
               <select required value={form.seriesId || ""} onChange={e => set("seriesId", e.target.value)} style={inputStyle}>
                 <option value="" disabled>Choisir une série…</option>
                 {series.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
@@ -184,7 +228,46 @@ function SimpleWorkFormInner({ tableKey, id }) {
             <Field label="Date de publication"><input type="date" value={form.publishedAt ? String(form.publishedAt).slice(0, 10) : ""} onChange={e => set("publishedAt", e.target.value)} style={inputStyle} /></Field>
           </div>
 
-          <Field label={config.summaryLabel}><textarea rows={4} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>
+          <Field label={config.summaryLabel} hint={isArticle ? `${summary.length}/2900 caractères` : undefined}>
+            <textarea rows={4} maxLength={isArticle ? 2900 : undefined} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
+          </Field>
+
+          {isArticle && (
+            <>
+              <Field label="Thèmes" hint="Coche tous ceux qui s'appliquent — un article peut relever de plusieurs thèmes à la fois.">
+                <div className="ytd-admin-theme-checklist">
+                  {ARTICLE_THEMES.map(t => {
+                    const checked = (form.themes || "").split("\n").includes(t);
+                    return (
+                      <label key={t} className={checked ? "is-checked" : ""}>
+                        <input type="checkbox" checked={checked} onChange={() => set("themes", toggleInList(form.themes, t))} />
+                        {t}
+                      </label>
+                    );
+                  })}
+                </div>
+              </Field>
+
+              <Field label="Type de contenu" hint="Détermine le gabarit d'affichage de l'article sur le site.">
+                <div className="ytd-admin-content-type-picker">
+                  {ARTICLE_CONTENT_TYPES.map(ct => (
+                    <button key={ct.value} type="button" className={form.contentType === ct.value ? "is-active" : ""} onClick={() => set("contentType", ct.value)} title={ct.hint}>
+                      {ct.label}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="Tags" hint="Séparés par des virgules — relie l'article à plusieurs thématiques à la fois.">
+                <input value={tagsToInput(form.tags)} onChange={e => set("tags", inputToTags(e.target.value))} placeholder="ex : inégalités, éducation, Afrique de l'Ouest" style={inputStyle} />
+              </Field>
+
+              <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: T.ink, cursor: "pointer" }}>
+                <input type="checkbox" checked={!!form.featured} onChange={e => set("featured", e.target.checked)} />
+                Mettre à la une (mis en avant sur la page d'accueil)
+              </label>
+            </>
+          )}
 
           {config.urlField && (
             <Field label={config.urlLabel} hint="Sur le site, un aperçu de 2 minutes se lit directement sur la page ; au-delà, un bouton renvoie vers YouTube pour la suite.">
@@ -234,6 +317,12 @@ function SimpleWorkFormInner({ tableKey, id }) {
           </article>
           <div className="ytd-admin-editor-preview-actions">
             <Btn variant="green" onClick={() => save("published")} style={{ opacity: saving || anyUploading ? 0.7 : 1, cursor: anyUploading ? "wait" : "pointer" }}><Send size={15} /> Publier</Btn>
+            {isArticle && (
+              <>
+                <input type="datetime-local" value={form.scheduledAt || ""} onChange={e => set("scheduledAt", e.target.value)} style={{ ...inputStyle, fontSize: 13 }} />
+                <Btn variant="outline" onClick={() => save("scheduled")} style={{ opacity: saving || anyUploading ? 0.7 : 1, cursor: anyUploading ? "wait" : "pointer" }}><Clock size={15} /> Programmer la publication</Btn>
+              </>
+            )}
             <Btn variant="outline" onClick={() => save("draft")} style={{ opacity: saving || anyUploading ? 0.7 : 1, cursor: anyUploading ? "wait" : "pointer" }}><Save size={15} /> Enregistrer le brouillon</Btn>
             {anyUploading && <span style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 12 }}>Envoi du fichier en cours…</span>}
           </div>
