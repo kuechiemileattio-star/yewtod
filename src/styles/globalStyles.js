@@ -982,12 +982,14 @@ export const GLOBAL_STYLES = `${FONTS}
      the footer still reads as two columns of part et d'autre. */
   @media (max-width: 700px) {
     .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; text-align: center; }
+    .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
     .ytd-footer-grid > div:last-child { grid-column: 1 / -1; }
     .ytd-footer-newsletter-form { width: 100%; max-width: 340px; margin: 0 auto; }
     .ytd-footer-link { font-size: 12px !important; }
   }
   @media (max-width: 420px) {
     .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+    .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
     .ytd-footer-grid > div { align-items: flex-start !important; text-align: left !important; }
     .ytd-footer-heading { text-align: left !important; }
     .ytd-footer-link { justify-content: flex-start !important; font-size: 11.5px !important; }
