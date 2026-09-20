@@ -220,6 +220,26 @@ export function findChapterText(tableOfContents, keywords, fallbackPosition) {
   return "";
 }
 
+/**
+ * Lightweight version of extractPdfMetadata for long documents (books) where
+ * only the page count and table of contents (chapter titles) are needed —
+ * no per-page text/image extraction, which would mean rendering and
+ * uploading one PNG per page and is far too slow/heavy for a 300+ page book.
+ */
+export async function extractPdfOutline(file) {
+  const pdfjsLib = await loadPdfjs();
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  try {
+    const pageCount = pdf.numPages;
+    const outline = await pdf.getOutline();
+    const tableOfContents = await flattenOutline(pdf, outline);
+    return { pageCount, tableOfContents };
+  } finally {
+    pdf.destroy();
+  }
+}
+
 export async function extractPdfMetadata(file, onProgress) {
   const pdfjsLib = await loadPdfjs();
   const buffer = await file.arrayBuffer();

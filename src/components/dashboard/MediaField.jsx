@@ -13,13 +13,14 @@ const EXTERNAL_VIDEO = /youtube\.com|youtu\.be|vimeo\.com/i;
  * `kind="file"` shows a filename chip (for PDFs/CSVs). A manual URL input
  * stays available as a fallback for pasting an existing link.
  */
-export default function MediaField({ value, onChange, bucket, kind = "image", accept, pathPrefix = "" }) {
+export default function MediaField({ value, onChange, bucket, kind = "image", accept, pathPrefix = "", onFile, onUrl }) {
   const inputRef = useRef(null);
   const { upload, uploading, error } = useStorageUpload(bucket);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    onFile?.(file);
     try {
       const url = await upload(file, { pathPrefix });
       onChange(url);
@@ -28,6 +29,14 @@ export default function MediaField({ value, onChange, bucket, kind = "image", ac
     } finally {
       e.target.value = "";
     }
+  }
+
+  // A pasted link skips the upload flow entirely (no local File object ever
+  // exists), so anything that piggybacks on onFile — like PDF metadata
+  // extraction — needs its own hook here to still run.
+  function handleUrlPaste(url) {
+    onChange(url);
+    if (url) onUrl?.(url);
   }
 
   return (
@@ -70,7 +79,7 @@ export default function MediaField({ value, onChange, bucket, kind = "image", ac
         <input
           type="url"
           value={value || ""}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => handleUrlPaste(e.target.value)}
           placeholder="ou coller une URL"
           style={{ ...inputStyle, flex: 1 }}
         />

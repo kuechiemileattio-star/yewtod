@@ -19,7 +19,9 @@ de `supabase/migrations/` **dans l'ordre**, puis `supabase/seed.sql` :
 12. `migrations/012_scheduled_publish_visibility.sql` — un contenu au statut `scheduled` devient visible publiquement tout seul une fois sa `scheduled_at` passée (la policy RLS ne vérifiait auparavant que `status = 'published'`).
 13. `migrations/013_public_view_count.sql` — fonction RPC publique `get_public_view_count` pour afficher un compteur de vues sur chaque page (les lignes brutes de `content_views` restent réservées aux managers).
 14. `migrations/014_articles_multi_theme.sql` — remplace `theme`/`subtheme` (un seul thème) par `themes text[]` : un article peut appartenir à plusieurs thèmes à la fois (cases à cocher dans le formulaire, comme les "Fields" de SCIRP). Migre automatiquement les données existantes.
-15. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
+15. `migrations/015_content_download_tracking.sql` — ajoute un compteur de téléchargements public (`get_public_download_count`), distinct du compteur de vues.
+16. `migrations/016_books_purchase_entrance_fields.sql` — ajoute à `books` les champs façon fiche SCIRP : pages, mois de publication, DOI, ISBN/prix/lien d'achat (papier et ebook), description longue, exemples de chapitres, composants du livre, description ebook, biographie de l'auteur·e.
+17. `seed.sql` — rôles par défaut (Super Admin, Administrateur, Éditeur, Contributeur, Modérateur des collaborations), catalogue de permissions, paramètres de départ.
 
 Si tu préfères la CLI Supabase (`supabase db push` / `supabase migration up`),
 les fichiers sont déjà nommés dans l'ordre attendu par la CLI.

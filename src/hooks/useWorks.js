@@ -58,7 +58,7 @@ function normalizeWork(table, row) {
 }
 
 async function fetchTable(table) {
-  const selectCols = table === "articles" ? "*, authorProfile:profiles!author_id(full_name)" : "*";
+  const selectCols = table === "articles" ? "*, authorProfile:profiles!author_id(full_name, avatar_url)" : "*";
   const { data, error } = await supabase
     .from(table)
     .select(selectCols)
@@ -66,7 +66,7 @@ async function fetchTable(table) {
     .order("published_at", { ascending: false });
   if (error) throw error;
   return (data || []).map(row => {
-    if (row.authorProfile) row.authorProfile = { fullName: row.authorProfile.full_name };
+    if (row.authorProfile) row.authorProfile = { fullName: row.authorProfile.full_name, avatarUrl: row.authorProfile.avatar_url };
     return normalizeWork(table, row);
   });
 }
@@ -112,7 +112,7 @@ export function useWork(routeSlug, slug) {
     }
     setLoading(true);
     setError(null);
-    const selectCols = type.table === "articles" ? "*, authorProfile:profiles!author_id(full_name)" : "*";
+    const selectCols = type.table === "articles" ? "*, authorProfile:profiles!author_id(full_name, avatar_url)" : "*";
     supabase
       .from(type.table)
       .select(selectCols)
@@ -122,7 +122,7 @@ export function useWork(routeSlug, slug) {
         if (cancelled) return;
         if (err) { setError(err); setWork(null); }
         else {
-          if (data?.authorProfile) data.authorProfile = { fullName: data.authorProfile.full_name };
+          if (data?.authorProfile) data.authorProfile = { fullName: data.authorProfile.full_name, avatarUrl: data.authorProfile.avatar_url };
           setWork(data ? normalizeWork(type.table, data) : null);
         }
         setLoading(false);

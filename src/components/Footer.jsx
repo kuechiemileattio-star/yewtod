@@ -6,7 +6,6 @@ import { CONTENT_TYPES } from "../lib/contentTypes.js";
 import { useSocialLinks } from "../hooks/useSiteSettings.js";
 import { useNewsletterSubscribe } from "../hooks/useNewsletter.js";
 import BrandLogo from "./BrandLogo.jsx";
-import NodeMark from "./NodeMark.jsx";
 import { ArrowUpRight, ArrowUp, Mail, Send, Check, MoveUpRight, Linkedin, Twitter, Youtube, Instagram, Facebook, Link2 } from "lucide-react";
 
 const PLATFORM_ICONS = [
@@ -46,23 +45,19 @@ export default function Footer() {
   return (
     <footer className="ytd-footer">
       <div className="ytd-footer-cta">
-        <div className="ytd-footer-cta-inner" style={{ maxWidth: 1120, margin: "0 auto", padding: "64px 24px", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "end", gap: 30 }}>
+        <div className="ytd-footer-cta-inner" style={{ maxWidth: 1120, margin: "0 auto", padding: "24px 24px", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "end", gap: 20 }}>
           <div><span className="ytd-footer-eyebrow">Une idée à partager ?</span><h2>Les bonnes questions méritent de bonnes conversations.</h2><p>Recherche, collaboration ou simple échange : ouvrez la discussion avec Yewtod SS.</p></div>
           <button onClick={() => navigate(PATHS.collab)} className="ytd-footer-cta-button"><Mail size={16} /> Démarrer une conversation <ArrowUpRight size={15} /></button>
         </div>
       </div>
 
       <div className="ytd-footer-base">
-        <div className="ytd-footer-grid" style={{ maxWidth: 1120, margin: "0 auto", padding: "64px 24px 48px", display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1.2fr", gap: 40 }}>
+        <div className="ytd-footer-grid" style={{ maxWidth: 1120, margin: "0 auto", padding: "40px 24px 28px", display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1.2fr", gap: 40 }}>
           <div className="ytd-footer-brand">
             <BrandLogo dark />
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13.5, color: `${T.paper}AA`, lineHeight: 1.6, margin: "16px 0 20px", maxWidth: 300 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13.5, color: `${T.paper}AA`, lineHeight: 1.6, margin: "16px 0 0", maxWidth: 300 }}>
               Un espace de réflexion sur les sciences sociales, les systèmes complexes, l'économie, la politique publique et l'intelligence artificielle.
             </p>
-            <div className="ytd-footer-signature">
-              <NodeMark color={T.lime} />
-              <a href="mailto:contact@yewtod.ss" className="ytd-footer-mail">contact@yewtod.ss</a>
-            </div>
           </div>
 
           <div>
@@ -99,19 +94,6 @@ export default function Footer() {
               </div>
             )}
           </div>
-        </div>
-
-        <div className="ytd-footer-legal">
-          <div className="ytd-footer-legal-left">
-            <span>© 2026 Yewtod SS — Tous droits réservés</span>
-            <span aria-hidden="true">·</span>
-            <span>Sciences sociales</span>
-            <span aria-hidden="true">·</span>
-            <span>Systèmes complexes</span>
-            <span aria-hidden="true">·</span>
-            <span>Politiques publiques</span>
-          </div>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Retour en haut ↑</button>
         </div>
       </div>
 
