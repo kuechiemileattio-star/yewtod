@@ -829,6 +829,7 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; text-align: center; }
     .ytd-footer-brand, .ytd-footer-brand p { max-width: 100% !important; }
     .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
+    .ytd-footer-brand .ytd-brand-logo-frame { display: none; }
     .ytd-footer-grid > div { display: flex; flex-direction: column; align-items: center; }
     .ytd-footer-link { justify-content: center; }
     .ytd-footer-signature, .ytd-footer-social-row { justify-content: center; }
@@ -981,7 +982,7 @@ export const GLOBAL_STYLES = `${FONTS}
      get a smaller font and left-aligned text instead of full stacking, so
      the footer still reads as two columns of part et d'autre. */
   @media (max-width: 700px) {
-    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 25px !important; text-align: center; }
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 25px !important; text-align: center;display:none }
     .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
     .ytd-footer-grid > div:last-child { grid-column: 1 / -1; }
     .ytd-footer-newsletter-form { width: 100%; max-width: 340px; margin: 0 auto; }
