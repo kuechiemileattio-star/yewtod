@@ -988,7 +988,7 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-footer-link { font-size: 12px !important; }
   }
   @media (max-width: 420px) {
-    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important;text-align: center; }
+    .ytd-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important;text-align: center; }
     .ytd-footer-grid .ytd-footer-brand { grid-column: 1 / -1; }
     .ytd-footer-grid > div { align-items: flex-start !important; text-align: left !important; }
     .ytd-footer-heading { text-align: left !important; }
