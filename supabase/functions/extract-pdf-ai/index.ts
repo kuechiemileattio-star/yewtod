@@ -76,7 +76,16 @@ Deno.serve(async req => {
     const pdfBuffer = await pdfRes.arrayBuffer();
     const pdfSizeMb = pdfBuffer.byteLength / (1024 * 1024);
     if (pdfSizeMb > 32) throw new Error(`Ce PDF fait ${pdfSizeMb.toFixed(1)} Mo — la limite de l'API Claude pour un document est de 32 Mo.`);
-    const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    // Convert to base64 in chunks — spreading the whole byte array into
+    // String.fromCharCode(...) at once blows the JS call-stack argument
+    // limit (~65k) for any PDF above a couple hundred KB.
+    const bytes = new Uint8Array(pdfBuffer);
+    let binary = "";
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+    const base64Pdf = btoa(binary);
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
