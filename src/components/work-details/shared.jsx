@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowUpRight, Download } from "lucide-react";
 import { T } from "../../theme.js";
 
@@ -17,6 +17,42 @@ export function TableOfContents({ items }) {
           </li>
         ))}
       </ol>
+    </section>
+  );
+}
+
+/** Interactive sommaire: section list on the left (vertical), the selected
+ * section's own content on the right — used on both the Article and the
+ * Report public pages whenever a PDF's table of contents was extracted
+ * (with per-section content, either from the AI extraction's `summary` or
+ * the client-side pdfjs per-page text). */
+export function InteractiveSommaire({ items }) {
+  const [active, setActive] = useState(0);
+  if (!items?.length) return null;
+  const current = items[Math.min(active, items.length - 1)];
+
+  return (
+    <section className="ytd-afp-sommaire">
+      <h2 className="ytd-afp-sommaire-title">Sommaire</h2>
+      <div className="ytd-afp-sommaire-layout">
+        <nav className="ytd-afp-sommaire-nav">
+          <ol>
+            {items.map((item, i) => (
+              <li key={i}>
+                <button type="button" className={i === active ? "is-active" : ""} onClick={() => setActive(i)}>
+                  <span className="ytd-afp-sommaire-index">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="ytd-afp-sommaire-item-title">{item.title}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </nav>
+        <div className="ytd-afp-sommaire-content">
+          <h3>{current.title}</h3>
+          {current.page != null && <span className="ytd-afp-sommaire-page">p. {current.page}</span>}
+          <p>{current.content?.trim() || "Aucun résumé détaillé pour cette section."}</p>
+        </div>
+      </div>
     </section>
   );
 }
