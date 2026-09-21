@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Save, Send, Clock } from "lucide-react";
+import { Save, Send, Clock, Search, X, Check } from "lucide-react";
 import { T } from "../../theme.js";
 import { supabase } from "../../lib/supabaseClient.js";
 import { rowToUi } from "../../lib/adapters.js";
@@ -19,8 +19,65 @@ function emptyForm(config) {
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
-    ...(config.table === "articles" ? { themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "" } : {}),
+    ...(config.table === "articles" ? { content: "", themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
+}
+
+/** Pick which OTHER published articles show up under "À lire aussi" on this
+ * one's public page — matched by title (see ArticleFullPage.jsx), same
+ * pattern as the "Ouvrages similaires" picker on the Books form. */
+function SimilarArticlesPicker({ value, onChange, options, currentId }) {
+  const [query, setQuery] = useState("");
+  const selectedTitles = (value || "").split("\n").map(s => s.trim()).filter(Boolean);
+  const candidates = options.filter(a => a.id !== currentId);
+  const filtered = candidates.filter(a => a.title.toLowerCase().includes(query.toLowerCase()));
+
+  function toggle(title) {
+    const set = new Set(selectedTitles);
+    if (set.has(title)) set.delete(title); else set.add(title);
+    onChange(Array.from(set).join("\n"));
+  }
+
+  return (
+    <div className="ytd-admin-similar-picker">
+      {selectedTitles.length > 0 && (
+        <div className="ytd-admin-similar-chips">
+          {selectedTitles.map(title => (
+            <span key={title} className="ytd-admin-similar-chip">
+              {title}
+              <button type="button" onClick={() => toggle(title)} aria-label={`Retirer ${title}`}><X size={11} /></button>
+            </span>
+          ))}
+        </div>
+      )}
+      <label className="ytd-admin-similar-search">
+        <Search size={14} color={T.inkSoft} />
+        <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un article déjà publié…" />
+      </label>
+      <div className="ytd-admin-similar-list">
+        {filtered.length === 0 && <p className="ytd-admin-similar-empty">Aucun article ne correspond à cette recherche.</p>}
+        {filtered.map(a => {
+          const checked = selectedTitles.includes(a.title);
+          return (
+            <label key={a.id} className={`ytd-admin-similar-row ${checked ? "is-checked" : ""}`}>
+              <input type="checkbox" checked={checked} onChange={() => toggle(a.title)} />
+              {checked && <Check size={13} color={T.green} />}
+              <span className="ytd-admin-similar-row-title">{a.title}</span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ n, title }) {
+  return (
+    <div className="ytd-admin-section-header">
+      <span className="ytd-admin-section-header-n">{String(n).padStart(2, "0")}</span>
+      <span className="ytd-admin-section-header-title">{title}</span>
+    </div>
+  );
 }
 
 function toggleInList(value, item) {
@@ -47,6 +104,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
   const { createWork, updateWork, saving } = useWorkMutations();
   const [form, setForm] = useState(() => emptyForm(config));
   const [series, setSeries] = useState([]);
+  const [otherArticles, setOtherArticles] = useState([]);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState("");
   const [pdfNotice, setPdfNotice] = useState("");
@@ -64,6 +122,12 @@ function SimpleWorkFormInner({ tableKey, id }) {
     });
     return () => { active = false; };
   }, [id, config.table]);
+
+  // For the "similar articles" picker — every published article except this one.
+  useEffect(() => {
+    if (!isArticle) return;
+    supabase.from("articles").select("id, title").eq("status", "published").order("title").then(({ data }) => setOtherArticles(data || []));
+  }, [isArticle]);
 
   // Every episode must belong to a series (NOT NULL in the database) — the
   // only field this simplified form can't drop, unlike the other rich fields.
@@ -212,6 +276,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
       <div className="ytd-admin-editor-page">
         <div className="ytd-admin-editor-form">
+          <SectionHeader n={1} title="Identité" />
           <Field label="Titre" required><input required value={form.title} onChange={e => set("title", e.target.value)} style={inputStyle} /></Field>
 
           {isEpisode && (
@@ -228,12 +293,13 @@ function SimpleWorkFormInner({ tableKey, id }) {
             <Field label="Date de publication"><input type="date" value={form.publishedAt ? String(form.publishedAt).slice(0, 10) : ""} onChange={e => set("publishedAt", e.target.value)} style={inputStyle} /></Field>
           </div>
 
-          <Field label={config.summaryLabel} hint={isArticle ? `${summary.length}/2900 caractères` : undefined}>
-            <textarea rows={4} maxLength={isArticle ? 2900 : undefined} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
+          <Field label={config.summaryLabel} hint={isArticle ? `${summary.length}/2900 caractères — la description courte affichée en aperçu.` : undefined}>
+            <textarea rows={3} maxLength={isArticle ? 2900 : undefined} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
           </Field>
 
           {isArticle && (
             <>
+              <SectionHeader n={2} title="Classification" />
               <Field label="Thèmes" hint="Coche tous ceux qui s'appliquent — un article peut relever de plusieurs thèmes à la fois.">
                 <div className="ytd-admin-theme-checklist">
                   {ARTICLE_THEMES.map(t => {
@@ -262,12 +328,34 @@ function SimpleWorkFormInner({ tableKey, id }) {
                 <input value={tagsToInput(form.tags)} onChange={e => set("tags", inputToTags(e.target.value))} placeholder="ex : inégalités, éducation, Afrique de l'Ouest" style={inputStyle} />
               </Field>
 
-              <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: T.ink, cursor: "pointer" }}>
+              <label className="ytd-admin-featured-toggle">
                 <input type="checkbox" checked={!!form.featured} onChange={e => set("featured", e.target.checked)} />
                 Mettre à la une (mis en avant sur la page d'accueil)
               </label>
+
+              <Field label="Articles similaires" hint="Choisis les articles à afficher dans « À lire aussi » sur la page de celui-ci. Sans sélection, le site en propose automatiquement de la même catégorie.">
+                <SimilarArticlesPicker value={form.similarArticles} onChange={v => set("similarArticles", v)} options={otherArticles} currentId={id} />
+              </Field>
+
+              <SectionHeader n={3} title="Contenu de l'article" />
+              <Field
+                label="Corps du texte"
+                hint="Une ligne courte isolée (sans point final) devient un titre de section — ex. « Introduction » suivi d'un paragraphe. Une ligne commençant par • ou - devient une puce. Séparez les blocs par une ligne vide."
+              >
+                <textarea
+                  rows={14}
+                  value={form.content || ""}
+                  onChange={e => set("content", e.target.value)}
+                  placeholder={"Introduction\nLe texte de ce premier paragraphe…\n\nUn sous-titre de section\nLa suite du développement…\n\n• Premier point\n• Deuxième point"}
+                  style={{ ...inputStyle, resize: "vertical", fontFamily: "'IBM Plex Mono', monospace", fontSize: 13.5, lineHeight: 1.6 }}
+                />
+              </Field>
+
+              <SectionHeader n={4} title="Médias" />
             </>
           )}
+
+          {!isArticle && <SectionHeader n={2} title="Médias" />}
 
           {config.urlField && (
             <Field label={config.urlLabel} hint="Sur le site, un aperçu de 2 minutes se lit directement sur la page ; au-delà, un bouton renvoie vers YouTube pour la suite.">
@@ -302,7 +390,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
             <DropzoneField kind="image" bucket="covers" accept="image/*" value={form.coverImage} onChange={v => set("coverImage", v)} onUploadingChange={setImageUploading} />
           </Field>
 
-          {error && <p style={{ color: T.red, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>{error}</p>}
+          {error && <p className="ytd-admin-form-error">{error}</p>}
         </div>
 
         <aside className="ytd-admin-editor-preview">
@@ -310,6 +398,12 @@ function SimpleWorkFormInner({ tableKey, id }) {
           <article className="ytd-card ytd-work-card">
             <Cover tone={T.green} label={config.plural} image={form.coverImage} />
             <div style={{ marginTop: 12 }}>
+              {isArticle && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                  <span className="ytd-admin-preview-badge">{ARTICLE_CONTENT_TYPES.find(ct => ct.value === form.contentType)?.label}</span>
+                  {(form.themes || "").split("\n").filter(Boolean).slice(0, 1).map(t => <span key={t} className="ytd-admin-preview-badge ytd-admin-preview-badge-theme">{t}</span>)}
+                </div>
+              )}
               <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: T.inkSoft }}>{fmtDate(form.publishedAt) || "Date à définir"}</span>
               <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 17, fontWeight: 600, margin: "8px 0", lineHeight: 1.28 }}>{form.title || "Titre du travail"}</h3>
               {excerpt && <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: T.inkSoft, lineHeight: 1.5, margin: 0 }}>{excerpt}</p>}

@@ -241,12 +241,12 @@ export default function BookDetail() {
 
             {/* Colonne principale : onglets */}
             <div>
-              <div style={{ display: "flex", gap: 8, borderBottom: `1px solid ${PE.border}`, marginBottom: 24 }}>
+              <div className="ytd-book-tabs-row" style={{ display: "flex", flexWrap: "wrap", gap: 8, borderBottom: `1px solid ${PE.border}`, marginBottom: 24 }}>
                 {TABS.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className="pe-tab-btn"
+                    className="pe-tab-btn ytd-book-tab-btn"
                     style={{
                       background: "none",
                       border: "none",
@@ -255,6 +255,7 @@ export default function BookDetail() {
                       fontFamily: "'Inter', sans-serif",
                       fontSize: 15,
                       fontWeight: 700,
+                      whiteSpace: "nowrap",
                       color: activeTab === tab.key ? PE.red : PE.textSoft,
                       padding: "10px 16px",
                       marginBottom: -1,

@@ -175,7 +175,7 @@ export default function WorkDetail() {
   const related = works.filter(w => w.id !== work.id && w.category === work.category).slice(0, 3);
 
   if (work.table === "articles") {
-    return <ArticleFullPage work={work} related={works.filter(w => w.id !== work.id && w.category === work.category).slice(0, 4)} shareTo={shareTo} />;
+    return <ArticleFullPage work={work} otherArticles={works.filter(w => w.id !== work.id && w.table === "articles")} shareTo={shareTo} />;
   }
 
   const BodyComponent = WORK_DETAIL_COMPONENTS[work.table];

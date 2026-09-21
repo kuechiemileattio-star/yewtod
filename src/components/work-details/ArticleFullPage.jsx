@@ -77,10 +77,16 @@ function CommentsSection({ table, contentId }) {
   );
 }
 
-export default function ArticleFullPage({ work, related, shareTo }) {
+export default function ArticleFullPage({ work, otherArticles, shareTo }) {
   const [cited, setCited] = useState(false);
   const theme = (work.themes || "").split("\n").map(t => t.trim()).filter(Boolean)[0];
   const avatarUrl = work.authorProfile?.avatarUrl;
+
+  // "À lire aussi" = la sélection manuelle (similarArticles, par titre) ;
+  // à défaut, on complète avec d'autres articles récents.
+  const similarTitles = (work.similarArticles || "").split("\n").map(t => t.trim()).filter(Boolean);
+  const picked = similarTitles.map(title => otherArticles.find(a => a.title === title)).filter(Boolean);
+  const related = (picked.length > 0 ? picked : otherArticles).slice(0, 4);
 
   async function handleCite() {
     const year = new Date(work.date || Date.now()).getFullYear();

@@ -9,7 +9,7 @@ export const ARRAY_FIELDS = new Set([
   "charts", "tables", "appendices", "bibliography", "authors", "diagrams",
   "usefulLinks", "videos", "guests", "additionalResources", "speakers",
   "toolsUsed", "datasets", "screenshots", "visualizations", "downloadableFiles",
-  "favoriteQuotes", "illustrations", "relatedDocuments", "attachments", "themes", "components",
+  "favoriteQuotes", "illustrations", "relatedDocuments", "attachments", "themes", "components", "similarArticles",
 ]);
 
 export const JSON_LIST_FIELDS = new Set(["relatedContent", "relatedArticles", "similarBooks"]);
