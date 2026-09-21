@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Save, Send, Clock, Search, X, Check } from "lucide-react";
+import { Save, Send, Clock, Search, X, Check, Sparkles } from "lucide-react";
 import { T } from "../../theme.js";
-import { supabase } from "../../lib/supabaseClient.js";
+import { supabase, readFunctionErrorMessage } from "../../lib/supabaseClient.js";
 import { rowToUi } from "../../lib/adapters.js";
 import { fmtDate, ARTICLE_THEMES, ARTICLE_CONTENT_TYPES } from "../../lib/contentTypes.js";
 import { SIMPLE_WORK_TYPES, SIMPLE_WORK_ORDER } from "../../lib/simpleWorkTypes.js";
@@ -110,6 +110,8 @@ function SimpleWorkFormInner({ tableKey, id }) {
   const [pdfNotice, setPdfNotice] = useState("");
   const [fileUploading, setFileUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [aiExtracting, setAiExtracting] = useState(false);
+  const [aiNotice, setAiNotice] = useState("");
   const anyUploading = fileUploading || imageUploading;
 
   useEffect(() => {
@@ -138,6 +140,41 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
   function set(key, value) {
     setForm(prev => ({ ...prev, [key]: value }));
+  }
+
+  // Sends the already-uploaded PDF to Claude (via the extract-pdf-ai Edge
+  // Function — the API key can't live in the browser) for a real reading of
+  // the document, instead of the client-side pdfjs heuristics in
+  // analyzePdf() below. Complements rather than replaces it: this fills in
+  // title/résumé/sommaire with actual understanding of the content, on demand.
+  async function handleAiExtract() {
+    const pdfUrl = form[config.fileField];
+    if (!pdfUrl) return;
+    setAiExtracting(true);
+    setAiNotice("Claude lit le document…");
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("extract-pdf-ai", { body: { pdfUrl } });
+      if (fnError) throw new Error(await readFunctionErrorMessage(fnError));
+      if (data?.error) throw new Error(data.error);
+      setForm(prev => {
+        const next = { ...prev };
+        if (data.title && !prev.title) next.title = data.title;
+        if (data.summary) next[config.summaryField] = data.summary;
+        if (data.pageCount) next.pageCount = data.pageCount;
+        if (Array.isArray(data.tableOfContents) && data.tableOfContents.length) {
+          // Kept as structured data and shown on the public page as a real
+          // numbered "Sommaire" (see TableOfContents in shared.jsx) — no
+          // longer flattened into `content`, which would just duplicate it.
+          next.tableOfContents = data.tableOfContents.map(s => ({ title: s.title, page: s.page ?? null, content: s.summary || "" }));
+        }
+        return next;
+      });
+      setAiNotice(`Analyse Claude terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
+    } catch (err) {
+      setAiNotice(`Échec de l'analyse IA : ${err.message}`);
+    } finally {
+      setAiExtracting(false);
+    }
   }
 
   async function analyzePdf(fileOrBlob) {
@@ -383,6 +420,14 @@ function SimpleWorkFormInner({ tableKey, id }) {
                 onUrl={config.fileField === "pdfFile" ? handlePdfUrlPasted : undefined}
                 onUploadingChange={setFileUploading}
               />
+              {config.fileField === "pdfFile" && form.pdfFile && (
+                <div className="ytd-admin-ai-extract">
+                  <button type="button" onClick={handleAiExtract} disabled={aiExtracting} className="ytd-admin-ai-extract-btn">
+                    <Sparkles size={14} /> {aiExtracting ? "Claude analyse le document…" : "Analyser avec Claude (IA)"}
+                  </button>
+                  {aiNotice && <span className="ytd-admin-ai-extract-notice">{aiNotice}</span>}
+                </div>
+              )}
             </Field>
           )}
 

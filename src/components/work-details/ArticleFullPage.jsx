@@ -39,6 +39,39 @@ function ContentBlocks({ text }) {
   );
 }
 
+/** Sommaire à deux colonnes : la liste des sections à gauche, verticale, et le
+ * contenu de la section cliquée à droite — au lieu d'un simple index statique. */
+function InteractiveSommaire({ items }) {
+  const [active, setActive] = useState(0);
+  if (!items?.length) return null;
+  const current = items[Math.min(active, items.length - 1)];
+
+  return (
+    <section className="ytd-afp-sommaire">
+      <h2 className="ytd-afp-sommaire-title">Sommaire</h2>
+      <div className="ytd-afp-sommaire-layout">
+        <nav className="ytd-afp-sommaire-nav">
+          <ol>
+            {items.map((item, i) => (
+              <li key={i}>
+                <button type="button" className={i === active ? "is-active" : ""} onClick={() => setActive(i)}>
+                  <span className="ytd-afp-sommaire-index">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="ytd-afp-sommaire-item-title">{item.title}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </nav>
+        <div className="ytd-afp-sommaire-content">
+          <h3>{current.title}</h3>
+          {current.page != null && <span className="ytd-afp-sommaire-page">p. {current.page}</span>}
+          <p>{current.content?.trim() || "Aucun résumé détaillé pour cette section."}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CommentsSection({ table, contentId }) {
   const { comments, publishComment } = useContentComments(table, contentId);
   const [author, setAuthor] = useState("");
@@ -132,7 +165,9 @@ export default function ArticleFullPage({ work, otherArticles, shareTo }) {
             </div>
           </div>
 
-          <ContentBlocks text={work.content || work.summary} />
+          {work.tableOfContents?.length > 0
+            ? <InteractiveSommaire items={work.tableOfContents} />
+            : <ContentBlocks text={work.content || work.summary} />}
 
           <CommentsSection table={work.table} contentId={work.id} />
         </main>

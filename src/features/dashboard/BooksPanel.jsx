@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { Plus, Search, Edit3, Trash2, Save, X, BookOpen, PlusCircle, DollarSign, Hash, CalendarClock, Check } from "lucide-react";
+import { Plus, Search, Edit3, Trash2, Save, X, BookOpen, PlusCircle, DollarSign, Hash, CalendarClock, Check, Sparkles } from "lucide-react";
 import { T } from "../../theme.js";
 import { BOOK_CATEGORIES, BOOK_DIFFICULTY_LABELS } from "../../lib/contentTypes.js";
 import { extractPdfOutline } from "../../lib/pdfMetadata.js";
+import { supabase, readFunctionErrorMessage } from "../../lib/supabaseClient.js";
 import { useAdminBooks } from "../../hooks/useAdminBooks.js";
 import Btn from "../../components/Btn.jsx";
 import Field, { inputStyle } from "../../components/Field.jsx";
@@ -271,6 +272,36 @@ function SimilarBooksPicker({ book, allBooks, onChange }) {
 function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
   const update = key => e => onChange({ ...book, [key]: e.target.value });
   const [pdfNotice, setPdfNotice] = useState("");
+  const [aiExtracting, setAiExtracting] = useState(false);
+  const [aiNotice, setAiNotice] = useState("");
+
+  // Same idea as the article/report form's "Analyser avec Claude" — a real
+  // reading of the ebook PDF (description, biographie déduite du contenu,
+  // composition) via the extract-pdf-ai Edge Function, on demand.
+  async function handleAiExtract() {
+    if (!book.ebookFile) return;
+    setAiExtracting(true);
+    setAiNotice("Claude lit le document…");
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("extract-pdf-ai", { body: { pdfUrl: book.ebookFile } });
+      if (fnError) throw new Error(await readFunctionErrorMessage(fnError));
+      if (data?.error) throw new Error(data.error);
+      const updates = {};
+      if (data.title && !book.title) updates.title = data.title;
+      if (data.summary && !book.description) updates.description = data.summary;
+      if (data.pageCount && !book.pageCount) updates.pageCount = data.pageCount;
+      if (data.doi && !book.doi) updates.doi = data.doi;
+      if (Array.isArray(data.tableOfContents) && data.tableOfContents.length) {
+        updates.components = data.tableOfContents.map(s => s.title).join("\n");
+      }
+      onChange({ ...book, ...updates });
+      setAiNotice(`Analyse Claude terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
+    } catch (err) {
+      setAiNotice(`Échec de l'analyse IA : ${err.message}`);
+    } finally {
+      setAiExtracting(false);
+    }
+  }
 
   // Le sommaire (signets) du PDF déposé donne directement la composition
   // réelle de l'ouvrage — plus besoin de la retaper à la main.
@@ -369,6 +400,14 @@ function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
 
         <Field label="Version électronique (PDF)" hint={pdfNotice || "À héberger directement sur le site — distinct du lien d'achat externe ci-dessus. Son sommaire (signets) remplit automatiquement la composition ci-dessous."}>
           <MediaField kind="file" bucket="documents" accept="application/pdf" value={book.ebookFile} onChange={url => onChange({ ...book, ebookFile: url })} onFile={handleEbookPdfSelected} onUrl={handleEbookUrlPasted} />
+          {book.ebookFile && (
+            <div className="ytd-admin-ai-extract">
+              <button type="button" onClick={handleAiExtract} disabled={aiExtracting} className="ytd-admin-ai-extract-btn">
+                <Sparkles size={14} /> {aiExtracting ? "Claude analyse le document…" : "Analyser avec Claude (IA)"}
+              </button>
+              {aiNotice && <span className="ytd-admin-ai-extract-notice">{aiNotice}</span>}
+            </div>
+          )}
         </Field>
         <Field label="Description de l'ebook"><textarea rows={3} value={book.ebookDescription || ""} onChange={update("ebookDescription")} style={{ ...inputStyle, resize: "vertical" }} /></Field>
         <Field label="Biographie de l'auteur·e"><textarea rows={4} value={book.authorBio || ""} onChange={update("authorBio")} style={{ ...inputStyle, resize: "vertical" }} /></Field>

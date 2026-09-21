@@ -280,6 +280,11 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-featured-toggle { display: flex; align-items: center; gap: 8px; padding: 12px 22px; font-family: 'Inter', sans-serif; font-size: 13.5px; color: ${T.ink}; cursor: pointer; }
   .ytd-admin-featured-toggle input { accent-color: ${T.green}; width: 15px; height: 15px; }
   .ytd-admin-form-error { margin: 0; padding: 12px 22px; color: ${T.red}; background: ${T.red}12; border-top: 1px solid ${T.line}; font-family: 'Inter', sans-serif; font-size: 13px; }
+  .ytd-admin-ai-extract { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .ytd-admin-ai-extract-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border: 1px solid ${T.greenDeep}; border-radius: 20px; background: ${T.greenDeep}; color: #fff; cursor: pointer; font: 700 12.5px 'Inter', sans-serif; transition: opacity .2s ease; }
+  .ytd-admin-ai-extract-btn:hover:not(:disabled) { opacity: .88; }
+  .ytd-admin-ai-extract-btn:disabled { opacity: .65; cursor: wait; }
+  .ytd-admin-ai-extract-notice { font-family: 'Inter', sans-serif; font-size: 12px; color: ${T.inkSoft}; }
   .ytd-admin-preview-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 3px; background: ${T.red}; color: #fff; font: 700 9.5px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
   .ytd-admin-preview-badge-theme { background: none; border: 1px solid ${T.green}; color: ${T.green}; }
 
@@ -1119,6 +1124,22 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-afp-block p { margin: 0 0 10px; font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.8; color: ${T.ink}; }
   .ytd-afp-block ul { margin: 0 0 14px; padding-left: 22px; }
   .ytd-afp-block li { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: ${T.ink}; margin-bottom: 6px; }
+
+  .ytd-afp-sommaire-title { margin: 0 0 18px; font-family: 'Newsreader', serif; font-size: 22px; font-weight: 600; color: ${T.greenDeep}; }
+  .ytd-afp-sommaire-layout { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: 30px; align-items: start; }
+  .ytd-afp-sommaire-nav ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; border-right: 1px solid ${T.line}; padding-right: 20px; }
+  .ytd-afp-sommaire-nav button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 10px 12px; border: none; border-radius: 6px; background: none; color: ${T.inkSoft}; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.4; transition: background .15s ease, color .15s ease; }
+  .ytd-afp-sommaire-nav button:hover { background: ${T.paperAlt}; color: ${T.ink}; }
+  .ytd-afp-sommaire-nav button.is-active { background: ${T.green}14; color: ${T.greenDeep}; font-weight: 700; }
+  .ytd-afp-sommaire-index { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: ${T.inkSoft}; flex-shrink: 0; }
+  .ytd-afp-sommaire-nav button.is-active .ytd-afp-sommaire-index { color: ${T.green}; }
+  .ytd-afp-sommaire-content h3 { margin: 0 0 6px; font-family: 'Newsreader', serif; font-size: 21px; font-weight: 600; color: ${T.greenDeep}; }
+  .ytd-afp-sommaire-page { display: inline-block; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: ${T.inkSoft}; }
+  .ytd-afp-sommaire-content p { margin: 0; font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.8; color: ${T.ink}; white-space: pre-line; }
+  @media (max-width: 720px) {
+    .ytd-afp-sommaire-layout { grid-template-columns: 1fr; }
+    .ytd-afp-sommaire-nav ol { border-right: none; border-bottom: 1px solid ${T.line}; padding-right: 0; padding-bottom: 14px; }
+  }
 
   .ytd-afp-aside { display: grid; gap: 18px; position: sticky; top: 24px; }
   .ytd-afp-author-card, .ytd-afp-fiche, .ytd-afp-related, .ytd-afp-newsletter { border: 1px solid ${T.line}; border-radius: 8px; padding: 16px; background: ${T.paper}; }
