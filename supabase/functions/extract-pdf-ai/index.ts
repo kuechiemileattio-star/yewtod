@@ -1,17 +1,22 @@
 // Edge Function: extract-pdf-ai
 //
-// Sends a PDF (already uploaded to Storage) to the Claude API and asks it to
+// Sends a PDF (already uploaded to Storage) to Google Gemini and asks it to
 // return structured metadata — title, authors, summary, table of contents,
 // DOI, language — as real reading comprehension of the document rather than
 // the client-side pdfjs extraction (lib/pdfMetadata.js), which only reads
 // embedded bookmarks/raw text positions and has no understanding of meaning.
 //
+// Uses Gemini instead of Claude specifically because Gemini has a free tier
+// (no credit card, no billing) generous enough for personal/occasional use —
+// Claude requires a paid API balance.
+//
 // The PDF never reaches the browser bundle for this — the API key must stay
 // server-side, which is exactly why this has to be an Edge Function and not
 // a direct fetch() from the dashboard.
 //
-// Requires the ANTHROPIC_API_KEY secret:
-//   supabase secrets set ANTHROPIC_API_KEY=sk-ant-... --project-ref <project-ref>
+// Requires the GEMINI_API_KEY secret (free key, no card needed, from
+// aistudio.google.com/app/apikey):
+//   supabase secrets set GEMINI_API_KEY=... --project-ref <project-ref>
 //
 // Deploy:
 //   supabase functions deploy extract-pdf-ai --project-ref <project-ref>
@@ -20,7 +25,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
-const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,7 +58,7 @@ Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY n'est pas configurée sur ce projet Supabase.");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY n'est pas configurée sur ce projet Supabase.");
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization header");
@@ -68,14 +74,12 @@ Deno.serve(async req => {
     const { pdfUrl } = await req.json();
     if (!pdfUrl) throw new Error("pdfUrl est requis");
 
-    // Fetch the PDF ourselves and send it as base64 — Anthropic's PDF
-    // support also accepts a direct {type:"url"} source, but fetching it
-    // here works even for buckets/links Anthropic's own fetcher can't reach.
+    // Fetch the PDF ourselves and send it as base64.
     const pdfRes = await fetch(pdfUrl);
     if (!pdfRes.ok) throw new Error("Impossible de télécharger le PDF depuis Supabase Storage.");
     const pdfBuffer = await pdfRes.arrayBuffer();
     const pdfSizeMb = pdfBuffer.byteLength / (1024 * 1024);
-    if (pdfSizeMb > 32) throw new Error(`Ce PDF fait ${pdfSizeMb.toFixed(1)} Mo — la limite de l'API Claude pour un document est de 32 Mo.`);
+    if (pdfSizeMb > 20) throw new Error(`Ce PDF fait ${pdfSizeMb.toFixed(1)} Mo — la limite de l'API Gemini pour un document inline est de 20 Mo.`);
     // Convert to base64 in chunks — spreading the whole byte array into
     // String.fromCharCode(...) at once blows the JS call-stack argument
     // limit (~65k) for any PDF above a couple hundred KB.
@@ -87,41 +91,37 @@ Deno.serve(async req => {
     }
     const base64Pdf = btoa(binary);
 
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 4096,
-        messages: [{
-          role: "user",
-          content: [
-            { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64Pdf } },
-            { type: "text", text: EXTRACTION_PROMPT },
-          ],
-        }],
-      }),
-    });
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { inline_data: { mime_type: "application/pdf", data: base64Pdf } },
+              { text: EXTRACTION_PROMPT },
+            ],
+          }],
+          generationConfig: { responseMimeType: "application/json" },
+        }),
+      }
+    );
 
-    if (!anthropicRes.ok) {
-      const errBody = await anthropicRes.text();
-      throw new Error(`Erreur de l'API Claude (${anthropicRes.status}) : ${errBody.slice(0, 300)}`);
+    if (!geminiRes.ok) {
+      const errBody = await geminiRes.text();
+      throw new Error(`Erreur de l'API Gemini (${geminiRes.status}) : ${errBody.slice(0, 300)}`);
     }
 
-    const anthropicJson = await anthropicRes.json();
-    const rawText = anthropicJson.content?.find((b: { type: string }) => b.type === "text")?.text || "";
-    // Claude occasionally wraps JSON in a ```json fence despite instructions — strip it if present.
+    const geminiJson = await geminiRes.json();
+    const rawText = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const cleaned = rawText.trim().replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
 
     let extracted;
     try {
       extracted = JSON.parse(cleaned);
     } catch {
-      throw new Error("La réponse de Claude n'était pas un JSON valide — réessaie, ou le document est peut-être illisible (scan de mauvaise qualité, etc.).");
+      throw new Error("La réponse de Gemini n'était pas un JSON valide — réessaie, ou le document est peut-être illisible (scan de mauvaise qualité, etc.).");
     }
 
     return new Response(JSON.stringify(extracted), {

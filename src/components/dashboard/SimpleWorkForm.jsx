@@ -142,7 +142,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
     setForm(prev => ({ ...prev, [key]: value }));
   }
 
-  // Sends the already-uploaded PDF to Claude (via the extract-pdf-ai Edge
+  // Sends the already-uploaded PDF to Gemini (via the extract-pdf-ai Edge
   // Function — the API key can't live in the browser) for a real reading of
   // the document, instead of the client-side pdfjs heuristics in
   // analyzePdf() below. Complements rather than replaces it: this fills in
@@ -151,7 +151,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
     const pdfUrl = form[config.fileField];
     if (!pdfUrl) return;
     setAiExtracting(true);
-    setAiNotice("Claude lit le document…");
+    setAiNotice("L'IA lit le document…");
     try {
       const { data, error: fnError } = await supabase.functions.invoke("extract-pdf-ai", { body: { pdfUrl } });
       if (fnError) throw new Error(await readFunctionErrorMessage(fnError));
@@ -169,7 +169,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
         }
         return next;
       });
-      setAiNotice(`Analyse Claude terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
+      setAiNotice(`Analyse IA terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
     } catch (err) {
       console.error("Échec de l'analyse IA (extract-pdf-ai) :", err);
       setAiNotice(`Échec de l'analyse IA : ${err.message}`);
@@ -424,7 +424,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
               {config.fileField === "pdfFile" && form.pdfFile && (
                 <div className="ytd-admin-ai-extract">
                   <button type="button" onClick={handleAiExtract} disabled={aiExtracting} className="ytd-admin-ai-extract-btn">
-                    <Sparkles size={14} /> {aiExtracting ? "Claude analyse le document…" : "Analyser avec Claude (IA)"}
+                    <Sparkles size={14} /> {aiExtracting ? "L'IA analyse le document…" : "Analyser avec l'IA"}
                   </button>
                   {aiNotice && <span className="ytd-admin-ai-extract-notice">{aiNotice}</span>}
                 </div>

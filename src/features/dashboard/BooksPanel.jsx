@@ -275,13 +275,13 @@ function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
   const [aiExtracting, setAiExtracting] = useState(false);
   const [aiNotice, setAiNotice] = useState("");
 
-  // Same idea as the article/report form's "Analyser avec Claude" — a real
+  // Same idea as the article/report form's "Analyser avec l'IA" — a real
   // reading of the ebook PDF (description, biographie déduite du contenu,
   // composition) via the extract-pdf-ai Edge Function, on demand.
   async function handleAiExtract() {
     if (!book.ebookFile) return;
     setAiExtracting(true);
-    setAiNotice("Claude lit le document…");
+    setAiNotice("L'IA lit le document…");
     try {
       const { data, error: fnError } = await supabase.functions.invoke("extract-pdf-ai", { body: { pdfUrl: book.ebookFile } });
       if (fnError) throw new Error(await readFunctionErrorMessage(fnError));
@@ -295,7 +295,7 @@ function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
         updates.components = data.tableOfContents.map(s => s.title).join("\n");
       }
       onChange({ ...book, ...updates });
-      setAiNotice(`Analyse Claude terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
+      setAiNotice(`Analyse IA terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
     } catch (err) {
       console.error("Échec de l'analyse IA (extract-pdf-ai) :", err);
       setAiNotice(`Échec de l'analyse IA : ${err.message}`);
@@ -404,7 +404,7 @@ function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
           {book.ebookFile && (
             <div className="ytd-admin-ai-extract">
               <button type="button" onClick={handleAiExtract} disabled={aiExtracting} className="ytd-admin-ai-extract-btn">
-                <Sparkles size={14} /> {aiExtracting ? "Claude analyse le document…" : "Analyser avec Claude (IA)"}
+                <Sparkles size={14} /> {aiExtracting ? "L'IA analyse le document…" : "Analyser avec l'IA"}
               </button>
               {aiNotice && <span className="ytd-admin-ai-extract-notice">{aiNotice}</span>}
             </div>

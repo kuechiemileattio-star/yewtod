@@ -106,22 +106,24 @@ permission `invite_users`. Cela appelle l'Edge Function `invite-user`, qui :
 
 Dashboard → **Utilisateurs & rôles**, icône corbeille à côté d'un membre (indisponible sur son propre compte). Réservé à la permission `manage_users` (Super Admin l'a par défaut). Appelle l'Edge Function `delete-member`, qui supprime le compte via `supabase.auth.admin.deleteUser` — le profil (`on delete cascade`) et donc tous les droits/accès du membre disparaissent immédiatement. Action irréversible.
 
-## 6ter. Extraction de PDF par l'IA (Claude)
+## 6ter. Extraction de PDF par l'IA (Google Gemini)
 
-Bouton **"Analyser avec Claude (IA)"**, affiché dès qu'un PDF est déposé dans le formulaire (Rapports/Articles/Livres). Contrairement à l'extraction automatique existante (signets/texte bruts du PDF, côté navigateur), ce bouton envoie le document à l'API Claude pour une vraie lecture — titre, résumé, sommaire avec un résumé par section, DOI, nombre de pages — via l'Edge Function `extract-pdf-ai`.
+Bouton **"Analyser avec Claude (IA)"**, affiché dès qu'un PDF est déposé dans le formulaire (Rapports/Articles/Livres). Contrairement à l'extraction automatique existante (signets/texte bruts du PDF, côté navigateur, gratuite, toujours active), ce bouton envoie le document à une IA pour une vraie lecture — titre, résumé, sommaire avec un résumé par section, DOI, nombre de pages — via l'Edge Function `extract-pdf-ai`.
+
+Utilise **Google Gemini** plutôt que Claude/Anthropic : Gemini a un niveau gratuit (aucune carte bancaire requise) suffisant pour un usage personnel/occasionnel, contrairement à l'API Anthropic qui nécessite un solde payant.
 
 **Mise en place (à faire une seule fois)** :
-1. Récupère une clé API sur [console.anthropic.com](https://console.anthropic.com) (section API Keys).
+1. Récupère une clé API **gratuite** sur [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) (compte Google, pas de carte bancaire).
 2. Configure le secret sur le projet Supabase :
    ```
-   supabase secrets set ANTHROPIC_API_KEY=sk-ant-... --project-ref <project-ref>
+   supabase secrets set GEMINI_API_KEY=... --project-ref <project-ref>
    ```
 3. Déploie la fonction :
    ```
    supabase functions deploy extract-pdf-ai --project-ref <project-ref>
    ```
 
-Sans ces deux étapes, le bouton renvoie une erreur explicite ("ANTHROPIC_API_KEY n'est pas configurée..."). Coût : facturé à l'usage par l'API Anthropic (par PDF analysé), pas par Supabase.
+Sans ces deux étapes, le bouton renvoie une erreur explicite ("GEMINI_API_KEY n'est pas configurée..."). Le niveau gratuit de Gemini a une limite de requêtes par minute/jour — largement suffisante pour un usage occasionnel ; au-delà, Google demande de passer sur un plan payant.
 
 ## 7. Publier un contenu
 
