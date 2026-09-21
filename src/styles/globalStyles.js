@@ -1001,6 +1001,14 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-editor-page { grid-template-columns: 1fr; }
     .ytd-admin-editor-preview { position: static; }
     .ytd-admin-type-tabs { flex-wrap: nowrap; overflow-x: auto; }
+    /* The desktop "table de soumission" look (étiquette | champ, 190px fixe)
+       laisse trop peu de place au champ sur un téléphone — on repasse en
+       étiquette au-dessus / champ en dessous, comme un formulaire normal. */
+    .ytd-admin-editor-form .ytd-field { grid-template-columns: 1fr !important; gap: 6px !important; padding: 14px 16px !important; }
+    .ytd-admin-editor-form .ytd-field-label { text-align: left !important; padding-top: 0 !important; }
+    .ytd-admin-theme-checklist { grid-template-columns: 1fr !important; }
+    .ytd-admin-chapter-sample-row { grid-template-columns: 1fr !important; }
+    .ytd-admin-section-header { padding-left: 16px !important; padding-right: 16px !important; }
   }
   /* Even on the narrowest phones the Explorer/Travaux columns stay side by
      side rather than collapsing into one long vertical stack — "Travaux"'s

@@ -45,7 +45,11 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
   .pe-topbar-inner { flex-wrap: wrap; gap: 12px; }
   .pe-search-wrap { order: 3; width: 100%; }
   .ytd-book-detail-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-  .ytd-book-sidebar-box { max-width: 220px; margin: 0 auto; }
+  /* Le titre, le prix et les boutons restent alignés à gauche comme le
+     reste de la page (pas de max-width/margin:auto sur tout le bloc,
+     ça le décalait vers la droite par rapport au h1 et aux onglets) —
+     seule la couverture elle-même est plafonnée et centrée. */
+  .ytd-book-sidebar-box img { max-width: 260px !important; display: block !important; margin: 16px auto 18px !important; }
 }
 `;
   document.head.appendChild(style);
