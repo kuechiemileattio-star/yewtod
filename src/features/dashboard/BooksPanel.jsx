@@ -297,6 +297,7 @@ function BookEditor({ book, allBooks, onChange, onSave, onClose, saving }) {
       onChange({ ...book, ...updates });
       setAiNotice(`Analyse Claude terminée — ${data.tableOfContents?.length || 0} section(s) détectée(s).`);
     } catch (err) {
+      console.error("Échec de l'analyse IA (extract-pdf-ai) :", err);
       setAiNotice(`Échec de l'analyse IA : ${err.message}`);
     } finally {
       setAiExtracting(false);
