@@ -4,7 +4,6 @@ import { T } from "../theme.js";
 import { COLLAB_TYPES } from "../lib/contentTypes.js";
 import { useCollaborationSubmit } from "../hooks/useCollaborations.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
-import NodeMark from "../components/NodeMark.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Btn from "../components/Btn.jsx";
 import Field, { inputStyle } from "../components/Field.jsx";
@@ -41,8 +40,7 @@ export default function Collaborations() {
     <div className="ytd-collab-page" style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 110px" }}>
       <div className="ytd-collab-hero">
       <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <NodeMark />
+      <div style={{ marginBottom: 20 }}>
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Collaborations</span>
       </div>
       <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 62px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 16px" }}>Vous avez une idée ? Écrivez-moi.</h1>

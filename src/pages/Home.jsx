@@ -7,7 +7,6 @@ import { PATHS, workPath } from "../lib/paths.js";
 import { useWorks } from "../hooks/useWorks.js";
 import { useSiteSettings } from "../hooks/useSiteSettings.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
-import NodeMark from "../components/NodeMark.jsx";
 import Divider from "../components/Divider.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
@@ -46,10 +45,7 @@ export default function Home() {
       {/* HERO */}
       <section style={{ maxWidth: 1120, margin: "0 auto", padding: "72px 24px 60px", display: "grid", gridTemplateColumns: "1.05fr .95fr", alignItems: "center", gap: 56 }} className="ytd-home-hero ytd-editorial-hero">
         <div className="ytd-stagger" style={{ maxWidth: 720 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
-            <NodeMark pulse />
-          </div>
-          <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5.5vw, 62px)", lineHeight: 1.06, fontWeight: 500, color: T.ink, letterSpacing: "-0.015em", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5.5vw, 62px)", lineHeight: 1.06, fontWeight: 500, color: T.ink, letterSpacing: "-0.015em", margin: "0 0 22px" }}>
             Comprendre le monde sans le simplifier.
           </h1>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 18, lineHeight: 1.65, color: T.inkSoft, marginTop: 24, maxWidth: 620 }}>
@@ -98,7 +94,7 @@ export default function Home() {
 
       {/* DERNIER ARTICLE / RAPPORT / VIDÉO */}
       <Reveal as="section" className="ytd-editorial-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 72px" }}>
-        <SectionLabel>À la une</SectionLabel>
+        
         <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 48 }} className="ytd-hero-grid">
           <div onClick={() => openWork(latest)} className="ytd-card" style={{ cursor: "pointer" }}>
             <Cover tone={latest.tone} label={latest.category} image={latest.coverImage} tall />

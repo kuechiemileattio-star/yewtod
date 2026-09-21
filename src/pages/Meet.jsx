@@ -21,8 +21,7 @@ export default function Meet() {
     <div className="ytd-meet-page" style={{ maxWidth: 1060, margin: "0 auto", padding: "72px 24px 110px" }}>
       <header className="ytd-meet-hero">
       <div className="ytd-meet-hero-copy">
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <NodeMark />
+      <div style={{ marginBottom: 20 }}>
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Meet Yewtod</span>
       </div>
       <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 64px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 20px" }}>
