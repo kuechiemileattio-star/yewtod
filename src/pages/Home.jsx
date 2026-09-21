@@ -48,7 +48,6 @@ export default function Home() {
         <div className="ytd-stagger" style={{ maxWidth: 720 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
             <NodeMark pulse />
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Média de recherche appliquée</span>
           </div>
           <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5.5vw, 62px)", lineHeight: 1.06, fontWeight: 500, color: T.ink, letterSpacing: "-0.015em", margin: 0 }}>
             Comprendre le monde sans le simplifier.
