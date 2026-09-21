@@ -610,6 +610,11 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-profile-detail-row > span:first-child { display: inline-flex; align-items: center; gap: 7px; color: ${T.inkSoft}; font: 10.5px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
   .ytd-profile-detail-row strong { color: ${T.ink}; font: 600 13px 'Plus Jakarta Sans', sans-serif; text-align: right; overflow-wrap: anywhere; }
   .ytd-profile-editform { animation: ytdAdminIn .45s cubic-bezier(.16,1,.3,1) both; }
+  .ytd-profile-settings-tabs { display: flex; gap: 6px; margin-bottom: 24px; border-bottom: 1px solid ${T.line}; }
+  .ytd-profile-settings-tabs button { display: inline-flex; align-items: center; gap: 7px; padding: 10px 4px; margin-bottom: -1px; border: none; border-bottom: 2px solid transparent; background: none; color: ${T.inkSoft}; cursor: pointer; font: 600 13.5px 'Plus Jakarta Sans', sans-serif; transition: color .2s ease, border-color .2s ease; }
+  .ytd-profile-settings-tabs button + button { margin-left: 18px; }
+  .ytd-profile-settings-tabs button:hover { color: ${T.ink}; }
+  .ytd-profile-settings-tabs button.is-active { color: ${T.green}; border-bottom-color: ${T.green}; }
   .ytd-topbar-profile { position: relative; padding: 5px 9px 5px 5px !important; border-radius: 30px; transition: background .25s ease, transform .25s ease, box-shadow .25s ease; }
   .ytd-topbar-profile:hover { background: ${T.paperAlt}; transform: translateY(-2px); box-shadow: 0 8px 18px -14px ${T.greenDeep}; }
   .ytd-topbar-profile img, .ytd-topbar-profile > span:last-child { transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease; }
