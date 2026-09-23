@@ -59,15 +59,19 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
   font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: ${T.ink};
 }
 .ytd-article-sidebar-stats strong { color: ${T.green}; }
-.ytd-article-sidebar-sommaire { margin-top: 16px; padding-top: 16px; border-top: 1px solid ${T.line}; }
-.ytd-article-sidebar-sommaire .ytd-afp-sommaire-title { font-size: 15px; margin-bottom: 12px; }
-.ytd-article-sidebar-sommaire .ytd-afp-sommaire-content h3 { font-size: 16px; }
-.ytd-article-sidebar-sommaire .ytd-afp-sommaire-content p { font-size: 13.5px; }
-/* La colonne latérale (230px) est toujours plus étroite que la media query
-   interne du Sommaire (720px, pensée pour la largeur de fenêtre) — on force
-   donc l'empilement ici, peu importe la largeur de l'écran. */
-.ytd-article-sidebar-sommaire .ytd-afp-sommaire-layout { grid-template-columns: 1fr !important; }
-.ytd-article-sidebar-sommaire .ytd-afp-sommaire-nav ol { border-right: none !important; border-bottom: 1px solid ${T.line}; padding-right: 0 !important; padding-bottom: 14px; }
+.ytd-report-top {
+  display: flex; gap: 28px; align-items: flex-start; margin-bottom: 40px;
+}
+.ytd-report-top-cover {
+  width: 180px; flex-shrink: 0; border: 1px solid ${T.line}; border-radius: 6px; overflow: hidden;
+}
+.ytd-report-top-cover img { width: 100%; display: block; }
+.ytd-report-top-meta { flex: 1; min-width: 0; }
+.ytd-report-sommaire { margin-bottom: 40px; }
+@media (max-width: 640px) {
+  .ytd-report-top { flex-direction: column; }
+  .ytd-report-top-cover { width: 140px; }
+}
 
 .ytd-article-kicker {
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: ${T.inkSoft}; margin-bottom: 10px;
@@ -191,6 +195,8 @@ export default function WorkDetail() {
   const [downloadField, downloadLabel] = DOWNLOADABLE.find(([field]) => work[field]) || [];
   const downloadUrl = downloadField ? work[downloadField] : "";
   const isJournalStyle = JOURNAL_STYLE_TABLES.includes(work.table);
+  const isReportPage = work.table === "reports";
+  const hasSommaireContent = isReportPage && work.tableOfContents?.some(item => item.content?.trim());
 
   return (
     <div className="ytd-work-detail-page" style={{ maxWidth: isJournalStyle ? 1080 : 1000, margin: "0 auto", padding: "56px 24px 110px" }}>
@@ -198,7 +204,67 @@ export default function WorkDetail() {
         <ArrowLeft size={15} /> Retour
       </button>
 
-      {isJournalStyle ? (
+      {isReportPage ? (
+        <>
+          <nav className="ytd-article-breadcrumb" aria-label="Fil d'ariane">
+            <Link to={PATHS.home}><Home size={14} /> Accueil</Link>
+            <ChevronRight size={13} className="sep" />
+            <Link to={PATHS.works}>Works</Link>
+            <ChevronRight size={13} className="sep" />
+            <span className="current">{work.category}</span>
+          </nav>
+
+          <div className="ytd-report-top">
+            {work.coverImage && (
+              <div className="ytd-report-top-cover">
+                <img src={work.coverImage} alt={`Couverture de ${work.title}`} />
+              </div>
+            )}
+            <div className="ytd-report-top-meta">
+              <div className="ytd-article-kicker">
+                <strong>{work.category}</strong>{(work.volume || work.issue) && ` · Vol.${work.volume || "—"} No.${work.issue || "—"}`}{work.date && `, ${fmtDate(work.date)}`}
+              </div>
+              <h1 className="ytd-article-title">{work.title}</h1>
+              <p className="ytd-article-byline">{work.author}</p>
+              {work.authorAffiliation && <p className="ytd-article-affiliation">{work.authorAffiliation}</p>}
+
+              <div className="ytd-article-formats">
+                {work.doi && <span className="doi">DOI: <a href={`https://doi.org/${work.doi}`} target="_blank" rel="noreferrer">{work.doi}</a></span>}
+                {downloadUrl && (
+                  <button type="button" className="ytd-article-format-btn" disabled={downloading} onClick={() => handleDownload(downloadUrl, "pdf")}>
+                    <FileText size={14} /> {downloading ? "…" : "PDF"}
+                  </button>
+                )}
+                <span className="ytd-article-format-current"><Code2 size={14} /> HTML</span>
+              </div>
+
+              {(work.pageCount || downloadCount != null || viewCount != null) && (
+                <div className="ytd-article-sidebar-stats" style={{ flexDirection: "row", gap: 18, borderTop: "none", paddingTop: 0, marginTop: 4 }}>
+                  {work.pageCount && <span>{work.pageCount} pages</span>}
+                  {downloadCount != null && <span><Download size={12} /> <strong>{downloadCount}</strong> téléchargement{downloadCount === 1 ? "" : "s"}</span>}
+                  {viewCount != null && <span><Eye size={12} /> <strong>{viewCount}</strong> vue{viewCount === 1 ? "" : "s"}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {hasSommaireContent && (
+            <div className="ytd-report-sommaire">
+              <InteractiveSommaire items={work.tableOfContents} />
+            </div>
+          )}
+
+          <div className="ytd-work-detail-body" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {BodyComponent ? <BodyComponent work={work} /> : <p style={{ color: T.inkSoft }}>Type de contenu non pris en charge.</p>}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 24 }}>
+            <button type="button" onClick={handleShare} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 2, background: "transparent", color: T.ink, border: `1px solid ${T.ink}`, cursor: "pointer", fontFamily: "'Inter', sans-serif", fontSize: 13.5, fontWeight: 600 }}>
+              <Share2 size={15} /> {shared ? "Lien copié !" : "Partager"}
+            </button>
+          </div>
+        </>
+      ) : isJournalStyle ? (
         <>
           <nav className="ytd-article-breadcrumb" aria-label="Fil d'ariane">
             <Link to={PATHS.home}><Home size={14} /> Accueil</Link>
@@ -222,11 +288,6 @@ export default function WorkDetail() {
                 {downloadCount != null && <span><Download size={12} /> <strong>{downloadCount}</strong> téléchargement{downloadCount === 1 ? "" : "s"}</span>}
                 {viewCount != null && <span><Eye size={12} /> <strong>{viewCount}</strong> vue{viewCount === 1 ? "" : "s"}</span>}
               </div>
-              {work.table === "reports" && work.tableOfContents?.some(item => item.content?.trim()) && (
-                <div className="ytd-article-sidebar-sommaire">
-                  <InteractiveSommaire items={work.tableOfContents} />
-                </div>
-              )}
             </aside>
 
             <div>
