@@ -1,5 +1,24 @@
 # Base de données Yewtod SS — Supabase
 
+## ⚠️ À partir du 30 octobre 2026 : GRANT obligatoire sur toute NOUVELLE table
+
+Supabase arrête d'accorder automatiquement l'accès API (PostgREST/supabase-js)
+aux nouvelles tables du schéma `public`. **Les tables existantes ne sont pas
+concernées** — seule une table créée après cette date, sans `GRANT` explicite,
+serait bloquée par l'API.
+
+Aucune des migrations actuelles n'a besoin d'être modifiée. Mais **toute
+prochaine migration qui crée une nouvelle table** doit inclure ceci (à
+adapter avec le vrai nom de table) :
+
+```sql
+grant select on public.ma_nouvelle_table to anon;
+grant select, insert, update, delete on public.ma_nouvelle_table to authenticated;
+grant select, insert, update, delete on public.ma_nouvelle_table to service_role;
+```
+
+Ne pas oublier — sans ça, la table sera invisible pour le site une fois créée.
+
 ## 1. Appliquer le schéma
 
 Dans le Dashboard Supabase du projet → **SQL Editor**, exécuter les fichiers
