@@ -12,7 +12,7 @@ import Reveal from "../components/Reveal.jsx";
 import Cover from "../components/Cover.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
-import { Pill } from "../components/work-details/shared.jsx";
+import { Pill, InteractiveSommaire } from "../components/work-details/shared.jsx";
 import { WORK_DETAIL_COMPONENTS } from "../components/work-details/index.js";
 import ArticleFullPage from "../components/work-details/ArticleFullPage.jsx";
 
@@ -59,6 +59,15 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
   font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: ${T.ink};
 }
 .ytd-article-sidebar-stats strong { color: ${T.green}; }
+.ytd-article-sidebar-sommaire { margin-top: 16px; padding-top: 16px; border-top: 1px solid ${T.line}; }
+.ytd-article-sidebar-sommaire .ytd-afp-sommaire-title { font-size: 15px; margin-bottom: 12px; }
+.ytd-article-sidebar-sommaire .ytd-afp-sommaire-content h3 { font-size: 16px; }
+.ytd-article-sidebar-sommaire .ytd-afp-sommaire-content p { font-size: 13.5px; }
+/* La colonne latérale (230px) est toujours plus étroite que la media query
+   interne du Sommaire (720px, pensée pour la largeur de fenêtre) — on force
+   donc l'empilement ici, peu importe la largeur de l'écran. */
+.ytd-article-sidebar-sommaire .ytd-afp-sommaire-layout { grid-template-columns: 1fr !important; }
+.ytd-article-sidebar-sommaire .ytd-afp-sommaire-nav ol { border-right: none !important; border-bottom: 1px solid ${T.line}; padding-right: 0 !important; padding-bottom: 14px; }
 
 .ytd-article-kicker {
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: ${T.inkSoft}; margin-bottom: 10px;
@@ -213,6 +222,11 @@ export default function WorkDetail() {
                 {downloadCount != null && <span><Download size={12} /> <strong>{downloadCount}</strong> téléchargement{downloadCount === 1 ? "" : "s"}</span>}
                 {viewCount != null && <span><Eye size={12} /> <strong>{viewCount}</strong> vue{viewCount === 1 ? "" : "s"}</span>}
               </div>
+              {work.table === "reports" && work.tableOfContents?.some(item => item.content?.trim()) && (
+                <div className="ytd-article-sidebar-sommaire">
+                  <InteractiveSommaire items={work.tableOfContents} />
+                </div>
+              )}
             </aside>
 
             <div>

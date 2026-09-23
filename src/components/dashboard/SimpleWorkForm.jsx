@@ -19,7 +19,7 @@ function emptyForm(config) {
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
-    ...(config.table === "reports" ? { tableOfContents: [] } : {}),
+    ...(config.table === "reports" ? { tableOfContents: [], authors: "", version: "" } : {}),
     ...(config.table === "articles" ? { content: "", tableOfContents: [], themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
 }
@@ -401,6 +401,17 @@ function SimpleWorkFormInner({ tableKey, id }) {
             <Field label="Catégorie"><input value={config.plural} disabled style={{ ...inputStyle, color: T.inkSoft, background: T.paperAlt }} /></Field>
             <Field label="Date de publication"><input type="date" value={form.publishedAt ? String(form.publishedAt).slice(0, 10) : ""} onChange={e => set("publishedAt", e.target.value)} style={inputStyle} /></Field>
           </div>
+
+          {isReport && (
+            <div className="ytd-admin-meta-fields" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              <Field label="Auteurs" hint='Séparés par des virgules. Laissé vide, "Yewtod SS" est affiché par défaut.'>
+                <input value={tagsToInput(form.authors)} onChange={e => set("authors", inputToTags(e.target.value))} placeholder="ex : Yewtod SS" style={inputStyle} />
+              </Field>
+              <Field label="Version" hint="Optionnel — ex. v1.0, Édition 2026…">
+                <input value={form.version || ""} onChange={e => set("version", e.target.value)} style={inputStyle} />
+              </Field>
+            </div>
+          )}
 
           <Field label={config.summaryLabel} hint={isArticle ? `${summary.length}/2900 caractères — la description courte affichée en aperçu.` : undefined}>
             <textarea rows={3} maxLength={isArticle ? 2900 : undefined} value={summary} onChange={e => set(config.summaryField, e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
