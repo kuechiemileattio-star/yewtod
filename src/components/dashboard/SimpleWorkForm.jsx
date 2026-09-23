@@ -19,6 +19,7 @@ function emptyForm(config) {
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
+    ...(config.table === "reports" ? { tableOfContents: [] } : {}),
     ...(config.table === "articles" ? { content: "", tableOfContents: [], themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
 }
@@ -162,6 +163,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
   const config = SIMPLE_WORK_TYPES[tableKey];
   const isEpisode = config.table === "documentary_episodes";
   const isArticle = config.table === "articles";
+  const isReport = config.table === "reports";
   const navigate = useNavigate();
   const { createWork, updateWork, saving } = useWorkMutations();
   const [form, setForm] = useState(() => emptyForm(config));
@@ -298,10 +300,12 @@ function SimpleWorkFormInner({ tableKey, id }) {
     }
     setError("");
     const payload = { ...form, status: nextStatus };
-    if (isArticle) {
-      payload.tags = inputToTags(form.tags);
+    if (isArticle || isReport) {
       // Drop sections the user added but never filled in.
       payload.tableOfContents = (form.tableOfContents || []).filter(s => s.title?.trim() || s.content?.trim());
+    }
+    if (isArticle) {
+      payload.tags = inputToTags(form.tags);
       if (nextStatus === "scheduled") {
         payload.publishedAt = form.scheduledAt;
       } else {
@@ -454,7 +458,21 @@ function SimpleWorkFormInner({ tableKey, id }) {
             </>
           )}
 
-          {!isArticle && <SectionHeader n={2} title="Médias" />}
+          {isReport && (
+            <>
+              <SectionHeader n={2} title="Contenu du rapport" />
+              <Field
+                label="Rédaction par sections"
+                hint="Ajoute un sous-titre puis rédige son contenu, section après section. Sur la page publique, ces sous-titres formeront le Sommaire à gauche — cliquer sur l'un d'eux affiche son contenu à droite. Analyser un PDF avec l'IA (plus bas) remplit aussi ces sections automatiquement."
+              >
+                <ArticleSectionsBuilder value={form.tableOfContents} onChange={v => set("tableOfContents", v)} />
+              </Field>
+
+              <SectionHeader n={3} title="Médias" />
+            </>
+          )}
+
+          {!isArticle && !isReport && <SectionHeader n={2} title="Médias" />}
 
           {config.urlField && (
             <Field label={config.urlLabel} hint="Sur le site, un aperçu de 2 minutes se lit directement sur la page ; au-delà, un bouton renvoie vers YouTube pour la suite.">
