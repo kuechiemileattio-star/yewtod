@@ -101,7 +101,7 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-scroll-progress { position: absolute; left: 0; top: 0; height: 3px; z-index: 2; background: ${T.lime}; transition: width .12s ease-out; }
   .ytd-navbar { box-shadow: 0 10px 30px -26px ${T.greenDeep}00; transition: box-shadow .35s ease; }
   .ytd-navbar-scrolled { box-shadow: 0 14px 32px -22px ${T.greenDeep}55; }
-  .ytd-navbar .ytd-nav-link-active { box-shadow: inset 0 -3px 0 ${T.green}; }
+  .ytd-navbar .ytd-nav-link-active { box-shadow: none; }
   .ytd-mobile-menu { max-height: 0; opacity: 0; overflow: hidden; padding-top: 0 !important; padding-bottom: 0 !important; transition: max-height .4s cubic-bezier(.16,1,.3,1), opacity .25s ease, padding .4s ease; }
   .ytd-mobile-menu-open { max-height: 360px; opacity: 1; padding-top: 12px !important; padding-bottom: 20px !important; animation: ytdMenuIn .4s cubic-bezier(.16,1,.3,1) both; }
   .ytd-mobile-menu button { transform: translateX(-12px); opacity: 0; transition: transform .3s ease, opacity .3s ease, color .2s ease, background .2s ease; }
@@ -128,11 +128,10 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-logo-btn { }
   .ytd-logo-btn:hover { }
 
-  .ytd-nav-link { position: relative; border-radius: 3px; transition: color .2s ease, background .25s ease, transform .25s ease !important; }
-  .ytd-nav-link:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-  .ytd-nav-link-active { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
-  .ytd-nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: ${T.lime}; transform: scaleX(0); transform-origin: left; transition: transform .28s cubic-bezier(.16,1,.3,1); }
-  .ytd-nav-link:hover::after, .ytd-nav-link-active::after { transform: scaleX(1); }
+  .ytd-nav-link { position: relative; border-radius: 3px; transition: color .2s ease !important; }
+  .ytd-nav-link:hover { background: none; transform: none; }
+  .ytd-nav-link-active { background: none !important; box-shadow: none !important; }
+  .ytd-nav-link::after { display: none; }
   .ytd-admin-pill:hover { background: ${T.greenDeep} !important; color: ${T.paper} !important; transform: translateY(-2px); }
   .ytd-btn { position: relative; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease; }
   .ytd-btn > *:not(.ytd-btn-shine) { position: relative; z-index: 1; }

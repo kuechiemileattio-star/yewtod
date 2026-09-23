@@ -26,7 +26,6 @@ if (typeof document !== "undefined" && !document.getElementById(STYLE_ID)) {
 
 /* Desktop nav links */
 .ytd-nav-link { will-change: color; }
-.ytd-nav-link:hover { color: #ffffff !important; }
 
 /* CTA pill */
 .ytd-cta:hover {
