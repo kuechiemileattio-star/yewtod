@@ -453,15 +453,12 @@ function SimpleWorkFormInner({ tableKey, id }) {
                 Mettre à la une (mis en avant sur la page d'accueil)
               </label>
 
-              <Field label="Articles similaires" hint="Choisis les articles à afficher dans « À lire aussi » sur la page de celui-ci. Sans sélection, le site en propose automatiquement de la même catégorie.">
+              <Field label="Articles similaires">
                 <SimilarArticlesPicker value={form.similarArticles} onChange={v => set("similarArticles", v)} options={otherArticles} currentId={id} />
               </Field>
 
               <SectionHeader n={3} title="Contenu de l'article" />
-              <Field
-                label="Rédaction par sections"
-                hint="Ajoute un sous-titre puis rédige son contenu, section après section, jusqu'à la fin de l'article. Sur la page publique, ces sous-titres formeront le Sommaire à gauche — cliquer sur l'un d'eux affiche son contenu à droite."
-              >
+              <Field label="Rédaction par sections">
                 <ArticleSectionsBuilder value={form.tableOfContents} onChange={v => set("tableOfContents", v)} />
               </Field>
 
@@ -472,10 +469,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
           {isReport && (
             <>
               <SectionHeader n={2} title="Contenu du rapport" />
-              <Field
-                label="Rédaction par sections"
-                hint="Ajoute un sous-titre puis rédige son contenu, section après section. Sur la page publique, ces sous-titres formeront le Sommaire à gauche — cliquer sur l'un d'eux affiche son contenu à droite. Analyser un PDF avec l'IA (plus bas) remplit aussi ces sections automatiquement."
-              >
+              <Field label="Rédaction par sections">
                 <ArticleSectionsBuilder value={form.tableOfContents} onChange={v => set("tableOfContents", v)} />
               </Field>
 
