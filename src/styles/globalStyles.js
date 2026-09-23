@@ -1034,6 +1034,8 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-admin-theme-checklist { grid-template-columns: 1fr !important; }
     .ytd-admin-chapter-sample-row { grid-template-columns: 1fr !important; }
     .ytd-admin-section-header { padding-left: 16px !important; padding-right: 16px !important; }
+    .ytd-admin-section-block-head { flex-wrap: wrap; }
+    .ytd-admin-section-block-title { flex-basis: 100%; order: -1; margin-bottom: 4px; }
   }
   /* Even on the narrowest phones the Explorer/Travaux columns stay side by
      side rather than collapsing into one long vertical stack — "Travaux"'s
@@ -1145,20 +1147,25 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-afp-block ul { margin: 0 0 14px; padding-left: 22px; }
   .ytd-afp-block li { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: ${T.ink}; margin-bottom: 6px; }
 
-  .ytd-afp-sommaire-title { margin: 0 0 18px; font-family: 'Newsreader', serif; font-size: 22px; font-weight: 600; color: ${T.greenDeep}; }
+  .ytd-afp-sommaire { border: 1px solid ${T.line}; border-radius: 12px; background: ${T.paper}; padding: 26px 28px; box-shadow: 0 1px 2px rgba(10,14,22,.03); }
+  .ytd-afp-sommaire-title { display: flex; align-items: center; gap: 9px; margin: 0 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: ${T.greenDeep}; }
+  .ytd-afp-sommaire-title::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: ${T.green}; flex-shrink: 0; }
   .ytd-afp-sommaire-layout { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: 30px; align-items: start; }
-  .ytd-afp-sommaire-nav ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; border-right: 1px solid ${T.line}; padding-right: 20px; }
-  .ytd-afp-sommaire-nav button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 10px 12px; border: none; border-radius: 6px; background: none; color: ${T.inkSoft}; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.4; transition: background .15s ease, color .15s ease; }
+  .ytd-afp-sommaire-nav ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; border-right: 1px solid ${T.line}; padding-right: 18px; }
+  .ytd-afp-sommaire-nav button { position: relative; display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 10px 12px 10px 14px; border: none; border-radius: 6px; background: none; color: ${T.inkSoft}; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.4; transition: background .15s ease, color .15s ease; }
+  .ytd-afp-sommaire-nav button::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 3px; background: transparent; transition: background .15s ease; }
   .ytd-afp-sommaire-nav button:hover { background: ${T.paperAlt}; color: ${T.ink}; }
-  .ytd-afp-sommaire-nav button.is-active { background: ${T.green}14; color: ${T.greenDeep}; font-weight: 700; }
+  .ytd-afp-sommaire-nav button.is-active { background: ${T.green}12; color: ${T.greenDeep}; font-weight: 700; }
+  .ytd-afp-sommaire-nav button.is-active::before { background: ${T.green}; }
   .ytd-afp-sommaire-index { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: ${T.inkSoft}; flex-shrink: 0; }
   .ytd-afp-sommaire-nav button.is-active .ytd-afp-sommaire-index { color: ${T.green}; }
-  .ytd-afp-sommaire-content h3 { margin: 0 0 6px; font-family: 'Newsreader', serif; font-size: 21px; font-weight: 600; color: ${T.greenDeep}; }
-  .ytd-afp-sommaire-page { display: inline-block; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: ${T.inkSoft}; }
+  .ytd-afp-sommaire-content h3 { margin: 0 0 8px; font-family: 'Newsreader', serif; font-size: 21px; font-weight: 600; color: ${T.greenDeep}; line-height: 1.3; }
+  .ytd-afp-sommaire-page { display: inline-block; margin-bottom: 12px; padding: 2px 8px; border-radius: 10px; background: ${T.paperAlt}; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: ${T.inkSoft}; }
   .ytd-afp-sommaire-content p { margin: 0; font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.8; color: ${T.ink}; white-space: pre-line; }
   @media (max-width: 720px) {
-    .ytd-afp-sommaire-layout { grid-template-columns: 1fr; }
-    .ytd-afp-sommaire-nav ol { border-right: none; border-bottom: 1px solid ${T.line}; padding-right: 0; padding-bottom: 14px; }
+    .ytd-afp-sommaire { padding: 20px; }
+    .ytd-afp-sommaire-layout { grid-template-columns: 1fr; gap: 22px; }
+    .ytd-afp-sommaire-nav ol { border-right: none; border-bottom: 1px solid ${T.line}; padding-right: 0; padding-bottom: 16px; }
   }
 
   .ytd-afp-aside { display: grid; gap: 18px; position: sticky; top: 24px; }
