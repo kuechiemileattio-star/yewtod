@@ -285,6 +285,21 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-ai-extract-btn:hover:not(:disabled) { opacity: .88; }
   .ytd-admin-ai-extract-btn:disabled { opacity: .65; cursor: wait; }
   .ytd-admin-ai-extract-notice { font-family: 'Inter', sans-serif; font-size: 12px; color: ${T.inkSoft}; }
+  .ytd-admin-sections-builder { display: grid; gap: 14px; }
+  .ytd-admin-section-block { border: 1px solid ${T.line}; border-radius: 8px; background: ${T.paperAlt}; overflow: hidden; }
+  .ytd-admin-section-block-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid ${T.line}; background: ${T.paper}; }
+  .ytd-admin-section-block-n { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: ${T.inkSoft}; flex-shrink: 0; }
+  .ytd-admin-section-block-title { flex: 1; min-width: 0; border: none; background: none; outline: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; color: ${T.ink}; padding: 4px 0; }
+  .ytd-admin-section-block-title::placeholder { color: ${T.inkSoft}; font-weight: 400; }
+  .ytd-admin-section-block-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .ytd-admin-section-block-actions button { display: grid; place-items: center; width: 26px; height: 26px; border: none; border-radius: 5px; background: none; color: ${T.inkSoft}; cursor: pointer; transition: background .15s ease, color .15s ease; }
+  .ytd-admin-section-block-actions button:hover:not(:disabled) { background: ${T.paperAlt}; color: ${T.ink}; }
+  .ytd-admin-section-block-actions button:disabled { opacity: .3; cursor: default; }
+  .ytd-admin-section-block-actions button.is-danger:hover { background: ${T.red}14; color: ${T.red}; }
+  .ytd-admin-section-block-content { display: block; width: 100%; border: none; background: none; outline: none; resize: vertical; padding: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; color: ${T.ink}; box-sizing: border-box; }
+  .ytd-admin-section-add-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border: 1px dashed ${T.green}; border-radius: 8px; background: none; color: ${T.green}; cursor: pointer; font: 700 13px 'Inter', sans-serif; justify-self: start; transition: background .15s ease; }
+  .ytd-admin-section-add-btn:hover { background: ${T.green}0e; }
+  .ytd-admin-section-empty { margin: 0; color: ${T.inkSoft}; font-family: 'Inter', sans-serif; font-size: 13px; font-style: italic; }
   .ytd-admin-preview-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 3px; background: ${T.red}; color: #fff; font: 700 9.5px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
   .ytd-admin-preview-badge-theme { background: none; border: 1px solid ${T.green}; color: ${T.green}; }
 

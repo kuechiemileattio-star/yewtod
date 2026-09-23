@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Save, Send, Clock, Search, X, Check, Sparkles } from "lucide-react";
+import { Save, Send, Clock, Search, X, Check, Sparkles, Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { T } from "../../theme.js";
 import { supabase, readFunctionErrorMessage } from "../../lib/supabaseClient.js";
 import { rowToUi } from "../../lib/adapters.js";
@@ -19,7 +19,7 @@ function emptyForm(config) {
     [config.summaryField]: "", ...(config.fileField ? { [config.fileField]: "" } : {}),
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
-    ...(config.table === "articles" ? { content: "", themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
+    ...(config.table === "articles" ? { content: "", tableOfContents: [], themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
 }
 
@@ -67,6 +67,68 @@ function SimilarArticlesPicker({ value, onChange, options, currentId }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/** Builds the article body as a list of "sous-titre + contenu" blocks, one
+ * added at a time, instead of a single free-text field — this is exactly
+ * the {title, page, content} shape already used by the AI/PDF extraction
+ * (tableOfContents), so whatever is authored here shows up on the public
+ * page as the same interactive Sommaire (see InteractiveSommaire in
+ * work-details/shared.jsx): section list on the left, content of the
+ * clicked section on the right. */
+function ArticleSectionsBuilder({ value, onChange }) {
+  const sections = Array.isArray(value) ? value : [];
+
+  function update(i, patch) {
+    onChange(sections.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  }
+  function remove(i) {
+    onChange(sections.filter((_, idx) => idx !== i));
+  }
+  function move(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= sections.length) return;
+    const next = [...sections];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  }
+  function add() {
+    onChange([...sections, { title: "", page: null, content: "" }]);
+  }
+
+  return (
+    <div className="ytd-admin-sections-builder">
+      {sections.map((s, i) => (
+        <div key={i} className="ytd-admin-section-block">
+          <div className="ytd-admin-section-block-head">
+            <span className="ytd-admin-section-block-n">{String(i + 1).padStart(2, "0")}</span>
+            <input
+              value={s.title}
+              onChange={e => update(i, { title: e.target.value })}
+              placeholder="Titre du sous-titre / de la section"
+              className="ytd-admin-section-block-title"
+            />
+            <div className="ytd-admin-section-block-actions">
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Monter"><ChevronUp size={14} /></button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === sections.length - 1} aria-label="Descendre"><ChevronDown size={14} /></button>
+              <button type="button" onClick={() => remove(i)} aria-label="Supprimer cette section" className="is-danger"><Trash2 size={14} /></button>
+            </div>
+          </div>
+          <textarea
+            rows={5}
+            value={s.content}
+            onChange={e => update(i, { content: e.target.value })}
+            placeholder="Contenu de cette section…"
+            className="ytd-admin-section-block-content"
+          />
+        </div>
+      ))}
+      <button type="button" onClick={add} className="ytd-admin-section-add-btn">
+        <Plus size={15} /> Ajouter un sous-titre
+      </button>
+      {sections.length === 0 && <p className="ytd-admin-section-empty">Aucune section pour l'instant — clique sur "Ajouter un sous-titre" pour rédiger le premier bloc de l'article.</p>}
     </div>
   );
 }
@@ -119,7 +181,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
     let active = true;
     supabase.from(config.table).select("*").eq("id", id).maybeSingle().then(({ data }) => {
       if (!active) return;
-      if (data) setForm({ ...emptyForm(config), ...rowToUi(data) });
+      if (data) {
+        const ui = rowToUi(data);
+        setForm({ ...emptyForm(config), ...ui, tableOfContents: Array.isArray(ui.tableOfContents) ? ui.tableOfContents : [] });
+      }
       setLoading(false);
     });
     return () => { active = false; };
@@ -235,6 +300,8 @@ function SimpleWorkFormInner({ tableKey, id }) {
     const payload = { ...form, status: nextStatus };
     if (isArticle) {
       payload.tags = inputToTags(form.tags);
+      // Drop sections the user added but never filled in.
+      payload.tableOfContents = (form.tableOfContents || []).filter(s => s.title?.trim() || s.content?.trim());
       if (nextStatus === "scheduled") {
         payload.publishedAt = form.scheduledAt;
       } else {
@@ -377,16 +444,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
               <SectionHeader n={3} title="Contenu de l'article" />
               <Field
-                label="Corps du texte"
-                hint="Une ligne courte isolée (sans point final) devient un titre de section — ex. « Introduction » suivi d'un paragraphe. Une ligne commençant par • ou - devient une puce. Séparez les blocs par une ligne vide."
+                label="Rédaction par sections"
+                hint="Ajoute un sous-titre puis rédige son contenu, section après section, jusqu'à la fin de l'article. Sur la page publique, ces sous-titres formeront le Sommaire à gauche — cliquer sur l'un d'eux affiche son contenu à droite."
               >
-                <textarea
-                  rows={14}
-                  value={form.content || ""}
-                  onChange={e => set("content", e.target.value)}
-                  placeholder={"Introduction\nLe texte de ce premier paragraphe…\n\nUn sous-titre de section\nLa suite du développement…\n\n• Premier point\n• Deuxième point"}
-                  style={{ ...inputStyle, resize: "vertical", fontFamily: "'IBM Plex Mono', monospace", fontSize: 13.5, lineHeight: 1.6 }}
-                />
+                <ArticleSectionsBuilder value={form.tableOfContents} onChange={v => set("tableOfContents", v)} />
               </Field>
 
               <SectionHeader n={4} title="Médias" />
