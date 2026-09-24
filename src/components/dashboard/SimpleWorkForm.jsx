@@ -20,7 +20,7 @@ function emptyForm(config) {
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
     ...(config.table === "reports" ? { tableOfContents: [], authors: "", version: "" } : {}),
-    ...(config.table === "data_visualizations" ? { visualizationType: "bar", dataSource: "", legend: "", analysis: "", sourceCodeUrl: "" } : {}),
+    ...(config.table === "data_visualizations" ? { blocks: [], dataSource: "", legend: "", analysis: "", sourceCodeUrl: "" } : {}),
     ...(config.table === "articles" ? { content: "", tableOfContents: [], themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
 }
@@ -135,6 +135,82 @@ function ArticleSectionsBuilder({ value, onChange }) {
   );
 }
 
+const VIZ_TYPES = [["bar", "Barres"], ["line", "Lignes"], ["pie", "Camembert"]];
+
+/** Same "Ajouter" logic as ArticleSectionsBuilder, adapted for data
+ * visualizations: each block is its own titled visualization — title,
+ * description, chart type and its own CSV file — so one "Visualisations de
+ * données" entry can hold as many individual charts as needed. */
+function DataVizBlocksBuilder({ value, onChange, onUploadingChange }) {
+  const blocks = Array.isArray(value) ? value : [];
+
+  function update(i, patch) {
+    onChange(blocks.map((b, idx) => (idx === i ? { ...b, ...patch } : b)));
+  }
+  function remove(i) {
+    onChange(blocks.filter((_, idx) => idx !== i));
+  }
+  function move(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= blocks.length) return;
+    const next = [...blocks];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  }
+  function add() {
+    onChange([...blocks, { title: "", description: "", csvFile: "", visualizationType: "bar" }]);
+  }
+
+  return (
+    <div className="ytd-admin-sections-builder">
+      {blocks.map((b, i) => (
+        <div key={i} className="ytd-admin-section-block">
+          <div className="ytd-admin-section-block-head">
+            <span className="ytd-admin-section-block-n">{String(i + 1).padStart(2, "0")}</span>
+            <input
+              value={b.title}
+              onChange={e => update(i, { title: e.target.value })}
+              placeholder="Titre de cette visualisation"
+              className="ytd-admin-section-block-title"
+            />
+            <div className="ytd-admin-section-block-actions">
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Monter"><ChevronUp size={14} /></button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === blocks.length - 1} aria-label="Descendre"><ChevronDown size={14} /></button>
+              <button type="button" onClick={() => remove(i)} aria-label="Supprimer cette visualisation" className="is-danger"><Trash2 size={14} /></button>
+            </div>
+          </div>
+          <div className="ytd-admin-dataviz-block-body">
+            <textarea
+              rows={2}
+              value={b.description}
+              onChange={e => update(i, { description: e.target.value })}
+              placeholder="Description de ce visuel…"
+              className="ytd-admin-section-block-content"
+              style={{ marginBottom: 12 }}
+            />
+            <div className="ytd-admin-content-type-picker" style={{ marginBottom: 12 }}>
+              {VIZ_TYPES.map(([value, label]) => (
+                <button key={value} type="button" className={b.visualizationType === value ? "is-active" : ""} onClick={() => update(i, { visualizationType: value })}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <DropzoneField
+              kind="file" bucket="documents" accept=".csv" value={b.csvFile}
+              onChange={v => update(i, { csvFile: v })}
+              onUploadingChange={u => onUploadingChange?.(i, u)}
+            />
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={add} className="ytd-admin-section-add-btn">
+        <Plus size={15} /> Ajouter une visualisation
+      </button>
+      {blocks.length === 0 && <p className="ytd-admin-section-empty">Aucune visualisation pour l'instant — clique sur "Ajouter une visualisation" pour déposer le premier graphique.</p>}
+    </div>
+  );
+}
+
 function SectionHeader({ n, title }) {
   return (
     <div className="ytd-admin-section-header">
@@ -176,9 +252,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
   const [pdfNotice, setPdfNotice] = useState("");
   const [fileUploading, setFileUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [blockUploading, setBlockUploading] = useState({});
   const [aiExtracting, setAiExtracting] = useState(false);
   const [aiNotice, setAiNotice] = useState("");
-  const anyUploading = fileUploading || imageUploading;
+  const anyUploading = fileUploading || imageUploading || Object.values(blockUploading).some(Boolean);
 
   useEffect(() => {
     if (!id) return;
@@ -187,7 +264,11 @@ function SimpleWorkFormInner({ tableKey, id }) {
       if (!active) return;
       if (data) {
         const ui = rowToUi(data);
-        setForm({ ...emptyForm(config), ...ui, tableOfContents: Array.isArray(ui.tableOfContents) ? ui.tableOfContents : [] });
+        setForm({
+          ...emptyForm(config), ...ui,
+          tableOfContents: Array.isArray(ui.tableOfContents) ? ui.tableOfContents : [],
+          ...(isDataViz ? { blocks: Array.isArray(ui.blocks) ? ui.blocks : [] } : {}),
+        });
       }
       setLoading(false);
     });
@@ -306,6 +387,10 @@ function SimpleWorkFormInner({ tableKey, id }) {
       // Drop sections the user added but never filled in.
       payload.tableOfContents = (form.tableOfContents || []).filter(s => s.title?.trim() || s.content?.trim());
     }
+    if (isDataViz) {
+      // Drop visualization blocks the user added but never filled in.
+      payload.blocks = (form.blocks || []).filter(b => b.title?.trim() || b.description?.trim() || b.csvFile);
+    }
     if (isArticle) {
       payload.tags = inputToTags(form.tags);
       if (nextStatus === "scheduled") {
@@ -348,6 +433,19 @@ function SimpleWorkFormInner({ tableKey, id }) {
         try {
           await trySave(config.table, rest);
           navigate(`/dashboard/${config.adminPath}`, { state: { warning: "Enregistré, mais le thème/type/mise en avant n'ont pas pu être sauvegardés : exécute les migrations 011_articles_editorial_taxonomy.sql et 014_articles_multi_theme.sql dans Supabase, puis réessaie." } });
+          return;
+        } catch (err2) {
+          setError(err2.message || "Erreur lors de l'enregistrement.");
+          return;
+        }
+      }
+      // The "blocks" column (multi-visualization builder) only exists once
+      // 020_data_visualizations_blocks.sql has been run.
+      if (isDataViz && /\bblocks\b/i.test(msg)) {
+        const { blocks, ...rest } = payload;
+        try {
+          await trySave(config.table, rest);
+          navigate(`/dashboard/${config.adminPath}`, { state: { warning: "Enregistré, mais les visualisations n'ont pas pu être sauvegardées : exécute la migration 020_data_visualizations_blocks.sql dans Supabase, puis réessaie." } });
           return;
         } catch (err2) {
           setError(err2.message || "Erreur lors de l'enregistrement.");
@@ -481,21 +579,18 @@ function SimpleWorkFormInner({ tableKey, id }) {
 
           {isDataViz && (
             <>
-              <SectionHeader n={2} title="Paramètres du graphique" />
-              <div className="ytd-admin-meta-fields" style={{ gridTemplateColumns: "1fr 1fr" }}>
-                <Field label="Type de visualisation" hint="Détermine comment le fichier CSV déposé plus bas sera dessiné.">
-                  <div className="ytd-admin-content-type-picker">
-                    {[["bar", "Barres"], ["line", "Lignes"], ["pie", "Camembert"]].map(([value, label]) => (
-                      <button key={value} type="button" className={form.visualizationType === value ? "is-active" : ""} onClick={() => set("visualizationType", value)}>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <Field label="Source des données">
-                  <input value={form.dataSource || ""} onChange={e => set("dataSource", e.target.value)} placeholder="ex : Banque mondiale, INSEE…" style={inputStyle} />
-                </Field>
-              </div>
+              <SectionHeader n={2} title="Visualisations" />
+              <Field label="Source des données">
+                <input value={form.dataSource || ""} onChange={e => set("dataSource", e.target.value)} placeholder="ex : Banque mondiale, INSEE…" style={inputStyle} />
+              </Field>
+
+              <Field label="Graphiques" hint="Chaque visualisation a son propre titre, sa description et son fichier CSV (1ʳᵉ colonne = catégories, colonnes suivantes = valeurs numériques — une seule colonne de valeurs pour le camembert).">
+                <DataVizBlocksBuilder
+                  value={form.blocks}
+                  onChange={v => set("blocks", v)}
+                  onUploadingChange={(i, uploading) => setBlockUploading(prev => ({ ...prev, [i]: uploading }))}
+                />
+              </Field>
 
               <Field label="Légende">
                 <textarea rows={3} value={form.legend || ""} onChange={e => set("legend", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
@@ -521,8 +616,8 @@ function SimpleWorkFormInner({ tableKey, id }) {
             </Field>
           )}
 
-          {config.fileField && (
-            <Field label={config.fileLabel} hint={pdfNotice || (isDataViz ? "Première colonne = catégories (ex. années, pays…), colonnes suivantes = valeurs numériques. Une colonne de valeurs suffit pour le camembert." : undefined)}>
+          {config.fileField && !isDataViz && (
+            <Field label={config.fileLabel} hint={pdfNotice || undefined}>
               <DropzoneField
                 kind="file" bucket={config.fileBucket} accept={config.fileAccept} value={form[config.fileField]}
                 onChange={v => {
