@@ -20,6 +20,7 @@ function emptyForm(config) {
     ...(config.urlField ? { [config.urlField]: "" } : {}),
     ...(config.table === "documentary_episodes" ? { seriesId: "" } : {}),
     ...(config.table === "reports" ? { tableOfContents: [], authors: "", version: "" } : {}),
+    ...(config.table === "data_visualizations" ? { visualizationType: "bar", dataSource: "", legend: "", analysis: "", sourceCodeUrl: "" } : {}),
     ...(config.table === "articles" ? { content: "", tableOfContents: [], themes: "", contentType: "dossier", tags: "", featured: false, scheduledAt: "", similarArticles: "" } : {}),
   };
 }
@@ -164,6 +165,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
   const isEpisode = config.table === "documentary_episodes";
   const isArticle = config.table === "articles";
   const isReport = config.table === "reports";
+  const isDataViz = config.table === "data_visualizations";
   const navigate = useNavigate();
   const { createWork, updateWork, saving } = useWorkMutations();
   const [form, setForm] = useState(() => emptyForm(config));
@@ -477,7 +479,41 @@ function SimpleWorkFormInner({ tableKey, id }) {
             </>
           )}
 
-          {!isArticle && !isReport && <SectionHeader n={2} title="Médias" />}
+          {isDataViz && (
+            <>
+              <SectionHeader n={2} title="Paramètres du graphique" />
+              <div className="ytd-admin-meta-fields" style={{ gridTemplateColumns: "1fr 1fr" }}>
+                <Field label="Type de visualisation" hint="Détermine comment le fichier CSV déposé plus bas sera dessiné.">
+                  <div className="ytd-admin-content-type-picker">
+                    {[["bar", "Barres"], ["line", "Lignes"], ["pie", "Camembert"]].map(([value, label]) => (
+                      <button key={value} type="button" className={form.visualizationType === value ? "is-active" : ""} onClick={() => set("visualizationType", value)}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+                <Field label="Source des données">
+                  <input value={form.dataSource || ""} onChange={e => set("dataSource", e.target.value)} placeholder="ex : Banque mondiale, INSEE…" style={inputStyle} />
+                </Field>
+              </div>
+
+              <Field label="Légende">
+                <textarea rows={3} value={form.legend || ""} onChange={e => set("legend", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
+              </Field>
+
+              <Field label="Analyse">
+                <textarea rows={5} value={form.analysis || ""} onChange={e => set("analysis", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} />
+              </Field>
+
+              <Field label="Lien vers le code source" hint="Optionnel — ex. un notebook ou un dépôt GitHub.">
+                <input type="url" value={form.sourceCodeUrl || ""} onChange={e => set("sourceCodeUrl", e.target.value)} placeholder="https://…" style={inputStyle} />
+              </Field>
+
+              <SectionHeader n={3} title="Médias" />
+            </>
+          )}
+
+          {!isArticle && !isReport && !isDataViz && <SectionHeader n={2} title="Médias" />}
 
           {config.urlField && (
             <Field label={config.urlLabel} hint="Sur le site, un aperçu de 2 minutes se lit directement sur la page ; au-delà, un bouton renvoie vers YouTube pour la suite.">
@@ -486,7 +522,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
           )}
 
           {config.fileField && (
-            <Field label={config.fileLabel} hint={pdfNotice || undefined}>
+            <Field label={config.fileLabel} hint={pdfNotice || (isDataViz ? "Première colonne = catégories (ex. années, pays…), colonnes suivantes = valeurs numériques. Une colonne de valeurs suffit pour le camembert." : undefined)}>
               <DropzoneField
                 kind="file" bucket={config.fileBucket} accept={config.fileAccept} value={form[config.fileField]}
                 onChange={v => {

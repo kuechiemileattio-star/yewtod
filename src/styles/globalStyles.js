@@ -1167,6 +1167,30 @@ export const GLOBAL_STYLES = `${FONTS}
     .ytd-afp-sommaire-nav ol { border-right: none; border-bottom: 1px solid ${T.line}; padding-right: 0; padding-bottom: 16px; }
   }
 
+  .ytd-dataviz-frame { border: 1px solid ${T.line}; border-radius: 12px; background: ${T.paper}; padding: 28px 26px 22px; margin-bottom: 30px; box-shadow: 0 1px 2px rgba(10,14,22,.03); }
+  .ytd-dataviz-status { display: grid; place-items: center; min-height: 160px; color: ${T.inkSoft}; font-family: 'Inter', sans-serif; font-size: 13.5px; text-align: center; }
+  .ytd-dataviz-svg { width: 100%; height: auto; overflow: visible; }
+  .ytd-dataviz-gridline { stroke: ${T.line}; stroke-width: 1; }
+  .ytd-dataviz-axislabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: ${T.inkSoft}; }
+  .ytd-dataviz-value { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; fill: ${T.greenDeep}; }
+  .ytd-dataviz-legend { display: flex; flex-wrap: wrap; gap: 14px 20px; margin-top: 18px; padding-top: 16px; border-top: 1px solid ${T.line}; }
+  .ytd-dataviz-legend span { display: inline-flex; align-items: center; gap: 7px; font-family: 'Inter', sans-serif; font-size: 12.5px; color: ${T.ink}; }
+  .ytd-dataviz-legend i { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .ytd-dataviz-pie-wrap { display: flex; align-items: center; gap: 36px; flex-wrap: wrap; justify-content: center; }
+  .ytd-dataviz-pie { width: 220px; flex-shrink: 0; }
+  .ytd-dataviz-pie-center-value { font-family: 'Newsreader', serif; font-size: 26px; font-weight: 600; fill: ${T.greenDeep}; }
+  .ytd-dataviz-pie-center-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: ${T.inkSoft}; text-transform: uppercase; letter-spacing: .04em; }
+  .ytd-dataviz-pie-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; min-width: 160px; }
+  .ytd-dataviz-pie-list li { display: flex; align-items: center; gap: 9px; padding: 5px 8px; border-radius: 6px; cursor: pointer; transition: background .15s ease; }
+  .ytd-dataviz-pie-list li:hover, .ytd-dataviz-pie-list li.is-active { background: ${T.paperAlt}; }
+  .ytd-dataviz-pie-list i { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .ytd-dataviz-pie-list span { flex: 1; min-width: 0; font-family: 'Inter', sans-serif; font-size: 13px; color: ${T.ink}; }
+  .ytd-dataviz-pie-list strong { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: ${T.greenDeep}; }
+  @media (max-width: 560px) {
+    .ytd-dataviz-frame { padding: 20px 16px; }
+    .ytd-dataviz-pie-wrap { flex-direction: column; }
+  }
+
   .ytd-afp-aside { display: grid; gap: 18px; position: sticky; top: 24px; }
   .ytd-afp-author-card, .ytd-afp-fiche, .ytd-afp-related, .ytd-afp-newsletter { border: 1px solid ${T.line}; border-radius: 8px; padding: 16px; background: ${T.paper}; }
   .ytd-afp-author-card { display: flex; align-items: center; gap: 12px; }
