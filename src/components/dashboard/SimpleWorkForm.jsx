@@ -135,7 +135,10 @@ function ArticleSectionsBuilder({ value, onChange }) {
   );
 }
 
-const VIZ_TYPES = [["bar", "Barres"], ["line", "Lignes"], ["pie", "Camembert"]];
+const VIZ_TYPES = [
+  ["bar", "Barres"], ["line", "Lignes"], ["pie", "Camembert"],
+  ["area", "Aires"], ["stackedBar", "Barres empilées"], ["scatter", "Nuage de points"],
+];
 
 /** Same "Ajouter" logic as ArticleSectionsBuilder, adapted for data
  * visualizations: each block is its own titled visualization — title,
@@ -584,7 +587,7 @@ function SimpleWorkFormInner({ tableKey, id }) {
                 <input value={form.dataSource || ""} onChange={e => set("dataSource", e.target.value)} placeholder="ex : Banque mondiale, INSEE…" style={inputStyle} />
               </Field>
 
-              <Field label="Graphiques" hint="Chaque visualisation a son propre titre, sa description et son fichier CSV (1ʳᵉ colonne = catégories, colonnes suivantes = valeurs numériques — une seule colonne de valeurs pour le camembert).">
+              <Field label="Graphiques" hint="1ʳᵉ colonne = catégories, colonnes suivantes = valeurs numériques (une seule colonne pour le camembert). Pour le Nuage de points : 1ʳᵉ colonne = catégories/noms, 2ᵉ colonne = valeurs X, 3ᵉ colonne = valeurs Y.">
                 <DataVizBlocksBuilder
                   value={form.blocks}
                   onChange={v => set("blocks", v)}

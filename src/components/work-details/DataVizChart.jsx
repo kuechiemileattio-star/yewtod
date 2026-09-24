@@ -132,6 +132,142 @@ function LineChart({ labels, series, animate }) {
   );
 }
 
+function AreaChart({ labels, series, animate }) {
+  const [hover, setHover] = useState(null);
+  const W = 720, H = 340, padL = 46, padB = 36, padT = 16, padR = 16;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const max = Math.max(1, ...series.flatMap(s => s.values));
+  const stepX = labels.length > 1 ? plotW / (labels.length - 1) : 0;
+  const pointsFor = s => s.values.map((v, i) => [padL + i * stepX, padT + plotH - (v / max) * plotH]);
+  const baseline = padT + plotH;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="ytd-dataviz-svg" role="img" aria-label="Graphique en aires">
+      {[0, 0.25, 0.5, 0.75, 1].map(f => (
+        <g key={f}>
+          <line x1={padL} x2={W - padR} y1={padT + plotH * (1 - f)} y2={padT + plotH * (1 - f)} className="ytd-dataviz-gridline" />
+          <text x={padL - 8} y={padT + plotH * (1 - f) + 4} className="ytd-dataviz-axislabel" textAnchor="end">{Math.round(max * f)}</text>
+        </g>
+      ))}
+      {series.map((s, si) => {
+        const pts = pointsFor(s);
+        const line = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x},${y}`).join(" ");
+        const area = `${line} L${pts[pts.length - 1][0]},${baseline} L${pts[0][0]},${baseline} Z`;
+        const color = PALETTE[si % PALETTE.length];
+        return (
+          <g key={s.name} style={{ opacity: animate ? 1 : 0, transition: `opacity .9s ease ${si * 0.15}s` }}>
+            <path d={area} fill={color} opacity={0.16} />
+            <path d={line} fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+            {pts.map(([x, y], i) => {
+              const isHover = hover?.i === i && hover?.si === si;
+              return (
+                <g key={i} onMouseEnter={() => setHover({ i, si })} onMouseLeave={() => setHover(null)}>
+                  <circle cx={x} cy={y} r={isHover ? 5 : 3.5} fill={color} />
+                  {isHover && <text x={x} y={y - 12} textAnchor="middle" className="ytd-dataviz-value">{s.values[i]}</text>}
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+      {labels.map((label, i) => (
+        <text key={label} x={padL + i * stepX} y={H - padB + 18} textAnchor="middle" className="ytd-dataviz-axislabel">{label}</text>
+      ))}
+    </svg>
+  );
+}
+
+function StackedBarChart({ labels, series, animate }) {
+  const [hover, setHover] = useState(null);
+  const W = 720, H = 340, padL = 46, padB = 36, padT = 16, padR = 12;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const totals = labels.map((_, i) => series.reduce((sum, s) => sum + s.values[i], 0));
+  const max = Math.max(1, ...totals);
+  const groupW = plotW / labels.length;
+  const barW = Math.min(64, groupW * 0.55);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="ytd-dataviz-svg" role="img" aria-label="Graphique en barres empilées">
+      {[0, 0.25, 0.5, 0.75, 1].map(f => (
+        <g key={f}>
+          <line x1={padL} x2={W - padR} y1={padT + plotH * (1 - f)} y2={padT + plotH * (1 - f)} className="ytd-dataviz-gridline" />
+          <text x={padL - 8} y={padT + plotH * (1 - f) + 4} className="ytd-dataviz-axislabel" textAnchor="end">{Math.round(max * f)}</text>
+        </g>
+      ))}
+      {labels.map((label, i) => {
+        const x = padL + i * groupW + (groupW - barW) / 2;
+        let stackedSoFar = 0;
+        return (
+          <g key={label}>
+            {series.map((s, si) => {
+              const v = s.values[i];
+              const h = (v / max) * plotH;
+              const yTop = padT + plotH - (stackedSoFar + v) / max * plotH;
+              stackedSoFar += v;
+              const isHover = hover?.i === i && hover?.si === si;
+              return (
+                <g key={s.name} onMouseEnter={() => setHover({ i, si })} onMouseLeave={() => setHover(null)}>
+                  <rect
+                    x={x} width={barW}
+                    y={animate ? yTop : padT + plotH}
+                    height={animate ? h : 0}
+                    fill={PALETTE[si % PALETTE.length]}
+                    opacity={isHover ? 1 : 0.9}
+                    style={{ transition: `y .8s cubic-bezier(.16,1,.3,1) ${i * 0.05}s, height .8s cubic-bezier(.16,1,.3,1) ${i * 0.05}s, opacity .15s ease` }}
+                  />
+                  {isHover && <text x={x + barW / 2} y={yTop - 8} textAnchor="middle" className="ytd-dataviz-value">{v}</text>}
+                </g>
+              );
+            })}
+            <text x={x + barW / 2} y={H - padB + 18} textAnchor="middle" className="ytd-dataviz-axislabel">{label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function ScatterChart({ labels, series }) {
+  const [hover, setHover] = useState(null);
+  const W = 720, H = 360, padL = 50, padB = 40, padT = 16, padR = 20;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const xs = series[0]?.values || [];
+  const ys = series[1]?.values || xs;
+  const xMax = Math.max(1, ...xs), xMin = Math.min(0, ...xs);
+  const yMax = Math.max(1, ...ys), yMin = Math.min(0, ...ys);
+  const px = x => padL + ((x - xMin) / (xMax - xMin || 1)) * plotW;
+  const py = y => padT + plotH - ((y - yMin) / (yMax - yMin || 1)) * plotH;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="ytd-dataviz-svg" role="img" aria-label="Nuage de points">
+      {[0, 0.25, 0.5, 0.75, 1].map(f => (
+        <line key={f} x1={padL} x2={W - padR} y1={padT + plotH * (1 - f)} y2={padT + plotH * (1 - f)} className="ytd-dataviz-gridline" />
+      ))}
+      <line x1={padL} x2={padL} y1={padT} y2={padT + plotH} className="ytd-dataviz-gridline" />
+      <line x1={padL} x2={W - padR} y1={padT + plotH} y2={padT + plotH} className="ytd-dataviz-gridline" />
+      <text x={padL} y={padT + plotH + 18} textAnchor="start" className="ytd-dataviz-axislabel">{xMin}</text>
+      <text x={W - padR} y={padT + plotH + 18} textAnchor="end" className="ytd-dataviz-axislabel">{xMax}</text>
+      <text x={padL} y={padT + plotH + 34} textAnchor="start" className="ytd-dataviz-axislabel">{series[0]?.name}</text>
+      <text x={padL - 8} y={padT + plotH + 4} textAnchor="end" className="ytd-dataviz-axislabel">{yMin}</text>
+      <text x={padL - 8} y={padT + 8} textAnchor="end" className="ytd-dataviz-axislabel">{yMax}</text>
+      <text x={padL - 8} y={padT - 6} textAnchor="end" className="ytd-dataviz-axislabel">{series[1]?.name || ""}</text>
+      {xs.map((x, i) => {
+        const isHover = hover === i;
+        return (
+          <g key={i} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
+            <circle cx={px(x)} cy={py(ys[i])} r={isHover ? 7 : 5} fill={T.green} opacity={isHover ? 1 : 0.72} style={{ transition: "r .15s ease, opacity .15s ease" }} />
+            {isHover && (
+              <text x={px(x)} y={py(ys[i]) - 12} textAnchor="middle" className="ytd-dataviz-value">
+                {labels[i] ? `${labels[i]} · ` : ""}{x}, {ys[i]}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function PieChart({ labels, series, animate }) {
   const [hover, setHover] = useState(null);
   const values = series[0]?.values || [];
@@ -201,7 +337,8 @@ export default function DataVizChart({ csvUrl, type = "bar" }) {
   if (!csvUrl) return null;
 
   const hasData = data && data.labels.length > 0 && data.series.length > 0;
-  const Chart = type === "line" ? LineChart : type === "pie" ? PieChart : BarChart;
+  const CHART_COMPONENTS = { line: LineChart, pie: PieChart, area: AreaChart, stackedBar: StackedBarChart, scatter: ScatterChart, bar: BarChart };
+  const Chart = CHART_COMPONENTS[type] || BarChart;
 
   return (
     <div ref={ref} className="ytd-dataviz-frame">
@@ -211,7 +348,7 @@ export default function DataVizChart({ csvUrl, type = "bar" }) {
       {!loading && !error && hasData && (
         <>
           <Chart labels={data.labels} series={data.series} animate={inView} />
-          <ChartLegend series={data.series} />
+          {type !== "scatter" && <ChartLegend series={data.series} />}
         </>
       )}
     </div>
