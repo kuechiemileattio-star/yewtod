@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Mail, X, ShieldCheck, AlertCircle, Check, Loader2, Trash2 } from "lucide-react";
+import { Plus, Mail, X, ShieldCheck, ShieldAlert, AlertCircle, Check, Loader2, Trash2 } from "lucide-react";
 import { T } from "../../theme.js";
 import { useRolesAdmin } from "../../hooks/useRolesAdmin.js";
 import { useAuth } from "../../contexts/AuthContext.jsx";
@@ -17,6 +17,13 @@ export default function UsersRolesPanel() {
     roleHasPermission, createRole, deleteRole, togglePermission, updateProfile, inviteMember, revokeInvitation, deleteMember,
   } = useRolesAdmin();
   const { profile: currentProfile } = useAuth();
+
+  // A role that carries "manage_users" grants full control of the dashboard
+  // (members, roles, permissions) — surfacing this everywhere a role is
+  // picked or listed prevents accidentally handing out that level of access.
+  const manageUsersPerm = permissions.find(p => p.key === "manage_users");
+  const isSensitiveRole = roleId => !!manageUsersPerm && roleHasPermission(roleId, manageUsersPerm.id);
+  const permissionCount = roleId => permissions.filter(p => roleHasPermission(roleId, p.id)).length;
 
   const [newRoleName, setNewRoleName] = useState("");
   const [newRoleDescription, setNewRoleDescription] = useState("");
@@ -92,8 +99,9 @@ export default function UsersRolesPanel() {
               </div>
               <select value={p.role_id || ""} onChange={e => updateProfile(p.id, { role_id: e.target.value })} style={{ ...inputStyle, width: "auto", padding: "8px 10px", fontSize: 12 }}>
                 <option value="" disabled>Rôle…</option>
-                {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                {roles.map(r => <option key={r.id} value={r.id}>{isSensitiveRole(r.id) ? `⚠ ${r.name} (accès total)` : r.name}</option>)}
               </select>
+              {isSensitiveRole(p.role_id) && <ShieldAlert size={15} color={T.red} aria-label="Accès total au dashboard" title="Ce membre a un rôle avec accès total au dashboard (gestion des membres et des rôles)." />}
               <StatusPill statut={PROFILE_STATUS_LABELS[p.status]} />
               <label className="ytd-switch" title={p.status === "suspended" ? "Réactiver ce membre" : "Suspendre ce membre"}>
                 <input
@@ -127,8 +135,14 @@ export default function UsersRolesPanel() {
               <tr>
                 <th>Permission</th>
                 {roles.map(r => (
-                  <th key={r.id} style={{ textAlign: "center" }}>
-                    {r.name}{r.is_system_role && <span title="Rôle système" style={{ marginLeft: 4 }}>★</span>}
+                  <th key={r.id} style={{ textAlign: "center", background: isSensitiveRole(r.id) ? `${T.red}0e` : undefined }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      {r.name}{r.is_system_role && <span title="Rôle système">★</span>}
+                      {isSensitiveRole(r.id) && <ShieldAlert size={13} color={T.red} title="Accès total : ce rôle peut gérer les membres et les rôles." />}
+                    </span>
+                    <span style={{ display: "block", marginTop: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 400, color: T.inkSoft }}>
+                      {permissionCount(r.id)}/{permissions.length}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -144,7 +158,7 @@ export default function UsersRolesPanel() {
                     const checked = roleHasPermission(role.id, perm.id);
                     const lockGrant = perm.key === "invite_users";
                     return (
-                      <td key={role.id} style={{ textAlign: "center" }}>
+                      <td key={role.id} style={{ textAlign: "center", background: isSensitiveRole(role.id) ? `${T.red}08` : undefined }}>
                         <input
                           type="checkbox"
                           checked={checked}
@@ -183,13 +197,18 @@ export default function UsersRolesPanel() {
           <Field label="Rôle">
             <select required value={inviteRoleId} onChange={e => setInviteRoleId(e.target.value)} style={inputStyle}>
               <option value="" disabled>Choisir…</option>
-              {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+              {roles.map(r => <option key={r.id} value={r.id}>{isSensitiveRole(r.id) ? `⚠ ${r.name} (accès total)` : r.name}</option>)}
             </select>
           </Field>
           <Btn type="submit" variant="green" style={{ opacity: inviting ? 0.7 : 1 }}>
             {inviting ? <Loader2 size={14} className="ytd-spin" /> : <Plus size={14} />} {inviting ? "Envoi…" : "Inviter"}
           </Btn>
         </form>
+        {isSensitiveRole(inviteRoleId) && (
+          <p className="ytd-form-message" style={{ color: T.red, fontSize: 12.5, marginTop: 10 }}>
+            <ShieldAlert size={14} /> Ce rôle donne un accès total au dashboard (gestion des membres et des rôles) — à réserver aux personnes de confiance.
+          </p>
+        )}
         {inviteError && <p className="ytd-form-message" style={{ color: T.red, fontSize: 12.5, marginTop: 10 }}><AlertCircle size={14} /> {inviteError}</p>}
         {inviteSuccess && <p className="ytd-form-message" style={{ color: T.green, fontSize: 12.5, marginTop: 10 }}><Check size={14} /> {inviteSuccess}</p>}
 
