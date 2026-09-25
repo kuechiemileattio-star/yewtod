@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Trash2, Check } from "lucide-react";
+import { Plus, Trash2, Check, ExternalLink } from "lucide-react";
 import { T } from "../../theme.js";
 import { useAdminSettings } from "../../hooks/useAdminSettings.js";
 import Field, { inputStyle } from "../../components/Field.jsx";
@@ -63,6 +63,7 @@ export default function SettingsPanel() {
     <div className="ytd-dashboard-new ytd-admin-view ytd-admin-settings">
       <div className="ytd-admin-section-heading">
         <div><span className="ytd-admin-kicker">Configuration du projet</span><h1>Paramètres</h1><p>Identité du site, réflexion de la semaine et réseaux sociaux — tout est lu en direct par le site public.</p></div>
+        <a href="/" target="_blank" rel="noreferrer" className="ytd-admin-view-site-link"><ExternalLink size={14} /> Voir le site</a>
       </div>
 
       {saved && <p className="ytd-form-message" style={{ color: T.green, fontSize: 13, marginBottom: 18 }}><Check size={14} /> {saved}</p>}
@@ -72,10 +73,22 @@ export default function SettingsPanel() {
         <form onSubmit={saveIdentity} style={{ display: "grid", gap: 18 }}>
           <div className="ytd-admin-settings-fields">
             <Field label="Nom du site"><input value={siteName} onChange={e => setSiteName(e.target.value)} style={inputStyle} /></Field>
-            <Field label="Description SEO"><input value={seoDescription} onChange={e => setSeoDescription(e.target.value)} style={inputStyle} /></Field>
-            <Field label="Logo (URL)"><input type="url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} style={inputStyle} /></Field>
+            <Field label="Description SEO" hint={`${seoDescription.length}/155 caractères — au-delà, Google la tronque dans les résultats de recherche.`}>
+              <input value={seoDescription} onChange={e => setSeoDescription(e.target.value)} maxLength={200} style={{ ...inputStyle, borderColor: seoDescription.length > 155 ? T.red : undefined }} />
+            </Field>
+            <Field label="Logo (URL)">
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input type="url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} style={inputStyle} />
+                {logoUrl && <img src={logoUrl} alt="Aperçu du logo" className="ytd-admin-settings-preview-thumb" />}
+              </div>
+            </Field>
           </div>
-          <Field label="Favicon (URL)"><input type="url" value={faviconUrl} onChange={e => setFaviconUrl(e.target.value)} style={inputStyle} /></Field>
+          <Field label="Favicon (URL)">
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <input type="url" value={faviconUrl} onChange={e => setFaviconUrl(e.target.value)} style={inputStyle} />
+              {faviconUrl && <img src={faviconUrl} alt="Aperçu du favicon" className="ytd-admin-settings-preview-thumb ytd-admin-settings-preview-thumb-small" />}
+            </div>
+          </Field>
           <Btn type="submit" variant="green" style={{ alignSelf: "flex-start" }}>Enregistrer</Btn>
         </form>
       </section>

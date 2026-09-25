@@ -6,9 +6,13 @@ import Tag from "../components/Tag.jsx";
 import SectionLabel from "../components/SectionLabel.jsx";
 import { ArrowDownRight, BookOpen, Network, Target } from "lucide-react";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
+import { usePageContent } from "../hooks/usePageContent.js";
+import { MEET_DEFAULTS } from "../lib/pageDefaults.js";
 
 export default function Meet() {
   useDocumentMeta("Meet Yewtod", "Pourquoi Yewtod SS existe, sa méthode de travail et le parcours de son fondateur.");
+  const page = usePageContent("meet", MEET_DEFAULTS);
+  const founderTags = (page.founderTags || "").split("\n").map(t => t.trim()).filter(Boolean);
   const qa = [
     ["Pourquoi ce site ?", "Parce que je passais mon temps à prendre des notes de lecture pour moi-même, et qu'à un moment j'ai trouvé bête de ne pas les rendre publiques."],
     ["C'est un média ou un journal perso ?", "Un peu des deux, honnêtement. Le format est celui d'un média, mais je n'ai pas de rédaction ni de ligne éditoriale imposée — juste ce qui m'occupe l'esprit ce mois-ci."],
@@ -25,9 +29,9 @@ export default function Meet() {
         <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.green }}>Meet Yewtod</span>
       </div>
       <h1 style={{ fontFamily: "'Newsreader', serif", fontSize: "clamp(38px, 5vw, 64px)", fontWeight: 500, lineHeight: 1.02, margin: "0 0 20px" }}>
-        Un carnet de recherche, pas un magazine.
+        {page.heroTitle}
       </h1>
-      <p className="ytd-meet-lead">Je publie ici ce que je lis, ce que je vérifie et ce que je n'ai pas encore complètement compris — dans cet ordre-là, souvent.</p>
+      <p className="ytd-meet-lead">{page.heroLead}</p>
       </div>
       <div className="ytd-meet-hero-mark"><NodeMark size={22} color={T.paper} /><span>Recherche<br />appliquée</span><ArrowDownRight size={22} /></div>
       </header>
@@ -59,18 +63,18 @@ export default function Meet() {
 
       <Reveal><SectionLabel>Le fondateur</SectionLabel></Reveal>
       <Reveal><div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 48 }} className="ytd-founder ytd-founder-panel">
-        <div className="ytd-founder-portrait" style={{ width: 240, height: 290, background: T.greenDeep, border: `1px solid ${T.line}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <NodeMark size={16} color={T.green} />
+        <div className="ytd-founder-portrait" style={{ width: 240, height: 290, background: T.greenDeep, border: `1px solid ${T.line}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          {page.founderPortrait ? <img src={page.founderPortrait} alt="Yewtod" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <NodeMark size={16} color={T.green} />}
         </div>
         <div>
           <h3 style={{ fontFamily: "'Newsreader', serif", fontSize: 24, fontWeight: 600, margin: "0 0 16px" }}>Yewtod</h3>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, lineHeight: 1.7, margin: "0 0 16px" }}>
-            J'ai travaillé quelques années entre économie du développement et science des données, dont pas mal de terrain en Afrique de l'Ouest. C'est de là que vient l'obsession pour les systèmes complexes — on ne comprend pas grand-chose en isolant une seule variable.
+            {page.founderBio1}
           </p>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15.5, color: T.inkSoft, lineHeight: 1.7, margin: "0 0 20px" }}>
-            En ce moment, je passe le plus clair de mon temps sur la gouvernance des données et l'usage de l'IA dans les politiques publiques — deux sujets où la théorie et la pratique se parlent encore trop peu.
+            {page.founderBio2}
           </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{["Économie du développement", "Gouvernance des données", "Systèmes complexes", "IA & politiques publiques"].map(v => <Tag key={v}>{v}</Tag>)}</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{founderTags.map(v => <Tag key={v}>{v}</Tag>)}</div>
         </div>
       </div></Reveal>
     </div>

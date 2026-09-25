@@ -244,6 +244,10 @@ export const GLOBAL_STYLES = `${FONTS}
   .ytd-admin-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
   .ytd-admin-section-heading h1 { margin: 5px 0 6px; color: ${T.ink}; font: 500 32px 'Fraunces', serif; }
   .ytd-admin-section-heading p { margin: 0; color: ${T.inkSoft}; font: 13px/1.5 'Plus Jakarta Sans', sans-serif; }
+  .ytd-admin-view-site-link { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border: 1px solid ${T.line}; border-radius: 20px; color: ${T.ink}; text-decoration: none; font: 600 12.5px 'Inter', sans-serif; white-space: nowrap; transition: border-color .15s ease, color .15s ease; }
+  .ytd-admin-view-site-link:hover { border-color: ${T.green}; color: ${T.green}; }
+  .ytd-admin-settings-preview-thumb { width: 40px; height: 40px; object-fit: contain; border: 1px solid ${T.line}; border-radius: 6px; background: ${T.paperAlt}; flex-shrink: 0; padding: 4px; box-sizing: border-box; }
+  .ytd-admin-settings-preview-thumb-small { width: 28px; height: 28px; }
   .ytd-admin-book-toolbar { display: flex; gap: 14px; align-items: center; margin-bottom: 22px; padding: 10px; border: 1px solid ${T.line}; background: ${T.paper}; }
   .ytd-admin-search { display: flex; align-items: center; gap: 8px; min-width: 270px; padding: 9px 11px; color: ${T.inkSoft}; background: ${T.paperAlt}; }
   .ytd-admin-search input { width: 100%; border: 0; outline: 0; color: ${T.ink}; background: transparent; font: 12px 'Plus Jakarta Sans', sans-serif; }

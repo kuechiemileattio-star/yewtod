@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutGrid, FileText, FileBarChart2, Newspaper, BarChart3, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft, User, Menu, X } from "lucide-react";
+import { LayoutGrid, FileText, FileBarChart2, Newspaper, BarChart3, BookOpen, Handshake, Settings, Users, LogOut, ArrowLeft, User, Menu, X, FileEdit } from "lucide-react";
 import { T } from "../../theme.js";
 import { PATHS } from "../../lib/paths.js";
 import { useAuth } from "../../contexts/AuthContext.jsx";
@@ -20,6 +20,7 @@ const NAV_GROUPS = [
   ] },
   { label: "Administration", items: [
     { to: "users", label: "Utilisateurs & rôles", icon: Users, permission: "manage_users" },
+    { to: "pages", label: "Pages", icon: FileEdit, permission: "manage_pages" },
     { to: "settings", label: "Paramètres", icon: Settings, permission: "manage_settings" },
   ] },
   { label: null, items: [
