@@ -182,18 +182,47 @@ Bouton **"Analyser avec Claude (IA)"**, affiché dès qu'un PDF est déposé dan
 
 Utilise **Google Gemini** plutôt que Claude/Anthropic : Gemini a un niveau gratuit (aucune carte bancaire requise) suffisant pour un usage personnel/occasionnel, contrairement à l'API Anthropic qui nécessite un solde payant.
 
-**Mise en place (à faire une seule fois)** :
-1. Récupère une clé API **gratuite** sur [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) (compte Google, pas de carte bancaire).
-2. Configure le secret sur le projet Supabase :
+**Mise en place (à faire une seule fois par projet Supabase)** :
+1. Récupère une clé API **gratuite** sur [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) (compte Google, pas de carte bancaire). Une clé **différente** pour dev et pour prod.
+2. Configure le secret sur le projet lié (jamais dans un fichier du dépôt) :
    ```
-   supabase secrets set GEMINI_API_KEY=... --project-ref <project-ref>
+   npx supabase secrets set GEMINI_API_KEY=...
    ```
 3. Déploie la fonction :
    ```
-   supabase functions deploy extract-pdf-ai --project-ref <project-ref>
+   npx supabase functions deploy extract-pdf-ai --use-api
    ```
 
-Sans ces deux étapes, le bouton renvoie une erreur explicite ("GEMINI_API_KEY n'est pas configurée..."). Le niveau gratuit de Gemini a une limite de requêtes par minute/jour — largement suffisante pour un usage occasionnel ; au-delà, Google demande de passer sur un plan payant.
+Sans clé, le bouton renvoie une erreur explicite ("GEMINI_API_KEY n'est pas configurée..."). Le niveau gratuit de Gemini a une limite de requêtes par minute/jour — largement suffisante pour un usage occasionnel ; au-delà, Google demande de passer sur un plan payant.
+
+**Règles de sécurité de la fonction** (étape 2) :
+- réservée aux membres ayant `manage_articles` ou `manage_books` ;
+- n'accepte que l'URL publique d'un PDF du bucket `documents` **de ce projet** : la fonction
+  télécharge elle-même le fichier dans le Storage (protection SSRF). Un lien externe collé
+  dans le formulaire n'est pas analysable par l'IA — il faut téléverser le fichier ;
+- taille vérifiée **avant** téléchargement (20 Mo max), signature `%PDF-` contrôlée ;
+- clé Gemini transmise dans l'en-tête `x-goog-api-key`, jamais dans l'URL ;
+- réponse de Gemini filtrée (champs attendus, types, longueurs) : c'est une donnée non fiable ;
+- erreurs internes : détail dans les logs Supabase, message générique au client.
+
+## 6quater. CORS des Edge Functions (`ALLOWED_ORIGINS`)
+
+Les trois fonctions n'acceptent les appels **navigateur** que depuis les origines listées
+dans le secret `ALLOWED_ORIGINS` (séparées par des virgules ; `https://*.domaine` = un seul
+sous-domaine). Secret absent → toutes les origines refusées.
+
+```
+# dev (aujourd'hui)
+npx supabase secrets set ALLOWED_ORIGINS="http://localhost:5173"
+# une fois Cloudflare Pages branché
+npx supabase secrets set ALLOWED_ORIGINS="http://localhost:5173,https://*.yewtod.pages.dev"
+# production (projet yewtod)
+npx supabase secrets set ALLOWED_ORIGINS="https://yewtod.com,https://www.yewtod.com"
+```
+
+CORS n'est **pas** un contrôle d'accès (curl l'ignore) : l'accès reste protégé par le JWT et
+les permissions vérifiées dans chaque fonction. La logique commune est dans
+`supabase/functions/_shared/cors.ts` (tests : `deno test --allow-env supabase/functions/`).
 
 ## 7. Publier un contenu
 

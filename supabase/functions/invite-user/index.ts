@@ -19,15 +19,11 @@
 // Edge Function automatically; no extra secrets needed.)
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { handlePreflight, jsonResponse } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,15 +35,10 @@ class HttpError extends Error {
   }
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
 Deno.serve(async req => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  // CORS : origines du secret ALLOWED_ORIGINS uniquement (étape 2)
+  const preflight = handlePreflight(req);
+  if (preflight) return preflight;
 
   try {
     if (req.method !== "POST") throw new HttpError(405, "Méthode non autorisée.");
@@ -127,11 +118,11 @@ Deno.serve(async req => {
       );
     }
 
-    return json({ userId: invited.user.id, invitationId: invitation.id });
+    return jsonResponse(req, { userId: invited.user.id, invitationId: invitation.id });
   } catch (err) {
-    if (err instanceof HttpError) return json({ error: err.message }, err.status);
+    if (err instanceof HttpError) return jsonResponse(req, { error: err.message }, err.status);
     // Erreur inattendue : détail dans les logs Supabase, message générique au client.
     console.error("invite-user error:", err);
-    return json({ error: "Erreur interne lors de l'invitation." }, 500);
+    return jsonResponse(req, { error: "Erreur interne lors de l'invitation." }, 500);
   }
 });
