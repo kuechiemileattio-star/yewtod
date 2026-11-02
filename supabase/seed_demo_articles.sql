@@ -13,7 +13,7 @@
 -- image de démonstration cohérente ; à remplacer par de vraies images une
 -- fois les articles édités dans le dashboard.
 insert into public.articles
-  (title, subtitle, cover_image, summary, content, tags, theme, subtheme, content_type, status, published_at, featured)
+  (title, subtitle, cover_image, summary, content, tags, themes, content_type, status, published_at, featured)
 values
   (
     'Ce que l''IA générative change vraiment au travail de rédaction',
@@ -28,7 +28,7 @@ values
     'Conclusion' || chr(10) ||
     'Le travail rédactionnel ne disparaît pas, il se redéplace vers ce que ces outils ne savent pas faire : vérifier, choisir un angle, assumer une responsabilité éditoriale.',
     array['intelligence artificielle', 'travail', 'rédaction', 'automatisation'],
-    'Intelligence artificielle', 'Automatisation du travail', 'dossier', 'published', now() - interval '3 days', true
+    array['Intelligence artificielle'], 'dossier', 'published', now() - interval '3 days', true
   ),
   (
     'Le chômage structurel, une définition qui sert souvent à mal débattre',
@@ -39,7 +39,7 @@ values
     'Il se distingue du chômage conjoncturel, qui varie avec les phases de croissance ou de récession et se résorbe généralement avec la reprise économique — sans réforme structurelle nécessaire.' || chr(10) || chr(10) ||
     'Cette distinction est régulièrement instrumentalisée dans le débat public : attribuer un chômage élevé au seul cycle économique, ou au contraire à des causes structurelles, oriente des politiques publiques très différentes (relance budgétaire vs réformes du marché du travail).',
     array['économie', 'chômage', 'définition'],
-    'Économie', 'Macroéconomie', 'definition', 'published', now() - interval '10 days', false
+    array['Économie'], 'definition', 'published', now() - interval '10 days', false
   ),
   (
     'Pourquoi certains quartiers cumulent les mêmes difficultés depuis des décennies',
@@ -54,7 +54,7 @@ values
     'Conclusion' || chr(10) ||
     'Sans mixité sociale réelle dans le parc de logements, les dispositifs ciblés sur un quartier isolé ont montré des résultats durablement limités.',
     array['inégalités', 'urbanisme', 'politique de la ville'],
-    'Sociologie', 'Inégalités', 'dossier', 'published', now() - interval '6 days', false
+    array['Sociologie'], 'dossier', 'published', now() - interval '6 days', false
   ),
   (
     'La gouvernance multi-niveaux, une définition pour s''y retrouver',
@@ -65,7 +65,7 @@ values
     'Le concept s''est surtout développé pour décrire le fonctionnement de l''Union européenne, où une même politique publique (agricole, environnementale) implique simultanément des institutions communautaires, des États membres et des collectivités locales.' || chr(10) || chr(10) ||
     'Il est aujourd''hui mobilisé plus largement pour analyser toute situation où la coordination entre échelons, plutôt que la hiérarchie stricte, devient la norme de fonctionnement.',
     array['science politique', 'gouvernance', 'définition'],
-    'Science politique', 'Gouvernance', 'definition', 'published', now() - interval '8 days', false
+    array['Science politique'], 'definition', 'published', now() - interval '8 days', false
   ),
   (
     'Un accord commercial régional entre en vigueur ce mois-ci',
@@ -75,7 +75,7 @@ values
     'Un nouvel accord de libre-échange régional entre en application ce mois-ci, après plusieurs années de négociations, réduisant les droits de douane sur un large éventail de produits entre les pays signataires.' || chr(10) || chr(10) ||
     'Les analystes restent partagés sur son impact réel à court terme, certains secteurs bénéficiant d''un accès facilité aux marchés voisins pendant que d''autres redoutent une concurrence accrue sur leur marché intérieur.',
     array['commerce international', 'actualité', 'politiques publiques'],
-    'Science politique', 'Relations internationales', 'actualite', 'published', now() - interval '2 days', false
+    array['Science politique'], 'actualite', 'published', now() - interval '2 days', false
   ),
   (
     'Ce que les enquêtes disent vraiment des migrations ouest-africaines',
@@ -89,7 +89,7 @@ values
     'Conclusion' || chr(10) ||
     'Comprendre l''ampleur réelle de ces mobilités régionales est une condition préalable à toute politique migratoire qui prétend s''appuyer sur les faits plutôt que sur la perception.',
     array['migrations', 'démographie', 'Afrique de l''Ouest'],
-    'Anthropologie', 'Migrations', 'dossier', 'published', now() - interval '12 days', false
+    array['Anthropologie'], 'dossier', 'published', now() - interval '12 days', false
   ),
   (
     'Qu''est-ce qu''un service écosystémique ?',
@@ -100,7 +100,7 @@ values
     'Le concept a pris une importance croissante dans les politiques publiques environnementales, car il permet de donner une traduction économique — et donc négociable dans les arbitrages budgétaires — à des fonctions naturelles qui, autrement, n''apparaissent dans aucun compte.' || chr(10) || chr(10) ||
     'Il reste toutefois débattu : certains y voient un outil pragmatique de protection de la nature, d''autres critiquent le risque de réduire le vivant à sa seule valeur monétaire.',
     array['environnement', 'économie de l''environnement', 'définition'],
-    'Environnement & société', 'Ressources', 'definition', 'published', now() - interval '9 days', false
+    array['Environnement & société'], 'definition', 'published', now() - interval '9 days', false
   ),
   (
     'Le redoublement recule, mais les débats sur son efficacité restent vifs',
@@ -114,7 +114,7 @@ values
     'Conclusion' || chr(10) ||
     'Le vrai enjeu n''est peut-être pas redoubler ou non, mais ce qui est mis en place en amont pour éviter que le retard ne s''accumule.',
     array['éducation', 'redoublement', 'politiques publiques'],
-    'Éducation', 'Systèmes éducatifs', 'dossier', 'published', now() - interval '15 days', false
+    array['Éducation'], 'dossier', 'published', now() - interval '15 days', false
   ),
   (
     'Trois pays ont relevé leur salaire minimum ce trimestre',
@@ -124,7 +124,7 @@ values
     'Ce trimestre, trois pays ont annoncé une revalorisation de leur salaire minimum, dans des contextes très différents : ajustement à l''inflation dans un cas, réforme structurelle dans les deux autres.' || chr(10) || chr(10) ||
     'Ces décisions interviennent alors que le débat sur l''indexation automatique des salaires reste vif dans plusieurs économies développées, entre partisans d''une protection du pouvoir d''achat et inquiétudes sur l''effet emploi.',
     array['économie', 'salaire minimum', 'actualité'],
-    'Économie', 'Développement', 'actualite', 'published', now() - interval '1 day', false
+    array['Économie'], 'actualite', 'published', now() - interval '1 day', false
   ),
   (
     'Ce qu''une brève histoire des idées peut apprendre sur nos débats actuels',
@@ -133,5 +133,5 @@ values
     'Une courte note sur la manière dont d''anciens débats philosophiques ressurgissent sous une forme nouvelle.',
     'Beaucoup de controverses présentées comme inédites — sur la nature humaine, le rôle de la technique, ou les limites de la raison — reformulent en réalité des débats déjà anciens, parfois vieux de plusieurs siècles, sous un habillage contemporain.',
     array['histoire des idées', 'philosophie', 'brève'],
-    'Idées & débats', 'Histoire des idées', 'breve', 'published', now() - interval '4 days', false
+    array['Idées & débats'], 'breve', 'published', now() - interval '4 days', false
   );
