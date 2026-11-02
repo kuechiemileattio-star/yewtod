@@ -116,6 +116,28 @@ Seul un rôle possédant `manage_users` peut créer un rôle personnalisé et lu
 attribuer `invite_users` — ce n'est jamais coché par défaut sur un rôle
 non-système.
 
+## 4bis. Modèle de sécurité RBAC (migration 021)
+
+La base applique elle-même ces règles (trigger `trg_profiles_guard_update`,
+policies RLS, fonctions `is_super_admin` / `can_assign_role`) : le dashboard
+ne fait que les afficher. Elles valent pour toute requête faite avec la clé
+`anon` ou un jeton utilisateur ; le SQL Editor (`postgres`) et les Edge
+Functions (`service_role`) restent des acteurs de confiance.
+
+| Règle | Contenu |
+|---|---|
+| R1 | Personne ne modifie **son propre** rôle ou statut — Super Admin compris. Seule exception : `invited → active` à l'onboarding. |
+| R2 | Cette activation exige une invitation `pending` non expirée pour l'email du compte. |
+| R3 | `id`, `email`, `invited_by`, `created_at` d'un profil ne sont pas modifiables via l'API. |
+| R4 | Le rôle d'un nouveau compte vient uniquement de son invitation (`raw_user_meta_data` est contrôlé par le client et n'est jamais lu pour un droit). |
+| R5 | On n'attribue (invitation ou changement de rôle) qu'un rôle dont on possède **toutes** les permissions. Le rôle système (Super Admin) : uniquement par un Super Admin. |
+| R6 | On ne modifie / suspend / supprime un membre que si l'on pourrait lui attribuer son rôle actuel → un Administrateur ne peut pas toucher au Super Admin. |
+| R7 | Une invitation créée côté client a `invited_by` = soi et respecte R5 ; côté client, on ne peut ensuite que la révoquer. |
+| R8 | Un rôle système et ses permissions ne se modifient que par un Super Admin ; on n'accorde à un rôle qu'une permission qu'on détient ; `is_system_role` n'est pas modifiable via l'API. |
+
+Conséquence de R1 + R6 : il reste toujours au moins un Super Admin (il ne peut
+pas se rétrograder, et seul un autre Super Admin peut le faire).
+
 ## 5. Ajouter un rôle personnalisé
 
 Dashboard Yewtod SS → **Utilisateurs & rôles → Rôles → Nouveau rôle**, ou en SQL :
@@ -135,11 +157,20 @@ where r.name = 'Nom du rôle';
 Dashboard → **Utilisateurs & rôles → Inviter**, avec un compte disposant de la
 permission `invite_users`. Cela appelle l'Edge Function `invite-user`, qui :
 
-1. Crée le compte via `supabase.auth.admin.inviteUserByEmail` (email automatique).
-2. Insère une ligne dans `invitations` (statut `pending`).
-3. Le trigger `on_auth_user_created` crée le profil (`status = 'invited'`).
+1. Vérifie que l'appelant peut attribuer ce rôle (`can_assign_role`, règle R5 ci-dessous).
+2. Révoque les éventuelles invitations `pending` pour le même email, puis insère
+   la nouvelle ligne dans `invitations` (statut `pending`) — **avant** de créer le compte.
+3. Crée le compte via `supabase.auth.admin.inviteUserByEmail` (email automatique).
+   Le trigger `on_auth_user_created` crée le profil (`status = 'invited'`) avec
+   le rôle **lu dans l'invitation** (jamais dans les métadonnées). Si l'envoi
+   échoue, l'invitation est supprimée.
 4. La personne invitée clique sur le lien, définit son mot de passe, complète
-   son profil → `status` passe à `active` → accès au dashboard limité à son rôle.
+   son profil → `status` passe à `active` **seulement si son invitation est
+   encore `pending` et non expirée** (elle passe alors à `accepted`).
+   Révoquer une invitation avant ce moment bloque donc réellement l'accès.
+
+Un compte qui existe déjà ne peut pas être réinvité : supprimer le membre puis
+renvoyer une invitation.
 
 ## 6bis. Supprimer un membre
 

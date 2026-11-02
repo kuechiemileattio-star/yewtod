@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient.js";
+import { supabase, readFunctionErrorMessage } from "../lib/supabaseClient.js";
 
 export function useRolesAdmin() {
   const [roles, setRoles] = useState([]);
@@ -64,7 +64,8 @@ export function useRolesAdmin() {
   /** Calls the `invite-user` Edge Function (see supabase/functions/invite-user). */
   async function inviteMember(email, roleId) {
     const { data, error } = await supabase.functions.invoke("invite-user", { body: { email, role_id: roleId } });
-    if (error) throw error;
+    // Le message utile (ex. « rôle non attribuable ») est dans le corps de la réponse.
+    if (error) throw new Error(await readFunctionErrorMessage(error));
     await reload();
     return data;
   }
@@ -78,7 +79,7 @@ export function useRolesAdmin() {
   /** Calls the `delete-member` Edge Function — removes the auth account, which cascades to the profile. */
   async function deleteMember(userId) {
     const { error } = await supabase.functions.invoke("delete-member", { body: { user_id: userId } });
-    if (error) throw error;
+    if (error) throw new Error(await readFunctionErrorMessage(error));
     await reload();
   }
 

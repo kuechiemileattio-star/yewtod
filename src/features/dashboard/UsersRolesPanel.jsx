@@ -33,18 +33,48 @@ export default function UsersRolesPanel() {
   const [inviteSuccess, setInviteSuccess] = useState("");
   const [inviting, setInviting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [deleteError, setDeleteError] = useState("");
+  // Erreurs renvoyées par la base (trigger / RLS, migration 021) ou par les
+  // Edge Functions : affichées au lieu d'échouer silencieusement.
+  const [memberError, setMemberError] = useState("");
+  const [rolesError, setRolesError] = useState("");
 
   if (loading) return <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif" }}>Chargement…</p>;
 
+  async function handleProfileChange(member, patch) {
+    setMemberError("");
+    try {
+      await updateProfile(member.id, patch);
+    } catch (err) {
+      setMemberError(`${member.full_name || member.email} : ${err.message || "modification refusée."}`);
+    }
+  }
+
+  async function runRoleAction(action) {
+    setRolesError("");
+    try {
+      await action();
+    } catch (err) {
+      setRolesError(err.message || "Action refusée.");
+    }
+  }
+
+  async function handleRevokeInvitation(id) {
+    setInviteError("");
+    try {
+      await revokeInvitation(id);
+    } catch (err) {
+      setInviteError(err.message || "La révocation a échoué.");
+    }
+  }
+
   async function handleDeleteMember(member) {
-    setDeleteError("");
+    setMemberError("");
     if (!window.confirm(`Supprimer définitivement "${member.full_name || member.email}" ? Son profil, son accès et ses droits sur la plateforme seront retirés — action irréversible.`)) return;
     setDeletingId(member.id);
     try {
       await deleteMember(member.id);
     } catch (err) {
-      setDeleteError(err.message || "La suppression a échoué.");
+      setMemberError(err.message || "La suppression a échoué.");
     } finally {
       setDeletingId(null);
     }
@@ -53,9 +83,14 @@ export default function UsersRolesPanel() {
   async function handleCreateRole(e) {
     e.preventDefault();
     if (!newRoleName.trim()) return;
-    await createRole(newRoleName.trim(), newRoleDescription.trim());
-    setNewRoleName("");
-    setNewRoleDescription("");
+    setRolesError("");
+    try {
+      await createRole(newRoleName.trim(), newRoleDescription.trim());
+      setNewRoleName("");
+      setNewRoleDescription("");
+    } catch (err) {
+      setRolesError(err.message || "La création du rôle a échoué.");
+    }
   }
 
   async function handleInvite(e) {
@@ -69,10 +104,7 @@ export default function UsersRolesPanel() {
       setInviteSuccess(`Invitation envoyée à ${inviteEmail.trim()}.`);
       setInviteEmail("");
     } catch (err) {
-      setInviteError(
-        "L'envoi a échoué — la fonction 'invite-user' n'est probablement pas encore déployée sur ce projet Supabase (voir supabase/README.md). " +
-        (err.message || "")
-      );
+      setInviteError(err.message || "L'envoi de l'invitation a échoué.");
     } finally {
       setInviting(false);
     }
@@ -86,7 +118,7 @@ export default function UsersRolesPanel() {
 
       <section className="ytd-admin-settings-card">
         <div className="ytd-admin-settings-card-heading"><div><span>Équipe</span><h2>Membres</h2></div><span className="ytd-admin-settings-index">{profiles.length}</span></div>
-        {deleteError && <p className="ytd-form-message" style={{ color: T.red, fontSize: 12.5, margin: "0 0 12px" }}><AlertCircle size={14} /> {deleteError}</p>}
+        {memberError && <p className="ytd-form-message" role="alert" style={{ color: T.red, fontSize: 12.5, margin: "0 0 12px" }}><AlertCircle size={14} /> {memberError}</p>}
         <div style={{ display: "grid", gap: 8 }}>
           {profiles.map(p => (
             <div key={p.id} className="ytd-admin-member" style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -97,17 +129,24 @@ export default function UsersRolesPanel() {
                 <strong>{p.full_name || "(sans nom)"}</strong>
                 <small>{p.email}</small>
               </div>
-              <select value={p.role_id || ""} onChange={e => updateProfile(p.id, { role_id: e.target.value })} style={{ ...inputStyle, width: "auto", padding: "8px 10px", fontSize: 12 }}>
+              <select
+                value={p.role_id || ""}
+                onChange={e => handleProfileChange(p, { role_id: e.target.value })}
+                disabled={p.id === currentProfile?.id}
+                title={p.id === currentProfile?.id ? "Vous ne pouvez pas modifier votre propre rôle." : undefined}
+                style={{ ...inputStyle, width: "auto", padding: "8px 10px", fontSize: 12 }}
+              >
                 <option value="" disabled>Rôle…</option>
                 {roles.map(r => <option key={r.id} value={r.id}>{isSensitiveRole(r.id) ? `⚠ ${r.name} (accès total)` : r.name}</option>)}
               </select>
               {isSensitiveRole(p.role_id) && <ShieldAlert size={15} color={T.red} aria-label="Accès total au dashboard" title="Ce membre a un rôle avec accès total au dashboard (gestion des membres et des rôles)." />}
               <StatusPill statut={PROFILE_STATUS_LABELS[p.status]} />
-              <label className="ytd-switch" title={p.status === "suspended" ? "Réactiver ce membre" : "Suspendre ce membre"}>
+              <label className="ytd-switch" title={p.id === currentProfile?.id ? "Vous ne pouvez pas modifier votre propre statut." : p.status === "suspended" ? "Réactiver ce membre" : "Suspendre ce membre"}>
                 <input
                   type="checkbox"
                   checked={p.status !== "suspended"}
-                  onChange={e => updateProfile(p.id, { status: e.target.checked ? "active" : "suspended" })}
+                  disabled={p.id === currentProfile?.id}
+                  onChange={e => handleProfileChange(p, { status: e.target.checked ? "active" : "suspended" })}
                   aria-label={p.status === "suspended" ? "Réactiver" : "Suspendre"}
                 />
                 <span className="ytd-switch-track"><span className="ytd-switch-thumb" /></span>
@@ -129,6 +168,7 @@ export default function UsersRolesPanel() {
 
       <section className="ytd-admin-settings-card">
         <div className="ytd-admin-settings-card-heading"><div><span>Accès</span><h2>Rôles & permissions</h2></div><ShieldCheck size={18} color={T.green} /></div>
+        {rolesError && <p className="ytd-form-message" role="alert" style={{ color: T.red, fontSize: 12.5, margin: "0 0 12px" }}><AlertCircle size={14} /> {rolesError}</p>}
         <div className="ytd-admin-table-scroll">
           <table className="ytd-admin-table" style={{ minWidth: 640 }}>
             <thead>
@@ -162,7 +202,7 @@ export default function UsersRolesPanel() {
                         <input
                           type="checkbox"
                           checked={checked}
-                          onChange={e => togglePermission(role.id, perm.id, e.target.checked)}
+                          onChange={e => runRoleAction(() => togglePermission(role.id, perm.id, e.target.checked))}
                           title={lockGrant ? "Permission sensible : n'accorder qu'aux rôles de confiance" : undefined}
                         />
                       </td>
@@ -183,7 +223,7 @@ export default function UsersRolesPanel() {
         </form>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
           {roles.filter(r => !r.is_system_role).map(r => (
-            <button key={r.id} onClick={() => window.confirm(`Supprimer le rôle "${r.name}" ?`) && deleteRole(r.id)} style={{ display: "inline-flex", alignItems: "center", gap: 5, border: `1px solid ${T.line}`, background: "none", color: T.inkSoft, cursor: "pointer", fontSize: 11, padding: "5px 9px", fontFamily: "'JetBrains Mono', monospace" }}>
+            <button key={r.id} onClick={() => window.confirm(`Supprimer le rôle "${r.name}" ?`) && runRoleAction(() => deleteRole(r.id))} style={{ display: "inline-flex", alignItems: "center", gap: 5, border: `1px solid ${T.line}`, background: "none", color: T.inkSoft, cursor: "pointer", fontSize: 11, padding: "5px 9px", fontFamily: "'JetBrains Mono', monospace" }}>
               <X size={11} /> Supprimer "{r.name}"
             </button>
           ))}
@@ -221,7 +261,7 @@ export default function UsersRolesPanel() {
                 <span style={{ color: T.inkSoft, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>{inv.role?.name}</span>
                 <span style={{ color: T.inkSoft, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>{fmtDate(inv.sent_at)}</span>
                 <StatusPill statut={INVITATION_STATUS_LABELS[inv.status]} />
-                {inv.status === "pending" && <button onClick={() => revokeInvitation(inv.id)} style={{ border: 0, background: "none", color: T.inkSoft, cursor: "pointer" }}><X size={14} /></button>}
+                {inv.status === "pending" && <button onClick={() => handleRevokeInvitation(inv.id)} title="Révoquer l'invitation" aria-label={`Révoquer l'invitation de ${inv.email}`} style={{ border: 0, background: "none", color: T.inkSoft, cursor: "pointer" }}><X size={14} /></button>}
               </div>
             ))}
             {invitations.length === 0 && <p style={{ color: T.inkSoft, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>Aucune invitation envoyée.</p>}
