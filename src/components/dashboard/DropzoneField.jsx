@@ -22,7 +22,9 @@ function formatSize(bytes) {
  * look and behave identically. Shows the original filename + size picked
  * locally (Supabase Storage renames the file, so that info isn't in the URL).
  */
-export default function DropzoneField({ value, onChange, bucket, accept, kind = "file", hint, onFile, onUrl, onUploadingChange }) {
+// allowUrl={false} : pas de champ « coller un lien » (formulaire public, où une
+// URL libre — voire "javascript:…" — n'a rien à faire).
+export default function DropzoneField({ value, onChange, bucket, accept, kind = "file", hint, onFile, onUrl, onUploadingChange, allowUrl = true }) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [fileMeta, setFileMeta] = useState(null);
@@ -87,11 +89,11 @@ export default function DropzoneField({ value, onChange, bucket, accept, kind = 
         {error && <span className="ytd-dropzone-error">Échec de l'envoi : {error.message}</span>}
         <input ref={inputRef} type="file" accept={accept} onChange={e => { handleFiles(e.target.files); e.target.value = ""; }} style={{ display: "none" }} />
       </div>
-      <label className="ytd-dropzone-url-row">
+      {allowUrl && <label className="ytd-dropzone-url-row">
         <Link2 size={13} color={T.inkSoft} />
         <span>ou coller un lien</span>
         <input type="url" placeholder="https://…" value={!fileMeta && value ? value : ""} onChange={e => pasteUrl(e.target.value)} onClick={e => e.stopPropagation()} />
-      </label>
+      </label>}
     </div>
   );
 }

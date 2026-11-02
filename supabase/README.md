@@ -224,6 +224,35 @@ CORS n'est **pas** un contrôle d'accès (curl l'ignore) : l'accès reste proté
 les permissions vérifiées dans chaque fonction. La logique commune est dans
 `supabase/functions/_shared/cors.ts` (tests : `deno test --allow-env supabase/functions/`).
 
+## 6quinquies. Storage : buckets et accès (migration 022)
+
+Deux chemins d'accès bien distincts :
+
+- **URL publique** `…/storage/v1/object/public/<bucket>/<fichier>` : contrôlée uniquement
+  par le drapeau `public` du bucket, **sans RLS**. C'est ce qu'utilise le site.
+- **API Storage** (`list`, `download`, `createSignedUrl`, `upload`…) : contrôlée par la
+  **RLS** sur `storage.objects`. Un bucket public n'a donc besoin d'aucune policy `SELECT`
+  pour s'afficher ; une policy `SELECT` ouverte ne sert qu'à **lister** son contenu.
+
+| Bucket | Public | Max | Types | Écriture | Lecture API |
+|---|---|---|---|---|---|
+| `covers` | oui | 5 Mo | JPEG, PNG, WebP, GIF, AVIF | articles / livres / médias | mêmes rôles |
+| `documents` | oui | 50 Mo | PDF, CSV | articles / livres / médias | mêmes rôles |
+| `media-library` | oui | 20 Mo | images, PDF, MP4, WebM | articles / livres / médias / pages | mêmes rôles |
+| `avatars` | oui | 2 Mo | images | son dossier `<user_id>/` | son dossier |
+| `collaboration-attachments` | **non** | 10 Mo | PDF, DOC, DOCX, JPEG, PNG, WebP | **anonyme** : un fichier `<uuid>.<ext>` à la racine | `manage_collaborations` (URL signées) |
+
+- `allowed_mime_types` porte sur le `Content-Type` déclaré à l'upload, qui est aussi celui
+  avec lequel le fichier est **servi** : un HTML déclaré en PDF est servi en PDF, donc jamais
+  interprété. Le SVG (qui peut contenir du JavaScript) n'est plus accepté comme image.
+- Les pièces jointes des candidats sont des **données personnelles** : bucket privé, lien
+  signé valable 10 minutes généré à l'ouverture de la fiche dans le dashboard. La colonne
+  `collaborations.attachments` contient le chemin du fichier ; toute autre valeur est
+  affichée comme texte, jamais comme lien.
+- Les limites s'appliquent aux nouveaux uploads ; les fichiers déjà stockés ne sont pas
+  modifiés. Le réglage global **Storage → Settings → Upload file size limit** du dashboard
+  Supabase plafonne tous les buckets (50 Mo sur l'offre Free).
+
 ## 7. Publier un contenu
 
 Dashboard → module correspondant (Articles, Rapports, Études, …) → éditeur

@@ -6,6 +6,7 @@ import { fmtDate } from "../../lib/contentTypes.js";
 import Btn from "../../components/Btn.jsx";
 import Field, { inputStyle } from "../../components/Field.jsx";
 import StatusPill from "../../components/StatusPill.jsx";
+import CollabAttachments from "../../components/dashboard/CollabAttachments.jsx";
 
 const STAT_TILES = [
   { statut: "Nouveau", label: "Nouvelles demandes", icon: Inbox },
@@ -97,15 +98,7 @@ export default function CollaborationsPanel() {
             <button onClick={() => setSelected(null)} style={{ border: 0, background: "none", cursor: "pointer", color: T.inkSoft }}>Fermer</button>
           </div>
           <p style={{ fontFamily: "'Fraunces', serif", fontSize: 18, lineHeight: 1.55, marginBottom: 18, marginTop: 18 }}>{selected.description || "Aucune description fournie."}</p>
-          {selected.attachments?.length > 0 && (
-            <div style={{ marginBottom: 18 }}>
-              {selected.attachments.map(url => (
-                <a key={url} href={url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginRight: 10, padding: "8px 12px", border: `1px solid ${T.line}`, borderRadius: 6, background: T.paperAlt, color: T.ink, textDecoration: "none", fontFamily: "'Inter', sans-serif", fontSize: 13 }}>
-                  <Paperclip size={13} color={T.green} /> Pièce jointe
-                </a>
-              ))}
-            </div>
-          )}
+          <CollabAttachments attachments={selected.attachments} />
           <Field label="Statut">
             <select value={selected.statut} onChange={async e => { await updateStatus(selected.id, e.target.value); setSelected({ ...selected, statut: e.target.value }); }} style={inputStyle}>
               <option>Nouveau</option><option>En cours</option><option>Archivé</option>

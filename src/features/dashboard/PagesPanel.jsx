@@ -44,7 +44,7 @@ export default function PagesPanel() {
           <Field label="Texte de l'accroche"><textarea rows={2} value={form.heroLead} onChange={e => set("heroLead", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>
 
           <Field label="Photo du fondateur" hint="Optionnel — sans image, un symbole s'affiche à la place.">
-            <DropzoneField kind="image" bucket="avatars" accept="image/*" value={form.founderPortrait} onChange={v => set("founderPortrait", v)} onUploadingChange={setImageUploading} />
+            <DropzoneField kind="image" bucket="media-library" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" value={form.founderPortrait} onChange={v => set("founderPortrait", v)} onUploadingChange={setImageUploading} />
           </Field>
           <Field label="Bio — premier paragraphe"><textarea rows={3} value={form.founderBio1} onChange={e => set("founderBio1", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>
           <Field label="Bio — second paragraphe"><textarea rows={3} value={form.founderBio2} onChange={e => set("founderBio2", e.target.value)} style={{ ...inputStyle, resize: "vertical" }} /></Field>

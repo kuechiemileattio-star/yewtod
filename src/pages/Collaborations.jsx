@@ -88,9 +88,9 @@ export default function Collaborations() {
           <Field label="Description">
             <textarea required value={form.description} onChange={set("description")} rows={6} style={{ ...inputStyle, resize: "vertical", fontFamily: "'Inter', sans-serif" }} />
           </Field>
-          <Field label="Pièce jointe (facultatif)" hint="PDF, document ou image — un CV, un projet détaillé, un exemple de travail...">
+          <Field label="Pièce jointe (facultatif)" hint="PDF, Word ou image (JPG, PNG, WebP), 10 Mo maximum — un CV, un projet détaillé, un exemple de travail...">
             <DropzoneField
-              kind="file" bucket="collaboration-attachments" accept=".pdf,.doc,.docx,image/*"
+              kind="file" bucket="collaboration-attachments" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" allowUrl={false}
               value={form.attachment} onChange={url => setForm({ ...form, attachment: url })}
               onUploadingChange={setUploading}
             />
