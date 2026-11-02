@@ -1,8 +1,20 @@
+# Dépendances et build
 node_modules
 dist
-.DS_Store
 *.log
+.DS_Store
+.vercel
+
+# Variables d'environnement : jamais commitées (sauf le modèle)
 .env
 .env.local
+.env.*.local
+!.env.example
 
-.vercel
+# Supabase CLI : état LOCAL de ta machine (projet lié, version CLI…)
+# → ne doit jamais être partagé : il dit à la CLI sur quel projet agir.
+supabase/.temp/
+supabase/.branches/
+# Secrets des Edge Functions en local
+supabase/functions/.env
+supabase/functions/**/.env

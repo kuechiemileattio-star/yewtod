@@ -1,0 +1,33 @@
+# ============================================================================
+# supabase/config.toml — configuration de la CLI Supabase pour ce dépôt
+#
+# ⚠️ À LIRE : ce fichier décrit surtout une stack Supabase LOCALE (Docker).
+# Les réglages Auth (URL du site, redirections, SMTP, inscriptions…), Storage
+# ou API du projet EN LIGNE ne sont PAS appliqués par ce fichier : ils se
+# règlent dans le dashboard Supabase de chaque projet (dev et prod).
+#
+# Ce qui S'APPLIQUE bien en ligne : la section [functions.<nom>], lue par
+# `npx supabase functions deploy <nom>` au moment du déploiement.
+#
+# Le projet ciblé par la CLI n'est PAS défini ici : il vient de
+# `npx supabase link --project-ref <ref>` (fichier local supabase/.temp/,
+# ignoré par git). Vérifie-le toujours avec : cat supabase/.temp/project-ref
+# ============================================================================
+
+# Identifiant de la stack locale uniquement (nom des conteneurs Docker).
+project_id = "yewtod"
+
+# ----------------------------------------------------------------------------
+# Edge Functions
+# verify_jwt = true : la passerelle Supabase rejette (401) toute requête sans
+# JWT valide AVANT même d'exécuter la fonction. Première ligne de défense ;
+# chaque fonction vérifie ensuite elle-même les permissions de l'appelant.
+# ----------------------------------------------------------------------------
+[functions.invite-user]
+verify_jwt = true
+
+[functions.delete-member]
+verify_jwt = true
+
+[functions.extract-pdf-ai]
+verify_jwt = true

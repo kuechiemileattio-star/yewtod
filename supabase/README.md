@@ -19,6 +19,26 @@ grant select, insert, update, delete on public.ma_nouvelle_table to service_role
 
 Ne pas oublier — sans ça, la table sera invisible pour le site une fois créée.
 
+## 0. Environnements : dev et prod
+
+| Projet Supabase | Ref | Rôle |
+|---|---|---|
+| `yewtod-dev` | `htyimhfpggmofuqsdlpb` | Développement et tests — toutes les migrations y passent d'abord |
+| `yewtod` | `xzhzhkrwbjndiwuoujuv` | Production — n'est modifié qu'une fois les migrations validées sur dev |
+
+- La CLI agit sur le projet **lié** (`npx supabase link --project-ref <ref>`).
+  Ce lien est un état **local** stocké dans `supabase/.temp/` — ce dossier est
+  ignoré par git et ne doit jamais être commité. Avant toute commande `--linked` :
+  `cat supabase/.temp/project-ref`.
+- La CLI est figée en devDependency (`supabase` dans `package.json`) :
+  `npx supabase …` utilise toujours la même version pour tout le monde.
+- Une migration poussée (`npx supabase db push --linked`) est **définitive** :
+  on ne modifie jamais un fichier déjà poussé, on en crée un nouveau (`021_…`).
+- `supabase/config.toml` ne règle pas Auth/Storage du projet en ligne (ça se fait
+  dans le dashboard) ; seule sa section `[functions.*]` est utilisée au déploiement.
+- Contrôle de cohérence (build, audit, migrations local ↔ en ligne) :
+  `npm run verify` (ou `bash scripts/verifier.sh --rapide` pour sauter `npm ci`).
+
 ## 1. Appliquer le schéma
 
 Dans le Dashboard Supabase du projet → **SQL Editor**, exécuter les fichiers
