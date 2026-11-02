@@ -75,7 +75,7 @@ create table public.invitations (
   id uuid primary key default gen_random_uuid(),
   email text not null,
   role_id uuid not null references public.roles(id),
-  token text not null unique default encode(gen_random_bytes(24), 'hex'),
+  token text not null unique default encode(extensions.gen_random_bytes(24), 'hex'),
   status invitation_status not null default 'pending',
   invited_by uuid references public.profiles(id),
   sent_at timestamptz not null default now(),
