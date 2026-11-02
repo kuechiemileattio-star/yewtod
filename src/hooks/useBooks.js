@@ -73,6 +73,7 @@ export function useBookReviews(bookId) {
       .from("book_reviews")
       .select("*")
       .eq("book_id", bookId)
+      .eq("status", "approved") // pré-modération (migration 023)
       .order("created_at", { ascending: false });
     if (!error) setReviews((data || []).map(r => ({ id: r.id, author: r.author_name, text: r.text, date: r.created_at })));
     setLoading(false);
@@ -81,9 +82,9 @@ export function useBookReviews(bookId) {
   useEffect(() => { reload(); }, [reload]);
 
   async function publishReview({ author, text }) {
+    // Enregistré « en attente » : visible après validation par un modérateur.
     const { error } = await supabase.from("book_reviews").insert({ book_id: bookId, author_name: author, text });
     if (error) throw error;
-    await reload();
   }
 
   async function deleteReview(id) {

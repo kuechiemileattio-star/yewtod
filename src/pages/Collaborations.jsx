@@ -73,20 +73,20 @@ export default function Collaborations() {
       ) : (
         <Reveal as="form" className="ytd-collab-form" style={{ display: "flex", flexDirection: "column", gap: 22 }} onSubmit={handleSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="ytd-form-row">
-            <Field label="Nom"><input required value={form.nom} onChange={set("nom")} style={inputStyle} /></Field>
-            <Field label="Organisation"><input value={form.org} onChange={set("org")} style={inputStyle} /></Field>
+            <Field label="Nom"><input required maxLength={120} value={form.nom} onChange={set("nom")} style={inputStyle} /></Field>
+            <Field label="Organisation"><input maxLength={200} value={form.org} onChange={set("org")} style={inputStyle} /></Field>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="ytd-form-row">
-            <Field label="Email"><input required type="email" value={form.email} onChange={set("email")} style={inputStyle} /></Field>
+            <Field label="Email"><input required type="email" maxLength={254} value={form.email} onChange={set("email")} style={inputStyle} /></Field>
             <Field label="Type de collaboration">
               <select value={form.type} onChange={set("type")} style={inputStyle}>
                 {COLLAB_TYPES.map(t => <option key={t}>{t}</option>)}
               </select>
             </Field>
           </div>
-          <Field label="Sujet"><input required value={form.sujet} onChange={set("sujet")} style={inputStyle} /></Field>
+          <Field label="Sujet"><input required maxLength={200} value={form.sujet} onChange={set("sujet")} style={inputStyle} /></Field>
           <Field label="Description">
-            <textarea required value={form.description} onChange={set("description")} rows={6} style={{ ...inputStyle, resize: "vertical", fontFamily: "'Inter', sans-serif" }} />
+            <textarea required maxLength={5000} value={form.description} onChange={set("description")} rows={6} style={{ ...inputStyle, resize: "vertical", fontFamily: "'Inter', sans-serif" }} />
           </Field>
           <Field label="Pièce jointe (facultatif)" hint="PDF, Word ou image (JPG, PNG, WebP), 10 Mo maximum — un CV, un projet détaillé, un exemple de travail...">
             <DropzoneField

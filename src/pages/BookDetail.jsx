@@ -100,6 +100,7 @@ export default function BookDetail() {
   const { reviews, publishReview } = useBookReviews(book?.id);
   const [reviewAuthor, setReviewAuthor] = useState("");
   const [reviewText, setReviewText] = useState("");
+  const [reviewNotice, setReviewNotice] = useState("");
   const [activeTab, setActiveTab] = useState("description");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -163,9 +164,14 @@ export default function BookDetail() {
   async function submitReview(event) {
     event.preventDefault();
     if (!reviewAuthor.trim() || !reviewText.trim()) return;
-    await publishReview({ author: reviewAuthor.trim(), text: reviewText.trim() });
-    setReviewAuthor("");
-    setReviewText("");
+    try {
+      await publishReview({ author: reviewAuthor.trim(), text: reviewText.trim() });
+      setReviewAuthor("");
+      setReviewText("");
+      setReviewNotice("Merci ! Votre avis sera publié après relecture.");
+    } catch {
+      setReviewNotice("Votre avis n'a pas pu être envoyé. Vérifiez sa longueur (2 000 caractères maximum) et réessayez.");
+    }
   }
 
   return (
@@ -416,8 +422,9 @@ export default function BookDetail() {
             )}
           </div>
           <form className="ytd-book-review-form" onSubmit={submitReview}>
-            <input required value={reviewAuthor} onChange={(event) => setReviewAuthor(event.target.value)} placeholder="Votre nom" />
-            <textarea required rows={4} value={reviewText} onChange={(event) => setReviewText(event.target.value)} placeholder="Votre avis sur ce livre" />
+            <input required maxLength={80} value={reviewAuthor} onChange={(event) => setReviewAuthor(event.target.value)} placeholder="Votre nom" />
+            <textarea required maxLength={2000} rows={4} value={reviewText} onChange={(event) => setReviewText(event.target.value)} placeholder="Votre avis sur ce livre" />
+            {reviewNotice && <p role="status" style={{ margin: 0, fontSize: 13, color: "#2f6b4f" }}>{reviewNotice}</p>}
             <Btn type="submit" variant="green"><Send size={15} /> Publier l'avis</Btn>
           </form>
         </section>

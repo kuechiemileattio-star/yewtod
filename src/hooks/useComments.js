@@ -15,6 +15,9 @@ export function useContentComments(tableName, contentId) {
       .select("*")
       .eq("table_name", tableName)
       .eq("content_id", contentId)
+      // Pré-modération (migration 023) : le public ne voit que les avis approuvés.
+      // Filtre explicite : un modérateur connecté verrait sinon aussi l'attente.
+      .eq("status", "approved")
       .order("created_at", { ascending: false });
     if (!error) setComments((data || []).map(c => ({ id: c.id, author: c.author_name, text: c.text, date: c.created_at })));
     setLoading(false);
@@ -22,10 +25,11 @@ export function useContentComments(tableName, contentId) {
 
   useEffect(() => { reload(); }, [reload]);
 
+  /** Envoie un avis : il est enregistré « en attente » et n'apparaîtra
+   * qu'après validation par un modérateur (pas de rechargement ici). */
   async function publishComment({ author, text }) {
     const { error } = await supabase.from("content_comments").insert({ table_name: tableName, content_id: contentId, author_name: author, text });
     if (error) throw error;
-    await reload();
   }
 
   return { comments, loading, publishComment };

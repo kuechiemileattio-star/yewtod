@@ -20,6 +20,7 @@ import SimpleTypePanel from "./features/dashboard/SimpleTypePanel.jsx";
 import SimpleWorkForm from "./components/dashboard/SimpleWorkForm.jsx";
 import BooksPanel from "./features/dashboard/BooksPanel.jsx";
 import CollaborationsPanel from "./features/dashboard/CollaborationsPanel.jsx";
+import ModerationPanel from "./features/dashboard/ModerationPanel.jsx";
 import SettingsPanel from "./features/dashboard/SettingsPanel.jsx";
 import PagesPanel from "./features/dashboard/PagesPanel.jsx";
 import UsersRolesPanel from "./features/dashboard/UsersRolesPanel.jsx";
@@ -67,6 +68,7 @@ export default function YewtodSS() {
               ))}
               <Route path="books" element={<RequireAuth permission="manage_books"><BooksPanel /></RequireAuth>} />
               <Route path="collaborations" element={<RequireAuth permission="manage_collaborations"><CollaborationsPanel /></RequireAuth>} />
+              <Route path="moderation" element={<RequireAuth permission={["manage_articles", "manage_books"]}><ModerationPanel /></RequireAuth>} />
               <Route path="pages" element={<RequireAuth permission="manage_pages"><PagesPanel /></RequireAuth>} />
               <Route path="settings" element={<RequireAuth permission="manage_settings"><SettingsPanel /></RequireAuth>} />
               <Route path="users" element={<RequireAuth permission="manage_users"><UsersRolesPanel /></RequireAuth>} />

@@ -45,15 +45,18 @@ function CommentsSection({ table, contentId }) {
   const [author, setAuthor] = useState("");
   const [text, setText] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   async function submit(e) {
     e.preventDefault();
     if (!author.trim() || !text.trim()) return;
+    setNotice("");
     try {
       await publishComment({ author: author.trim(), text: text.trim() });
       setAuthor(""); setText(""); setError("");
-    } catch (err) {
-      setError(err.message || "Erreur lors de l'envoi de l'avis.");
+      setNotice("Merci ! Votre avis sera publié après relecture.");
+    } catch {
+      setError("Votre avis n'a pas pu être envoyé. Vérifiez sa longueur (2 000 caractères maximum) et réessayez.");
     }
   }
 
@@ -69,9 +72,10 @@ function CommentsSection({ table, contentId }) {
         )) : <p className="ytd-afp-comments-empty">Aucun avis pour le moment. Soyez le premier à réagir.</p>}
       </div>
       <form className="ytd-afp-comment-form" onSubmit={submit}>
-        <input required value={author} onChange={e => setAuthor(e.target.value)} placeholder="Votre nom" />
-        <textarea required rows={3} value={text} onChange={e => setText(e.target.value)} placeholder="Votre avis sur cet article" />
+        <input required maxLength={80} value={author} onChange={e => setAuthor(e.target.value)} placeholder="Votre nom" />
+        <textarea required maxLength={2000} rows={3} value={text} onChange={e => setText(e.target.value)} placeholder="Votre avis sur cet article" />
         {error && <p className="ytd-afp-comment-error">{error}</p>}
+        {notice && <p className="ytd-afp-comment-notice" role="status" style={{ color: "#2f6b4f", margin: 0, fontSize: 13 }}>{notice}</p>}
         <button type="submit"><Send size={14} /> Publier l'avis</button>
       </form>
     </section>

@@ -253,6 +253,32 @@ Deux chemins d'accès bien distincts :
   modifiés. Le réglage global **Storage → Settings → Upload file size limit** du dashboard
   Supabase plafonne tous les buckets (50 Mo sur l'offre Free).
 
+## 6sexies. Écritures publiques et modération (migration 023)
+
+| Écriture anonyme | Passage | Règles |
+|---|---|---|
+| Avis sur un contenu (`content_comments`) | `insert` direct | nom ≤ 80, avis ≤ 2 000 caractères ; contenu **publié** uniquement ; arrive en `pending` |
+| Avis sur un livre (`book_reviews`) | `insert` direct | idem ; livre publié uniquement |
+| Demande de collaboration | `insert` direct | longueurs bornées, email valide, ≤ 3 pièces jointes `<uuid>.<ext>` ; arrive toujours en `nouveau` |
+| Newsletter | fonction `subscribe_newsletter(email)` | email normalisé ; **même réponse** que l'adresse soit nouvelle ou déjà inscrite |
+| Vue / téléchargement | fonction `log_content_event(table, id, kind)` | contenu publié uniquement ; cible invalide ignorée sans erreur |
+
+- **Pré-modération** : un avis n'est visible sur le site qu'au statut `approved`.
+  Dashboard → **Modération** (permission `manage_articles` pour les avis d'articles,
+  `manage_books` pour les avis de livres) : Approuver / Rejeter / Supprimer. La
+  modération ne peut changer que le statut (jamais le texte du visiteur) ;
+  `moderated_by` / `moderated_at` tracent qui a décidé.
+- `created_at` et les statuts initiaux sont imposés par un trigger : le visiteur ne
+  peut ni antidater, ni publier directement, ni envoyer une demande « archivée ».
+- Les règles de format portent sur l'**insertion publique** (policies `INSERT … WITH CHECK`),
+  pas sur des contraintes `CHECK` : celles-ci s'appliqueraient aussi aux mises à jour
+  des lignes anciennes (un modérateur ne pourrait plus changer leur statut).
+- Les compteurs publics restent **indicatifs** : sans identifier les visiteurs (IP,
+  cookie → consentement RGPD), un appel répété peut toujours les gonfler. Le front
+  compte une vue par session et par contenu.
+- À venir : Cloudflare Turnstile + limitation de débit (étape 5), double opt-in de la
+  newsletter avant le premier envoi réel.
+
 ## 7. Publier un contenu
 
 Dashboard → module correspondant (Articles, Rapports, Études, …) → éditeur

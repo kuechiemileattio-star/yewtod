@@ -1,11 +1,26 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient.js";
 
-/** Logs one page-view row the first time a given content id is shown. */
+/** Enregistre un événement (vue / téléchargement) via la fonction
+ * log_content_event (migration 023 : cible vérifiée côté base).
+ * Une seule fois par session de navigation et par contenu : évite de compter
+ * les rafraîchissements et le double montage des composants en mode dev.
+ * (Un compteur public anonyme reste indicatif : voir le commentaire de 023.) */
+function logEventOncePerSession(tableName, contentId, kind) {
+  if (!tableName || !contentId) return;
+  const key = `ytd:${kind}:${tableName}:${contentId}`;
+  try {
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+  } catch { /* stockage indisponible (navigation privée stricte) : on compte quand même */ }
+  supabase.rpc("log_content_event", { p_table: tableName, p_content_id: contentId, p_kind: kind })
+    .then(({ error }) => { if (error) console.warn("log_content_event :", error.message); });
+}
+
+/** Logs one page-view the first time a given content id is shown in this session. */
 export default function useLogView(tableName, contentId) {
   useEffect(() => {
-    if (!tableName || !contentId) return;
-    supabase.from("content_views").insert({ table_name: tableName, content_id: contentId });
+    logEventOncePerSession(tableName, contentId, "view");
   }, [tableName, contentId]);
 }
 
@@ -37,6 +52,5 @@ export function useDownloadCount(tableName, contentId) {
  * file (not merely opens the page), so "Téléchargements" reflects real
  * downloads separately from "Vues" (see 015_content_download_tracking.sql). */
 export function logDownload(tableName, contentId) {
-  if (!tableName || !contentId) return;
-  supabase.from("content_views").insert({ table_name: tableName, content_id: contentId, kind: "download" });
+  logEventOncePerSession(tableName, contentId, "download");
 }

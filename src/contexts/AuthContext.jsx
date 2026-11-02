@@ -55,8 +55,10 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
   }
 
+  /** key : une permission, ou une liste dont il suffit de posséder UNE
+   * (ex. ["manage_articles", "manage_books"] pour la modération). */
   function hasPermission(key) {
-    return permissions.has(key);
+    return Array.isArray(key) ? key.some(k => permissions.has(k)) : permissions.has(key);
   }
 
   const value = {

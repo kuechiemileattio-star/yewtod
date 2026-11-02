@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient.js";
 
-/** Public newsletter signup form -> insert into `newsletter_subscribers` (RLS allows anonymous insert). */
+/** Public newsletter signup form → fonction subscribe_newsletter (migration 023).
+ * Même réponse que l'adresse soit nouvelle ou déjà inscrite (pas d'énumération). */
 export function useNewsletterSubscribe() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -9,9 +10,9 @@ export function useNewsletterSubscribe() {
   async function subscribe(email) {
     setSubmitting(true);
     setError(null);
-    const { error: err } = await supabase.from("newsletter_subscribers").insert({ email });
+    const { error: err } = await supabase.rpc("subscribe_newsletter", { p_email: email });
     setSubmitting(false);
-    if (err && err.code !== "23505") { setError(err); throw err; } // 23505 = already subscribed, treat as success
+    if (err) { setError(err); throw err; }
   }
 
   return { subscribe, submitting, error };

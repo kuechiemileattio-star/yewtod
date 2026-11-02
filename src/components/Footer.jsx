@@ -24,7 +24,7 @@ const SITE_LINKS = [[PATHS.home, "Home"], [PATHS.works, "Works"], [PATHS.meet, "
 export default function Footer() {
   const navigate = useNavigate();
   const socialLinks = useSocialLinks();
-  const { subscribe, submitting } = useNewsletterSubscribe();
+  const { subscribe, submitting, error: subscribeError } = useNewsletterSubscribe();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [showToTop, setShowToTop] = useState(false);
@@ -81,9 +81,12 @@ export default function Footer() {
               <div className="ytd-footer-newsletter-sent"><Check size={14} /> Merci, à bientôt.</div>
             ) : (
               <form onSubmit={handleSubscribe} className="ytd-footer-newsletter-form">
-                <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" />
+                <input required type="email" maxLength={254} value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" />
                 <button type="submit" disabled={submitting}><Send size={14} /> {submitting ? "Envoi…" : "S'inscrire"}</button>
               </form>
+            )}
+            {!sent && subscribeError && (
+              <p role="alert" style={{ margin: "8px 0 0", fontSize: 12.5, color: "#f2b8a8" }}>Inscription impossible : vérifiez l'adresse email.</p>
             )}
             {socialLinks.length > 0 && (
               <div className="ytd-footer-social-row">
