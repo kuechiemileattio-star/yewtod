@@ -2,44 +2,76 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserStatus;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use Laravel\Fortify\RecoveryCode;
 
 /**
  * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    /** Mot de passe de test conforme à la politique (jamais utilisé en ligne). */
+    public const PASSWORD = 'Correct-Cheval-Pile-42!';
+
+    protected static ?string $hash = null;
+
     public function definition(): array
     {
         return [
             'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'bio' => null,
+            'theme_preference' => 'system',
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    public function configure(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->afterMaking(function (User $user) {
+            $user->forceFill([
+                'email' => $user->email ?? Str::lower(fake()->unique()->userName()).'@exemple.test',
+                'password' => static::$hash ??= Hash::make(self::PASSWORD),
+                'status' => $user->status ?? UserStatus::Active,
+                'role_id' => $user->role_id ?? Role::query()->where('slug', 'contributeur')->value('id'),
+                'password_changed_at' => now(),
+            ]);
+        });
+    }
+
+    public function role(string $slug): static
+    {
+        return $this->afterMaking(fn (User $u) => $u->forceFill(['role_id' => Role::query()->where('slug', $slug)->value('id')]));
+    }
+
+    public function superAdmin(): static
+    {
+        return $this->role(Role::SUPER_ADMIN);
+    }
+
+    public function status(UserStatus $status): static
+    {
+        return $this->afterMaking(fn (User $u) => $u->forceFill(['status' => $status]));
+    }
+
+    public function email(string $email): static
+    {
+        return $this->afterMaking(fn (User $u) => $u->forceFill(['email' => $email]));
+    }
+
+    /** Membre avec une 2FA déjà confirmée (secret de test). */
+    public function withTwoFactor(): static
+    {
+        return $this->afterMaking(fn (User $u) => $u->forceFill([
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(collect(range(1, 8))->map(fn () => RecoveryCode::generate())->all())),
+            'two_factor_confirmed_at' => now(),
+        ]));
     }
 }

@@ -112,6 +112,7 @@ return [
     |
     */
 
-    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+    // Reconfirmation du mot de passe au-delà de 15 minutes (cahier § 8.1.6).
+    'password_timeout' => 900,
 
 ];

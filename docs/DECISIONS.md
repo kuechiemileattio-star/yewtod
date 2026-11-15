@@ -14,3 +14,8 @@ Ce fichier trace chaque choix pris sans validation intermédiaire (consigne du p
 | D8 | Alpine.js | **Build CSP** de Livewire/Alpine (`csp_safe`) | Permet une CSP sans `unsafe-eval` ; toute logique Alpine vit dans `resources/js/app.js` (`Alpine.data`) |
 | D9 | Styles inline | `style-src 'self' 'unsafe-inline'` | Alpine/Livewire écrivent l'attribut `style` (x-show, transitions). Le cahier n'exige l'absence d'`unsafe-inline` que pour les scripts |
 | D10 | Mots de passe compromis en local | `HIBP_ENABLED=false` dans le `.env` de génération | L'environnement de génération ne joint pas l'API HIBP ; la règle est testée avec une réponse simulée. **À laisser à `true` chez toi et en ligne** |
+| D11 | Enrôlement 2FA | Code envoyé par email exigé avant d'enregistrer un appareil, sauf juste après l'onboarding | Empêche un voleur de mot de passe d'enrôler son téléphone sur un compte sans 2FA |
+| D12 | Routes Fortify | `Fortify::ignoreRoutes()` puis routes redéclarées (`routes/auth.php`), URL en français | Limitation par route et réponse non énumérante pour « mot de passe oublié » |
+| D13 | Limitation « croissante » | Fenêtres empilées 1 min / 15 min / 1 h + plafond par IP | Laravel n'a pas de délai exponentiel natif ; l'empilement donne une attente qui s'allonge |
+| D14 | Création du compte invité | Le compte est créé au moment de l'onboarding (statut « invité » puis « actif » dans la même transaction) | Évite des comptes sans mot de passe en base ; R1/R2 restent respectées et testées |
+| D15 | Réinitialisation de mot de passe | Jeton haché par Laravel (bcrypt/Argon) plutôt que SHA-256 | Plus fort que SHA-256 ; c'est le mécanisme natif, testé |

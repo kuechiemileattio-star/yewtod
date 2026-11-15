@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsureActiveMember;
+use App\Http\Middleware\EnsureTwoFactorEnabled;
+use App\Http\Middleware\RequirePermission;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +18,20 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // En-têtes de sécurité sur toutes les réponses web.
         $middleware->web(prepend: [SecurityHeaders::class]);
+
+        // Le cookie de thème est écrit par le navigateur : il n'est pas chiffré
+        // (valeur fermée light/dark/system, revalidée côté serveur).
+        $middleware->encryptCookies(except: ['theme']);
+
+        $middleware->alias([
+            'member' => EnsureActiveMember::class,
+            '2fa' => EnsureTwoFactorEnabled::class,
+            'permission' => RequirePermission::class,
+        ]);
+
+        // Après connexion, retour à la page demandée (cahier § 5.7.6).
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo(fn () => route('dashboard'));
 
         // Proxys de confiance : AUCUN par défaut. Faire confiance à « * »
         // permettrait de falsifier l'IP (X-Forwarded-For) et donc de
