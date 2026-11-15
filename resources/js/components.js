@@ -181,6 +181,49 @@ export function registerComponents(Alpine) {
         },
     }));
 
+    /* Navigation publique : ombre au défilement, barre de progression, menu mobile. */
+    Alpine.data('siteNav', () => ({
+        scrolled: false,
+        progress: 0,
+        menuOpen: false,
+        init() {
+            const update = () => {
+                const max = document.documentElement.scrollHeight - window.innerHeight;
+                this.scrolled = window.scrollY > 8;
+                this.progress = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+            };
+            window.addEventListener('scroll', update, { passive: true });
+            update();
+        },
+        get progressStyle() { return 'transform: scaleX(' + this.progress + ')'; },
+        toggleMenu() { this.menuOpen ? this.closeMenu() : this.openMenu(); },
+        openMenu() { this.menuOpen = true; document.documentElement.classList.add('overflow-hidden'); },
+        closeMenu() { this.menuOpen = false; document.documentElement.classList.remove('overflow-hidden'); },
+    }));
+
+    /* Apparition au défilement (Reveal), désactivée si l'utilisateur réduit les animations. */
+    Alpine.data('reveal', () => ({
+        shown: false,
+        init() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+                this.shown = true;
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                if (entries.some((e) => e.isIntersecting)) { this.shown = true; io.disconnect(); }
+            }, { rootMargin: '0px 0px -10% 0px' });
+            io.observe(this.$el);
+        },
+        get revealClass() { return this.shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'; },
+    }));
+
+    Alpine.data('backToTop', () => ({
+        up() {
+            window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            document.getElementById('contenu')?.focus({ preventScroll: true });
+        },
+    }));
+
     /* Copie dans le presse-papiers (citation, lien). */
     Alpine.data('copyText', () => ({
         copied: false,

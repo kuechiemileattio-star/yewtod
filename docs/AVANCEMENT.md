@@ -7,8 +7,8 @@
 | 00 Socle | ✅ fait | voir `git log` |
 | 01 Authentification | ✅ fait | |
 | 02 RBAC | ✅ fait | |
-| 03 Design system | ⏳ en cours | |
-| 04 Contenus | à faire | |
+| 03 Design system | ✅ fait | |
+| 04 Contenus | ⏳ en cours | |
 | 05 Site public | à faire | |
 | 06 Livres | à faire | |
 | 07 Écritures publiques | à faire | |
@@ -16,6 +16,6 @@
 | 09 Revue finale | à faire | |
 | 10 Déploiement | à faire | |
 
-**Prochaine action** : lot 03 (composants Blade, gabarit public, accessibilité).
+**Prochaine action** : lot 04 (modèle contents, éditeur, circuit éditorial, uploads, Gemini).
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.

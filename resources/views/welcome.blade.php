@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yewtod SS</title></head>
-<body><main><h1>Yewtod SS</h1><p>Socle installé.</p></main></body>
-</html>
+{{-- Accueil provisoire (lot 03) : remplacé par la vraie page d'accueil au lot 05. --}}
+<x-layouts.public>
+    <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <h1 class="max-w-3xl text-4xl font-bold sm:text-5xl">{{ app(\App\Services\SiteSettings::class)->page('home')['hero_title'] }}</h1>
+        <p class="mt-4 max-w-2xl text-lg text-muted">{{ app(\App\Services\SiteSettings::class)->page('home')['hero_text'] }}</p>
+    </section>
+</x-layouts.public>

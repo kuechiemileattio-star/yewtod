@@ -23,3 +23,6 @@ Ce fichier trace chaque choix pris sans validation intermédiaire (consigne du p
 | D17 | Permission `publish_content` | 10e permission ajoutée (Éditeur, Administrateur, Super Admin) | Décision 10 : le Contributeur soumet, l'Éditeur publie |
 | D18 | Captures responsives | Playwright piloté par `tests/visual/captures.mjs`, Chrome système, JPEG qualité 55 | Exigence décision 14 ; JPEG pour limiter le poids du dépôt |
 | D19 | Commande `yewtod:dev-session` | Outil local (refusé hors `local`) qui ouvre une session pour les captures | Les captures du dashboard nécessitent d'être connecté malgré la 2FA |
+| D20 | Bordure des champs | Jeton `line-strong` (≥ 3:1) pour les champs, `line` réservé aux séparateurs | WCAG 1.4.11 : la couleur de bordure du cahier (#CAD5DF) est trop claire pour délimiter un champ |
+| D21 | Accents en texte | Variantes `accent-ink` (#B13A26) et `accent-2-ink` (#1D6874) en clair | L'orange et le bleu-vert de la palette n'atteignent pas 4,5:1 sur fond clair |
+| D22 | Muted clair | #5A6679 au lieu de #657286 | #657286 sur #F7F3EC est juste sous 4,5:1 |

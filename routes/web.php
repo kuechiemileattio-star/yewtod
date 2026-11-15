@@ -20,4 +20,6 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
     Route::livewire('/profil', Dashboard\Profile::class)->name('.profile');
     Route::livewire('/utilisateurs', Dashboard\Users::class)->middleware('permission:manage_users|invite_users')->name('.users');
     Route::livewire('/journal', Dashboard\AuditLog::class)->name('.audit');
+    // Guide de style du système de design (documentation vivante).
+    Route::view('/design', 'dashboard.styleguide')->name('.styleguide');
 });

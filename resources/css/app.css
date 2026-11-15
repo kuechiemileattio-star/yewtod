@@ -6,6 +6,8 @@
 @source '../views';
 @source '../js';
 @source '../../app';
+/* Classes générées dynamiquement (guide de style). */
+@source inline("bg-{page,surface,surface-2,ink,muted,line,accent,accent-ink,accent-2,accent-2-ink,warning,danger,success}");
 
 /* Mode sombre piloté par la classe .dark posée côté serveur sur <html> (cahier § 9). */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -27,6 +29,7 @@
     --ink: #172238;
     --muted: #5A6679;
     --line: #CAD5DF;
+    --line-strong: #7A879A;
     --accent: #F0644D;
     --accent-ink: #B13A26;
     --on-accent: #FFFFFF;
@@ -48,6 +51,7 @@
     --ink: #E8EDF4;
     --muted: #A3AFC2;
     --line: #2C3A55;
+    --line-strong: #6B7A96;
     --accent: #F37A65;
     --accent-ink: #F58C79;
     --on-accent: #0F1626;
@@ -69,6 +73,7 @@
     --color-ink: var(--ink);
     --color-muted: var(--muted);
     --color-line: var(--line);
+    --color-line-strong: var(--line-strong);
     --color-accent: var(--accent);
     --color-accent-ink: var(--accent-ink);
     --color-on-accent: var(--on-accent);
@@ -85,6 +90,8 @@
     --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, Cambria, serif;
     --breakpoint-xs: 22rem;
+    /* Bleu nuit fixe (texte sur fond orange, identique en clair et en sombre). */
+    --color-navy: #172238;
 }
 
 @layer base {
@@ -118,7 +125,7 @@
     @apply mb-1 block text-sm font-semibold text-ink;
 }
 @utility field-input {
-    @apply block min-h-11 w-full rounded-lg border-line bg-surface text-ink placeholder:text-muted focus:border-accent-2 focus:ring-accent-2;
+    @apply block min-h-11 w-full rounded-lg border-line-strong bg-surface text-ink placeholder:text-muted focus:border-accent-2 focus:ring-accent-2;
 }
 @utility field-help {
     @apply mt-1 text-xs text-muted;
@@ -148,3 +155,7 @@
     header, footer, nav, .no-print { display: none !important; }
     body { background: #fff; color: #000; }
 }
+
+/* Transition d'entrée de page (cahier § 2.1). */
+@keyframes page-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.page-enter { animation: page-enter .35s ease-out both; }

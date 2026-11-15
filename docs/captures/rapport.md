@@ -1,9 +1,19 @@
 # Revue responsive automatique
 
-Générée le 2026-11-15T18:09:34.224Z.
+Générée le 2026-11-15T18:14:45.510Z.
 
 | Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
 | --- | --- | --- | --- | --- | --- |
+| accueil-provisoire | 320 | clair | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 375 | clair | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 768 | clair | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 1024 | clair | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 1440 | clair | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 320 | sombre | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 375 | sombre | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 768 | sombre | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| accueil-provisoire | 1440 | sombre | 200 | ✅ aucun | ✅ |
 | connexion | 320 | clair | 200 | ✅ aucun | ✅ |
 | connexion | 375 | clair | 200 | ✅ aucun | ✅ |
 | connexion | 768 | clair | 200 | ✅ aucun | ✅ |
@@ -74,3 +84,13 @@ Générée le 2026-11-15T18:09:34.224Z.
 | dashboard-journal | 768 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-journal | 1024 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-journal | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-design | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-design | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-design | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-design | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-design | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-design | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-design | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-design | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-design | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-design | 1440 | sombre | 200 | ✅ aucun | ✅ |
