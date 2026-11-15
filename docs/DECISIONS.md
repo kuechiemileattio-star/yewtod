@@ -26,3 +26,7 @@ Ce fichier trace chaque choix pris sans validation intermédiaire (consigne du p
 | D20 | Bordure des champs | Jeton `line-strong` (≥ 3:1) pour les champs, `line` réservé aux séparateurs | WCAG 1.4.11 : la couleur de bordure du cahier (#CAD5DF) est trop claire pour délimiter un champ |
 | D21 | Accents en texte | Variantes `accent-ink` (#B13A26) et `accent-2-ink` (#1D6874) en clair | L'orange et le bleu-vert de la palette n'atteignent pas 4,5:1 sur fond clair |
 | D22 | Muted clair | #5A6679 au lieu de #657286 | #657286 sur #F7F3EC est juste sous 4,5:1 |
+| D23 | Axes thématiques | 8 axes provisoires (`app/Support/Taxonomy.php`) | Le cahier en annonce 8 sans les nommer ; à ajuster dans ce fichier |
+| D24 | Documents des publications | Disque privé + contrôleur (au lieu du disque public) | Un PDF de brouillon ne doit jamais être joignable ; permet le comptage réel des téléchargements |
+| D25 | Éditeur riche | `contenteditable` minimal + HTML Purifier côté serveur (pas TipTap) | Moins de dépendances, compatible build CSP ; la sécurité repose sur le nettoyage serveur |
+| D26 | CSV des visualisations | Analysé à l'envoi et stocké en JSON dans `meta.blocks[].data` | Le navigateur ne télécharge jamais de CSV ; données bornées (500 lignes, 20 séries) |

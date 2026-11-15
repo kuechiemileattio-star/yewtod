@@ -1,96 +1,26 @@
 # Revue responsive automatique
 
-Générée le 2026-11-15T18:14:45.510Z.
+Générée le 2026-11-15T21:25:13.827Z.
 
 | Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
 | --- | --- | --- | --- | --- | --- |
-| accueil-provisoire | 320 | clair | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 375 | clair | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 768 | clair | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 1024 | clair | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 1440 | clair | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 320 | sombre | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 375 | sombre | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 768 | sombre | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| accueil-provisoire | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| connexion | 320 | clair | 200 | ✅ aucun | ✅ |
-| connexion | 375 | clair | 200 | ✅ aucun | ✅ |
-| connexion | 768 | clair | 200 | ✅ aucun | ✅ |
-| connexion | 1024 | clair | 200 | ✅ aucun | ✅ |
-| connexion | 1440 | clair | 200 | ✅ aucun | ✅ |
-| connexion | 320 | sombre | 200 | ✅ aucun | ✅ |
-| connexion | 375 | sombre | 200 | ✅ aucun | ✅ |
-| connexion | 768 | sombre | 200 | ✅ aucun | ✅ |
-| connexion | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| connexion | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 320 | clair | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 375 | clair | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 768 | clair | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 1024 | clair | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 1440 | clair | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 320 | sombre | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 375 | sombre | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 768 | sombre | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| mot-de-passe-oublie | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-utilisateurs-roles | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-profil-mot-de-passe | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-journal | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-design | 320 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-design | 375 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-design | 768 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-design | 1024 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-design | 1440 | clair | 200 | ✅ aucun | ✅ |
-| dashboard-design | 320 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-design | 375 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-design | 768 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-design | 1024 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-design | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| editeur-rapport | 320 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 375 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 768 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 1024 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 1440 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 320 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 375 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 768 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 1024 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-rapport | 1440 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 320 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 375 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 768 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 1024 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 1440 | clair | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 320 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 375 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 768 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 1024 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |
+| editeur-visualisation | 1440 | sombre | 200 | ✅ aucun | G, I, Titre, • Liste, 1. Liste |

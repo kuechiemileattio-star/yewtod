@@ -18,7 +18,9 @@ trait Toasts
     {
         try {
             $action();
-            $this->toast($success);
+            if ($success !== '') {
+                $this->toast($success);
+            }
 
             return true;
         } catch (AuthorizationException $e) {

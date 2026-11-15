@@ -177,7 +177,8 @@ export function registerComponents(Alpine) {
         accept() {
             this.open = false;
             const arg = this.$root.dataset.arg;
-            this.$wire[this.$root.dataset.method](...(arg !== undefined ? [Number(arg)] : []));
+            const args = arg === undefined ? [] : [/^\d+$/.test(arg) ? Number(arg) : arg];
+            this.$wire[this.$root.dataset.method](...args);
         },
     }));
 
@@ -222,6 +223,58 @@ export function registerComponents(Alpine) {
             window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
             document.getElementById('contenu')?.focus({ preventScroll: true });
         },
+    }));
+
+    /*
+     * Éditeur de texte riche minimal (contenteditable). Le HTML produit est
+     * de toute façon NETTOYÉ côté serveur par HTML Purifier avant stockage.
+     */
+    Alpine.data('richText', () => ({
+        timer: null,
+        sync() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => this.$wire.$set(this.$el.dataset.model, this.$refs.area.innerHTML, false), 250);
+        },
+        exec(event) {
+            const cmd = event.currentTarget.dataset.cmd;
+            this.$refs.area.focus();
+            const map = { bold: ['bold'], italic: ['italic'], ul: ['insertUnorderedList'], ol: ['insertOrderedList'], h3: ['formatBlock', 'h3'], quote: ['formatBlock', 'blockquote'], clear: ['removeFormat'] };
+            if (cmd === 'link') {
+                const url = window.prompt('Adresse du lien (https://…)');
+                if (url && /^https?:\/\//i.test(url)) document.execCommand('createLink', false, url);
+            } else if (map[cmd]) {
+                document.execCommand(map[cmd][0], false, map[cmd][1] ?? null);
+            }
+            this.sync();
+        },
+    }));
+
+    /* Analyse du PDF dans le navigateur avec pdf.js (chargé à la demande, cahier § 4.3). */
+    Alpine.data('pdfInspector', () => ({
+        progress: '',
+        async inspect(event) {
+            const file = event.target.files?.[0];
+            if (!file || file.type !== 'application/pdf') return;
+            this.progress = 'Analyse du PDF…';
+            try {
+                const { analysePdf } = await import('./pdf-analyse.js');
+                const info = await analysePdf(file, (page, total) => { this.progress = `Analyse : page ${page} / ${total}`; });
+                this.progress = `${info.pages} page(s), ${info.outline.length} signet(s) détecté(s).`;
+                this.$wire.applyPdfInfo(info.pages, info.outline);
+            } catch (e) {
+                this.progress = 'Analyse locale impossible (le fichier sera tout de même envoyé).';
+            }
+        },
+    }));
+
+    /* Avertissement « modifications non enregistrées » (cahier § 10 P1). */
+    Alpine.data('unsavedGuard', () => ({
+        dirty: false,
+        init() {
+            window.addEventListener('content-saved', () => { this.dirty = false; });
+            window.addEventListener('beforeunload', (e) => { if (this.dirty) { e.preventDefault(); e.returnValue = ''; } });
+        },
+        markDirty() { this.dirty = true; },
     }));
 
     /* Copie dans le presse-papiers (citation, lien). */

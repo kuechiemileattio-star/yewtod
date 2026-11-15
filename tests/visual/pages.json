@@ -43,5 +43,25 @@
     "name": "dashboard-design",
     "path": "/dashboard/design",
     "auth": true
+  },
+  {
+    "name": "dashboard-articles",
+    "path": "/dashboard/contenus/articles",
+    "auth": true
+  },
+  {
+    "name": "dashboard-autres",
+    "path": "/dashboard/contenus/autres",
+    "auth": true
+  },
+  {
+    "name": "editeur-rapport",
+    "path": "/dashboard/contenus/rapports/nouveau",
+    "auth": true
+  },
+  {
+    "name": "editeur-visualisation",
+    "path": "/dashboard/contenus/visualisations-de-donnees/nouveau",
+    "auth": true
   }
 ]
