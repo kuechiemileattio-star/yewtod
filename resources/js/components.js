@@ -156,6 +156,31 @@ export function registerComponents(Alpine) {
         dismiss(event) { this.remove(Number(event.currentTarget.dataset.id)); },
     }));
 
+    /*
+     * Appel d'une méthode Livewire depuis un champ (build CSP : pas
+     * d'expression « $event.target.value » dans les gabarits).
+     * <select x-data="wireCall" data-method="changeRole" data-arg="12" x-on:change="withValue">
+     */
+    Alpine.data('wireCall', () => ({
+        withValue(event) {
+            const arg = this.$el.dataset.arg;
+            const args = arg !== undefined ? [Number(arg), event.target.value] : [event.target.value];
+            this.$wire[this.$el.dataset.method](...args);
+        },
+    }));
+
+    /* Confirmation avant une action Livewire destructrice (data-method, data-arg). */
+    Alpine.data('confirmAction', () => ({
+        open: false,
+        ask() { this.open = true; this.$nextTick(() => this.$refs.cancel?.focus()); },
+        cancel() { this.open = false; },
+        accept() {
+            this.open = false;
+            const arg = this.$root.dataset.arg;
+            this.$wire[this.$root.dataset.method](...(arg !== undefined ? [Number(arg)] : []));
+        },
+    }));
+
     /* Copie dans le presse-papiers (citation, lien). */
     Alpine.data('copyText', () => ({
         copied: false,

@@ -6,8 +6,8 @@
 | --- | --- | --- |
 | 00 Socle | ✅ fait | voir `git log` |
 | 01 Authentification | ✅ fait | |
-| 02 RBAC | ⏳ en cours | |
-| 03 Design system | à faire | |
+| 02 RBAC | ✅ fait | |
+| 03 Design system | ⏳ en cours | |
 | 04 Contenus | à faire | |
 | 05 Site public | à faire | |
 | 06 Livres | à faire | |
@@ -16,6 +16,6 @@
 | 09 Revue finale | à faire | |
 | 10 Déploiement | à faire | |
 
-**Prochaine action** : lot 02 (Policies, écrans Utilisateurs & rôles, Mon profil).
+**Prochaine action** : lot 03 (composants Blade, gabarit public, accessibilité).
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.

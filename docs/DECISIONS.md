@@ -19,3 +19,7 @@ Ce fichier trace chaque choix pris sans validation intermédiaire (consigne du p
 | D13 | Limitation « croissante » | Fenêtres empilées 1 min / 15 min / 1 h + plafond par IP | Laravel n'a pas de délai exponentiel natif ; l'empilement donne une attente qui s'allonge |
 | D14 | Création du compte invité | Le compte est créé au moment de l'onboarding (statut « invité » puis « actif » dans la même transaction) | Évite des comptes sans mot de passe en base ; R1/R2 restent respectées et testées |
 | D15 | Réinitialisation de mot de passe | Jeton haché par Laravel (bcrypt/Argon) plutôt que SHA-256 | Plus fort que SHA-256 ; c'est le mécanisme natif, testé |
+| D16 | RBAC | Tables maison `roles` / `permissions` (pas `spatie/laravel-permission`) | Le cahier l'autorise ; R1–R8 sont plus lisibles dans un service unique, sans cache de permissions à invalider |
+| D17 | Permission `publish_content` | 10e permission ajoutée (Éditeur, Administrateur, Super Admin) | Décision 10 : le Contributeur soumet, l'Éditeur publie |
+| D18 | Captures responsives | Playwright piloté par `tests/visual/captures.mjs`, Chrome système, JPEG qualité 55 | Exigence décision 14 ; JPEG pour limiter le poids du dépôt |
+| D19 | Commande `yewtod:dev-session` | Outil local (refusé hors `local`) qui ouvre une session pour les captures | Les captures du dashboard nécessitent d'être connecté malgré la 2FA |

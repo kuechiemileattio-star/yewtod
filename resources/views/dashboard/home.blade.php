@@ -1,3 +1,3 @@
-<x-layouts.guest title="Tableau de bord" :wide="true">
+<x-layouts.dashboard title="Vue d'ensemble">
     <p>Bienvenue, {{ auth()->user()->name }}.</p>
-</x-layouts.guest>
+</x-layouts.dashboard>

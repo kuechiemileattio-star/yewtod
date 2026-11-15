@@ -1,0 +1,76 @@
+# Revue responsive automatique
+
+Générée le 2026-11-15T18:09:34.224Z.
+
+| Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
+| --- | --- | --- | --- | --- | --- |
+| connexion | 320 | clair | 200 | ✅ aucun | ✅ |
+| connexion | 375 | clair | 200 | ✅ aucun | ✅ |
+| connexion | 768 | clair | 200 | ✅ aucun | ✅ |
+| connexion | 1024 | clair | 200 | ✅ aucun | ✅ |
+| connexion | 1440 | clair | 200 | ✅ aucun | ✅ |
+| connexion | 320 | sombre | 200 | ✅ aucun | ✅ |
+| connexion | 375 | sombre | 200 | ✅ aucun | ✅ |
+| connexion | 768 | sombre | 200 | ✅ aucun | ✅ |
+| connexion | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| connexion | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 320 | clair | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 375 | clair | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 768 | clair | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 1024 | clair | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 1440 | clair | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 320 | sombre | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 375 | sombre | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 768 | sombre | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| mot-de-passe-oublie | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-utilisateurs-roles | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-profil-mot-de-passe | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-journal | 1440 | sombre | 200 | ✅ aucun | ✅ |

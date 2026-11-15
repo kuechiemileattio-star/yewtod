@@ -1,0 +1,9 @@
+[
+  { "name": "connexion", "path": "/login", "auth": false },
+  { "name": "mot-de-passe-oublie", "path": "/mot-de-passe-oublie", "auth": false },
+  { "name": "dashboard-utilisateurs", "path": "/dashboard/utilisateurs", "auth": true },
+  { "name": "dashboard-utilisateurs-roles", "path": "/dashboard/utilisateurs?onglet=roles", "auth": true },
+  { "name": "dashboard-profil", "path": "/dashboard/profil", "auth": true },
+  { "name": "dashboard-profil-mot-de-passe", "path": "/dashboard/profil?onglet=mot-de-passe", "auth": true },
+  { "name": "dashboard-journal", "path": "/dashboard/journal", "auth": true }
+]

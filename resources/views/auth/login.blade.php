@@ -7,7 +7,7 @@
             <label class="flex min-h-11 items-center gap-2 text-sm">
                 <input type="checkbox" name="remember" class="size-5 rounded border-line text-accent-2-ink"> Se souvenir de moi
             </label>
-            <a class="link text-sm" href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+            <a class="link inline-flex min-h-11 items-center text-sm" href="{{ route('password.request') }}">Mot de passe oublié ?</a>
         </div>
         <button type="submit" class="btn-primary w-full">Se connecter</button>
     </form>
