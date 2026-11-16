@@ -24,6 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // (valeur fermée light/dark/system, revalidée côté serveur).
         $middleware->encryptCookies(except: ['theme']);
 
+        // Hôtes acceptés : celui d'APP_URL (et ses sous-domaines). Toute requête
+        // portant un autre en-tête Host est rejetée hors environnement local.
+        $middleware->trustHosts(at: fn () => array_filter([
+            '^'.preg_quote((string) parse_url((string) config('app.url'), PHP_URL_HOST)).'$',
+        ]), subdomains: false);
+
         $middleware->alias([
             'member' => EnsureActiveMember::class,
             '2fa' => EnsureTwoFactorEnabled::class,

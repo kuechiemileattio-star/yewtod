@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         // En production, migrate:fresh, migrate:reset, db:wipe… sont bloqués.
         DB::prohibitDestructiveCommands($this->app->isProduction());
 
+        $this->pinApplicationUrl();
         $this->useMigrationConnection();
         $this->publicRateLimits();
         $this->registerPublicSources();
@@ -61,6 +63,28 @@ class AppServiceProvider extends ServiceProvider
             'dashboard.collaborations' => Collaborations::newCount($user),
         ]);
         $this->app->tag(['badges.public-writes'], 'dashboard.badges');
+    }
+
+    /**
+     * Protection contre l'empoisonnement par l'en-tête Host : toutes les URL
+     * absolues (liens de réinitialisation et d'invitation dans les emails,
+     * sitemap, RSS, balises canoniques, Open Graph) sont construites à partir
+     * d'APP_URL, jamais de l'en-tête Host envoyé par le client. Sans cela, une
+     * demande « mot de passe oublié » forgée avec `Host: attaquant.example`
+     * enverrait à la victime un lien qui livre son jeton à l'attaquant, et un
+     * sitemap empoisonné resterait en cache une heure.
+     * Les hôtes inconnus sont en plus refusés par TrustHosts (bootstrap/app.php).
+     */
+    private function pinApplicationUrl(): void
+    {
+        $root = rtrim((string) config('app.url'), '/');
+        if ($root === '') {
+            return;
+        }
+        URL::forceRootUrl($root);
+        if (str_starts_with($root, 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 
     /**
