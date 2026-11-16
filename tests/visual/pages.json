@@ -1,8 +1,69 @@
 [
   {
-    "name": "accueil-provisoire",
+    "name": "accueil",
     "path": "/",
     "auth": false
+  },
+  {
+    "name": "publications",
+    "path": "/works",
+    "auth": false
+  },
+  {
+    "name": "publications-filtrees",
+    "path": "/works?categorie=articles&axe=economie",
+    "auth": false
+  },
+  {
+    "name": "article",
+    "path": "/works/articles/ce-que-la-sociologie-dit-vraiment-du-teletravail",
+    "auth": false
+  },
+  {
+    "name": "rapport",
+    "path": "/works/rapports/rapport-2026-sur-la-precarite-etudiante",
+    "auth": false
+  },
+  {
+    "name": "visualisation",
+    "path": "/works/visualisations-de-donnees/visualisation-levolution-du-taux-demploi-par-sexe",
+    "auth": false
+  },
+  {
+    "name": "serie",
+    "path": "/works/series-documentaires/serie-vivre-de-la-terre",
+    "auth": false
+  },
+  {
+    "name": "episode",
+    "path": "/works/episodes-documentaires/episode-1-sinstaller",
+    "auth": false
+  },
+  {
+    "name": "note",
+    "path": "/works/notes-de-recherche/note-piste-sur-les-tiers-lieux-ruraux",
+    "auth": false
+  },
+  {
+    "name": "meet",
+    "path": "/meet",
+    "auth": false
+  },
+  {
+    "name": "mentions-legales",
+    "path": "/mentions-legales",
+    "auth": false
+  },
+  {
+    "name": "confidentialite",
+    "path": "/confidentialite",
+    "auth": false
+  },
+  {
+    "name": "page-404",
+    "path": "/page-qui-n-existe-pas",
+    "auth": false,
+    "status": 404
   },
   {
     "name": "connexion",

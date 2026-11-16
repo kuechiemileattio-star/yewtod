@@ -54,7 +54,7 @@ class SecurityHeaders
             "style-src 'self' 'unsafe-inline'{$hot}",
             "img-src 'self' data: blob: https://i.ytimg.com https://img.youtube.com",
             "font-src 'self'{$hot}",
-            "media-src 'self'",
+            "media-src 'self' https:",
             "connect-src 'self'".($hot !== '' ? $hot.' '.str_replace('http', 'ws', $this->viteDevOrigin()) : ''),
             'frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://challenges.cloudflare.com',
             // pdf.js lance son worker depuis nos propres assets.

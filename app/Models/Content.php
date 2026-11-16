@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Contracts\Trackable;
 use App\Enums\ContentStatus;
 use App\Enums\ContentType;
+use App\Http\Controllers\Site\SeoController;
 use App\Services\ImageProcessor;
+use App\Services\SiteSettings;
 use Carbon\CarbonImmutable;
 use Database\Factories\ContentFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -57,7 +60,7 @@ use Illuminate\Support\Str;
  * @property-read User|null $author
  * @property-read Content|null $parent
  */
-class Content extends Model
+class Content extends Model implements Trackable
 {
     /** @use HasFactory<ContentFactory> */
     use HasFactory;
@@ -74,6 +77,13 @@ class Content extends Model
         'published_at' => null, 'scheduled_at' => null, 'author_id' => null, 'parent_id' => null, 'episode_number' => null,
         'seo_title' => null, 'seo_description' => null,
     ];
+
+    protected static function booted(): void
+    {
+        // Le sitemap et le flux RSS sont en cache : toute écriture les invalide.
+        static::saved(fn () => SeoController::flush());
+        static::deleted(fn () => SeoController::flush());
+    }
 
     protected function casts(): array
     {
@@ -214,5 +224,62 @@ class Content extends Model
     public function publicUrl(): string
     {
         return url('/works/'.$this->type->value.'/'.$this->slug);
+    }
+
+    /** URL du fichier principal (contrôleur : visibilité vérifiée, comptage). */
+    public function downloadUrl(): ?string
+    {
+        return $this->file_path ? url('/works/'.$this->type->value.'/'.$this->slug.'/telecharger') : null;
+    }
+
+    public function seoTitleText(): string
+    {
+        return $this->seo_title ?: $this->title;
+    }
+
+    public function seoDescriptionText(): string
+    {
+        return $this->seo_description ?: $this->excerpt(160);
+    }
+
+    /**
+     * Données structurées schema.org (cahier § 10 P1) : Article pour les
+     * articles, ScholarlyArticle pour les gabarits « revue », CreativeWork
+     * (ou VideoObject quand une vidéo est connue) pour les documentaires.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonLd(): array
+    {
+        $type = match ($this->type->template()) {
+            'article' => 'Article',
+            'journal' => 'ScholarlyArticle',
+            default => 'CreativeWork',
+        };
+        $authors = $this->type === ContentType::Report || $this->type === ContentType::Study
+            ? array_map(fn ($a) => ['@type' => 'Person', 'name' => (string) $a], (array) ($this->meta['authors'] ?? []))
+            : [];
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type' => $type,
+            'headline' => Str::limit($this->title, 110, '…'),
+            'name' => $this->title,
+            'description' => $this->seoDescriptionText(),
+            'url' => $this->publicUrl(),
+            'inLanguage' => $this->language,
+            'datePublished' => $this->displayDate()->toIso8601String(),
+            'dateModified' => $this->updated_at->toIso8601String(),
+            'author' => $authors ?: ['@type' => $this->displayAuthor() === 'Yewtod SS' ? 'Organization' : 'Person', 'name' => $this->displayAuthor()],
+            'publisher' => ['@type' => 'Organization', 'name' => app(SiteSettings::class)->siteName()],
+            'keywords' => implode(', ', $this->tags),
+        ];
+        if ($this->cover_path) {
+            $data['image'] = $this->coverUrl();
+        }
+        if (! empty($this->meta['doi'])) {
+            $data['identifier'] = ['@type' => 'PropertyValue', 'propertyID' => 'DOI', 'value' => $this->meta['doi']];
+        }
+
+        return $data;
     }
 }

@@ -293,4 +293,79 @@ export function registerComponents(Alpine) {
         cancel() { this.open = false; },
         accept() { this.open = false; this.$refs.form?.requestSubmit(); },
     }));
+    /*
+     * Sommaire interactif d'une publication (cahier § 2.4) : sans JavaScript,
+     * toutes les sections s'affichent ; avec, seule la section choisie reste.
+     */
+    Alpine.data('sectionToc', () => ({
+        init() { this.show(0); },
+        select(event) {
+            event.preventDefault();
+            this.show(Number(event.currentTarget.dataset.index));
+            const panel = this.$el.querySelector(`.toc-panel[data-index="${event.currentTarget.dataset.index}"]`);
+            panel?.focus({ preventScroll: true });
+            if (window.innerWidth < 768) panel?.scrollIntoView({ block: 'start' });
+        },
+        show(index) {
+            this.$el.querySelectorAll('.toc-panel').forEach((p) => { p.hidden = Number(p.dataset.index) !== index; });
+            this.$el.querySelectorAll('.toc-tab').forEach((t) => t.setAttribute('aria-selected', String(Number(t.dataset.index) === index)));
+        },
+    }));
+
+    /* Partage natif (mobile) ou copie du lien en repli. */
+    Alpine.data('shareNative', () => ({
+        label: 'Partager',
+        async share() {
+            const { title, url } = this.$el.dataset;
+            if (navigator.share) {
+                try { await navigator.share({ title, url }); } catch (e) { /* partage annulé */ }
+                return;
+            }
+            try { await navigator.clipboard.writeText(url); this.label = 'Lien copié'; setTimeout(() => (this.label = 'Partager'), 2000); } catch (e) { /* sans presse-papiers */ }
+        },
+    }));
+
+    /* Formulaire de filtres : soumission à chaque changement (le bouton « Appliquer » reste pour le mode sans JS). */
+    Alpine.data('autoSubmit', () => ({
+        submit(event) {
+            if (event.target.type === 'search' || event.target.type === 'date') return;
+            this.$el.requestSubmit();
+        },
+    }));
+
+    /*
+     * Recherche globale (cahier § 10 P2) : Ctrl K / ⌘ K ouvre la boîte,
+     * résultats JSON du serveur (publications et livres visibles uniquement).
+     * Les résultats sont insérés par x-text : jamais interprétés comme du HTML.
+     */
+    Alpine.data('globalSearch', () => ({
+        open: false,
+        q: '',
+        results: [],
+        loading: false,
+        timer: null,
+        init() {
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); this.show(); }
+            });
+        },
+        show() { this.open = true; document.documentElement.classList.add('overflow-hidden'); this.$nextTick(() => this.$refs.input?.focus()); },
+        close() { this.open = false; document.documentElement.classList.remove('overflow-hidden'); },
+        get empty() { return this.q.trim().length >= 2 && !this.loading && this.results.length === 0; },
+        get hint() { return this.q.trim().length < 2; },
+        search() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(async () => {
+                const q = this.q.trim();
+                if (q.length < 2) { this.results = []; return; }
+                this.loading = true;
+                try {
+                    const res = await fetch(this.$root.dataset.url + '?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' } });
+                    this.results = res.ok ? (await res.json()).results : [];
+                } catch (e) { this.results = []; }
+                this.loading = false;
+            }, 200);
+        },
+        submitAll() { window.location.href = this.$root.dataset.works + '?q=' + encodeURIComponent(this.q.trim()); },
+    }));
 }

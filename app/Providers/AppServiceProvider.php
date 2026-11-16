@@ -3,11 +3,14 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +33,19 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands($this->app->isProduction());
 
         $this->useMigrationConnection();
+        $this->publicRateLimits();
+    }
+
+    /**
+     * Limitation par IP des URL publiques coûteuses (cahier § 8.4, § 8.6
+     * anti-DoS). Les écritures publiques (avis, newsletter, collaborations)
+     * ont leurs propres limites (lot 07).
+     */
+    private function publicRateLimits(): void
+    {
+        RateLimiter::for('public-download', fn (Request $r) => Limit::perMinute(30)->by('dl|'.$r->ip()));
+        RateLimiter::for('public-search', fn (Request $r) => Limit::perMinute(60)->by('search|'.$r->ip()));
+        RateLimiter::for('public-feed', fn (Request $r) => Limit::perMinute(60)->by('feed|'.$r->ip()));
     }
 
     /**

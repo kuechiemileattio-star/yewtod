@@ -1,13 +1,39 @@
 <?php
 
 use App\Http\Controllers\Dashboard\ThemePreferenceController;
+use App\Http\Controllers\Site;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
-// Page provisoire ; remplacée par le site public au lot 05.
-Route::view('/', 'welcome')->name('home');
+/*
+ * Site public (cahier § 2). Lecture seule, rendue côté serveur.
+ * Les paramètres de type et de slug sont contraints par expression régulière ;
+ * le contrôleur revérifie le type dans le registre (liste blanche).
+ */
+Route::get('/', Site\HomeController::class)->name('home');
+Route::get('/works', [Site\WorkController::class, 'index'])->name('works.index');
+Route::pattern('workType', '[a-z-]{3,40}');
+Route::pattern('workSlug', '[a-z0-9-]{1,320}');
+Route::get('/works/{workType}/{workSlug}', [Site\WorkController::class, 'show'])->name('works.show');
+Route::middleware('throttle:public-download')->group(function () {
+    Route::get('/works/{workType}/{workSlug}/telecharger', [Site\WorkController::class, 'download'])->name('works.download');
+    Route::get('/works/{workType}/{workSlug}/fichiers/{index}', [Site\WorkController::class, 'file'])->whereNumber('index')->name('works.file');
+});
+Route::get('/meet', [Site\PageController::class, 'meet'])->name('meet');
+Route::get('/mentions-legales', [Site\PageController::class, 'legal'])->name('legal');
+Route::get('/confidentialite', [Site\PageController::class, 'privacy'])->name('privacy');
+Route::get('/recherche', Site\SearchController::class)->middleware('throttle:public-search')->name('search');
+Route::middleware('throttle:public-feed')->group(function () {
+    Route::get('/sitemap.xml', [Site\SeoController::class, 'sitemap'])->name('sitemap');
+    Route::get('/feed', [Site\SeoController::class, 'feed'])->name('feed');
+    Route::get('/robots.txt', [Site\SeoController::class, 'robots'])->name('robots');
+});
+
+// Aperçu réel d'un brouillon : URL signée (30 min) ET membre connecté avec 2FA.
+Route::get('/apercu/{content}', [Site\WorkController::class, 'preview'])
+    ->middleware(['signed', 'auth', 'member', '2fa'])->whereNumber('content')->name('content.preview');
 
 /*
  * Back-office : connecté + membre actif + 2FA confirmée sur TOUTES les routes.
@@ -33,3 +59,6 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
     // Guide de style du système de design (documentation vivante).
     Route::view('/design', 'dashboard.styleguide')->name('.styleguide');
 });
+
+// Toute URL inconnue : vraie page 404 (bug n° 14), rendue dans le groupe web.
+Route::fallback([Site\PageController::class, 'notFound']);

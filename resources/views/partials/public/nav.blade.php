@@ -10,7 +10,7 @@
 <header x-data="siteNav" class="sticky top-0 z-40 border-b border-transparent bg-page/90 backdrop-blur transition-shadow" x-bind:class="scrolled ? 'shadow-md border-line' : ''">
     {{-- Barre de progression de lecture --}}
     <div class="absolute inset-x-0 top-0 h-0.5 origin-left bg-accent" x-bind:style="progressStyle" aria-hidden="true"></div>
-    <nav class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
+    <nav class="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 xs:px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
         <a href="{{ url('/') }}" class="flex min-h-11 shrink-0 items-center gap-2 font-serif text-xl font-bold">
             @if ($logo)
                 <img src="{{ $logo }}" alt="{{ $siteName }}" class="h-8 w-auto">
@@ -30,9 +30,10 @@
             @endforeach
         </ul>
         <div class="ml-auto flex items-center gap-1">
+            @include('partials.public.search')
             <x-theme-switcher />
             <a href="{{ url('/collaborations') }}" class="btn-primary hidden sm:inline-flex">Collaborer</a>
-            <a href="{{ route('dashboard') }}" class="btn-ghost min-w-11 px-2" aria-label="Espace membres" title="Espace membres"><x-icon name="user" /></a>
+            <a href="{{ route('dashboard') }}" class="btn-ghost hidden min-w-11 px-2 xs:inline-flex" aria-label="Espace membres" title="Espace membres"><x-icon name="user" /></a>
             <button type="button" class="btn-ghost min-w-11 px-2 lg:hidden" x-on:click="toggleMenu" aria-controls="menu-mobile" x-bind:aria-expanded="menuOpen" aria-label="Ouvrir le menu">
                 <span x-show="!menuOpen"><x-icon name="menu" /></span><span x-show="menuOpen" x-cloak><x-icon name="close" /></span>
             </button>
@@ -46,5 +47,6 @@
             @endforeach
         </ul>
         <a href="{{ url('/collaborations') }}" class="btn-primary mt-8 w-full">Collaborer</a>
+        <a href="{{ route('dashboard') }}" class="btn-secondary mt-3 w-full"><x-icon name="user" class="size-4" /> Espace membres</a>
     </div>
 </header>

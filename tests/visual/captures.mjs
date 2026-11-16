@@ -10,7 +10,7 @@
  * Résultat : docs/captures/*.jpg + docs/captures/rapport.md
  */
 import { chromium } from 'playwright';
-import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 
 const BASE = process.env.BASE ?? 'http://127.0.0.1:8000';
 const COOKIE = process.env.COOKIE ?? '';
@@ -24,7 +24,8 @@ mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME ?? '/usr/bin/google-chrome', args: ['--no-sandbox'] });
 const report = [];
 
-for (const p of pages.filter((p) => p.name.includes(filter))) {
+// Sans cookie de session, les pages du dashboard sont ignorées (elles captureraient l'écran de connexion).
+for (const p of pages.filter((p) => p.name.includes(filter) && (!p.auth || COOKIE))) {
     for (const theme of THEMES) {
         const context = await browser.newContext({ colorScheme: theme, reducedMotion: 'reduce' });
         const host = new URL(BASE).hostname;
@@ -61,12 +62,18 @@ for (const p of pages.filter((p) => p.name.includes(filter))) {
 }
 await browser.close();
 
-const lines = ['# Revue responsive automatique', '', `Générée le ${new Date().toISOString()}.`, '',
-    '| Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |', '| --- | --- | --- | --- | --- | --- |'];
+// Les lignes des pages non recapturées (filtre) sont conservées : le rapport reste complet.
+const done = new Set(report.map((r) => r.page));
+const previous = existsSync(out + 'rapport.md')
+    ? readFileSync(out + 'rapport.md', 'utf8').split('\n').filter((l) => /^\| [a-z0-9-]+ \| \d+ \|/.test(l) && !done.has(l.split(' | ')[0].slice(2)))
+    : [];
+const lines = ['# Revue responsive automatique', '', `Mise à jour le ${new Date().toISOString()}.`, '',
+    '| Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |', '| --- | --- | --- | --- | --- | --- |', ...previous];
 for (const r of report) {
     lines.push(`| ${r.page} | ${r.width} | ${r.theme === 'dark' ? 'sombre' : 'clair'} | ${r.status} | ${r.overflow ? '❌ ' + r.scrollWidth + ' px' : '✅ aucun'} | ${r.small.length ? r.small.join(', ') : '✅'} |`);
 }
 writeFileSync(out + 'rapport.md', lines.join('\n') + '\n');
-const bad = report.filter((r) => r.overflow || r.status >= 400);
+const expected = Object.fromEntries(pages.map((p) => [p.name, p.status ?? 200]));
+const bad = report.filter((r) => r.overflow || r.status !== expected[r.page]);
 console.log(`${report.length} captures, ${bad.length} problème(s) de débordement ou d'erreur HTTP.`);
 for (const b of bad) console.log(' -', b.page, b.width, b.theme, b.status, b.scrollWidth);
