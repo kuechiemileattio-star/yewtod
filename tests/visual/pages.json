@@ -55,6 +55,11 @@
     "auth": false
   },
   {
+    "name": "collaborations",
+    "path": "/collaborations",
+    "auth": false
+  },
+  {
     "name": "meet",
     "path": "/meet",
     "auth": false
@@ -138,6 +143,16 @@
   {
     "name": "dashboard-livres",
     "path": "/dashboard/livres",
+    "auth": true
+  },
+  {
+    "name": "dashboard-moderation",
+    "path": "/dashboard/moderation",
+    "auth": true
+  },
+  {
+    "name": "dashboard-collaborations",
+    "path": "/dashboard/collaborations",
     "auth": true
   }
 ]

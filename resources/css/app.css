@@ -175,3 +175,6 @@
 
 /* Indicateurs Livewire masqués par défaut (équivalent de @livewireStyles, sans style inline). */
 [wire\:loading], [wire\:loading\.delay], [wire\:offline] { display: none; }
+
+/* Champ piège anti-robots : hors écran, invisible et inaccessible aux humains. */
+.honeypot { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }

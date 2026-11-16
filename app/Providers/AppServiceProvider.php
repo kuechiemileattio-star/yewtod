@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Livewire\Dashboard\Collaborations;
+use App\Livewire\Dashboard\Moderation;
 use App\Models\Book;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Events\CommandStarting;
@@ -51,6 +54,13 @@ class AppServiceProvider extends ServiceProvider
             ->where(fn ($w) => $w->where('title', 'like', $like)->orWhere('author', 'like', $like))->limit(5)->get(['slug', 'title', 'author'])
             ->map(fn (Book $b) => ['title' => $b->title, 'kind' => 'Livre · '.$b->author, 'url' => $b->publicUrl()]));
         $this->app->tag(['sources.books.search'], 'search.sources');
+
+        // Pastilles du menu (cahier § 10 P1) : avis en attente, nouvelles collaborations.
+        $this->app->bind('badges.public-writes', fn () => fn (User $user) => [
+            'dashboard.moderation' => Moderation::pendingFor($user),
+            'dashboard.collaborations' => Collaborations::newCount($user),
+        ]);
+        $this->app->tag(['badges.public-writes'], 'dashboard.badges');
     }
 
     /**
@@ -62,6 +72,11 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('public-download', fn (Request $r) => Limit::perMinute(30)->by('dl|'.$r->ip()));
         RateLimiter::for('public-search', fn (Request $r) => Limit::perMinute(60)->by('search|'.$r->ip()));
+        // Formulaires publics : 5 envois par minute et 30 par jour, par formulaire et par IP.
+        RateLimiter::for('public-form', fn (Request $r) => [
+            Limit::perMinute(5)->by('form|'.$r->route()?->getName().'|'.$r->ip()),
+            Limit::perDay(30)->by('form-day|'.$r->route()?->getName().'|'.$r->ip()),
+        ]);
         RateLimiter::for('public-feed', fn (Request $r) => Limit::perMinute(60)->by('feed|'.$r->ip()));
     }
 

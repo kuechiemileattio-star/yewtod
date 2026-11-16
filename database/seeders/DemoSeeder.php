@@ -55,6 +55,7 @@ class DemoSeeder extends Seeder
             // Complété au fil des lots (contenus, livres, avis, collaborations, newsletter).
             DemoContentSeeder::class,
             DemoBookSeeder::class,
+            DemoPublicWritesSeeder::class,
         ], fn ($c) => class_exists($c)));
     }
 }

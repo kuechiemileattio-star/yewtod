@@ -69,6 +69,34 @@ class UploadService
         return $this->putPrivate($file, $directory, self::DOWNLOAD_MIMES[$mime]);
     }
 
+    /** Pièces jointes des demandes de collaboration (cahier § 2.7) : PDF, Word, images ; pas de SVG. */
+    public const ATTACHMENT_MIMES = [
+        'application/pdf' => 'pdf', 'application/msword' => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        'application/vnd.oasis.opendocument.text' => 'odt',
+        'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif',
+    ];
+
+    /**
+     * Pièce jointe privée (données personnelles) : type vérifié sur le
+     * contenu réel, 10 Mo, nom aléatoire, disque privé.
+     *
+     * @return array{path: string, name: string, size: int, mime: string}
+     */
+    public function attachment(UploadedFile $file, string $directory = 'collaborations'): array
+    {
+        $this->assertSize($file, self::MAX_ATTACHMENT_KB);
+        $mime = $this->mime($file);
+        if (! isset(self::ATTACHMENT_MIMES[$mime])) {
+            throw ValidationException::withMessages(['attachments' => 'Pièce jointe refusée : PDF, Word ou image (JPEG, PNG, WebP, GIF) uniquement.']);
+        }
+        if ($mime === 'application/pdf' && ! self::isPdf($file->getRealPath())) {
+            throw ValidationException::withMessages(['attachments' => 'Le PDF joint n\'est pas valide.']);
+        }
+
+        return $this->putPrivate($file, $directory, self::ATTACHMENT_MIMES[$mime]) + ['mime' => $mime];
+    }
+
     /** Signature `%PDF-` contrôlée sur les premiers octets (cahier § 5.8). */
     public static function isPdf(string $path): bool
     {

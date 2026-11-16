@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\CollaborationFileController;
 use App\Http\Controllers\Dashboard\ThemePreferenceController;
 use App\Http\Controllers\Site;
 use App\Livewire\Dashboard;
@@ -26,6 +27,19 @@ Route::get('/books/{bookSlug}', [Site\BookController::class, 'show'])->where('bo
 Route::middleware('throttle:public-download')->where(['bookSlug' => '[a-z0-9-]{1,320}'])->group(function () {
     Route::get('/books/{bookSlug}/extraits/{index}', [Site\BookController::class, 'excerpt'])->whereNumber('index')->name('books.excerpt');
     Route::get('/books/{bookSlug}/livre-electronique', [Site\BookController::class, 'ebook'])->name('books.ebook');
+});
+// Écritures publiques : limitation par IP sur chacun des 4 formulaires (cahier § 8.4).
+Route::get('/collaborations', [Site\PublicFormController::class, 'collaborationForm'])->name('collaborations');
+Route::middleware('throttle:public-form')->group(function () {
+    Route::post('/works/{workType}/{workSlug}/avis', [Site\PublicFormController::class, 'reviewWork'])->name('reviews.work');
+    Route::post('/books/{bookSlug}/avis', [Site\PublicFormController::class, 'reviewBook'])->where('bookSlug', '[a-z0-9-]{1,320}')->name('reviews.book');
+    Route::post('/collaborations', [Site\PublicFormController::class, 'collaborationStore'])->name('collaborations.store');
+    Route::post('/newsletter', [Site\PublicFormController::class, 'newsletterSubscribe'])->name('newsletter.subscribe');
+});
+Route::middleware('throttle:public-feed')->where(['token' => '[A-Za-z0-9]{40}'])->group(function () {
+    Route::get('/newsletter/confirmer/{token}', [Site\PublicFormController::class, 'newsletterConfirm'])->name('newsletter.confirm');
+    Route::get('/newsletter/desinscription/{token}', [Site\PublicFormController::class, 'newsletterUnsubscribeForm'])->name('newsletter.unsubscribe');
+    Route::post('/newsletter/desinscription/{token}', [Site\PublicFormController::class, 'newsletterUnsubscribe'])->name('newsletter.unsubscribe.confirm');
 });
 Route::get('/meet', [Site\PageController::class, 'meet'])->name('meet');
 Route::get('/mentions-legales', [Site\PageController::class, 'legal'])->name('legal');
@@ -64,6 +78,16 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
 
     // Livres (cahier § 4.4).
     Route::livewire('/livres', Dashboard\Books::class)->middleware('permission:manage_books')->name('.books');
+
+    // Modération des avis (cahier § 4.6) : la permission fine est vérifiée par avis.
+    Route::livewire('/moderation', Dashboard\Moderation::class)->middleware('permission:manage_articles|manage_books')->name('.moderation');
+
+    // Collaborations (cahier § 4.5).
+    Route::middleware('permission:manage_collaborations')->group(function () {
+        Route::livewire('/collaborations', Dashboard\Collaborations::class)->name('.collaborations');
+        Route::get('/collaborations/export', [CollaborationFileController::class, 'export'])->name('.collaborations.export');
+        Route::get('/collaborations/fichiers/{file}', [CollaborationFileController::class, 'download'])->middleware('signed')->whereNumber('file')->name('.collaborations.file');
+    });
 
     // Guide de style du système de design (documentation vivante).
     Route::view('/design', 'dashboard.styleguide')->name('.styleguide');

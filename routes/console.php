@@ -1,7 +1,9 @@
 <?php
 
 use App\Services\BookService;
+use App\Services\CollaborationService;
 use App\Services\ContentWorkflow;
+use App\Services\NewsletterService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
@@ -20,3 +22,12 @@ Schedule::command('yewtod:publish-scheduled')->everyMinute()->withoutOverlapping
 
 // Pas de worker permanent : la file « database » est vidée à chaque minute.
 Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=1')->everyMinute()->withoutOverlapping();
+
+// Purges RGPD (cahier § 8.5, § 13.1) : demandes de collaboration anciennes, inscriptions non confirmées.
+Artisan::command('yewtod:purge-public-data', function () {
+    $collabs = CollaborationService::purge();
+    $pending = NewsletterService::purgePending();
+    $this->info("{$collabs} demande(s) de collaboration et {$pending} inscription(s) non confirmée(s) supprimée(s).");
+})->purpose('Applique les durées de conservation des écritures publiques');
+
+Schedule::command('yewtod:purge-public-data')->dailyAt('03:15');
