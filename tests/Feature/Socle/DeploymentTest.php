@@ -22,3 +22,11 @@ it('signale une configuration de production non conforme', function () {
         ->expectsOutputToContain('APP_DEBUG=false')
         ->expectsOutputToContain('Analyse IA (GEMINI_API_KEY) — la fonction se désactive proprement')->assertFailed();
 });
+
+it('donne le code 2FA d\'un compte de démo en local uniquement', function () {
+    member('editeur', true, ['email' => 'editeur@yewtod.test']);
+    $this->artisan('yewtod:code-demo editeur@yewtod.test')->assertFailed(); // environnement « testing »
+    app()->detectEnvironment(fn () => 'local');
+    $this->artisan('yewtod:code-demo editeur@yewtod.test')->expectsOutputToContain('Code actuel')->assertSuccessful();
+    $this->artisan('yewtod:code-demo quelquun@exemple.fr')->assertFailed();
+});

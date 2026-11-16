@@ -89,7 +89,7 @@ export function registerComponents(Alpine) {
             return [this.okLength, this.okLower, this.okUpper, this.okDigit, this.okSymbol, this.okRepeat, this.okPersonal]
                 .filter(Boolean).length + (this.value.length >= 16 ? 1 : 0);
         },
-        get barStyle() { return 'width: ' + Math.round((this.score / 8) * 100) + '%'; },
+        get barStyle() { return { width: Math.round((this.score / 8) * 100) + '%' }; },
         get level() {
             if (this.score >= 8) return 'Très robuste';
             if (this.score >= 7) return 'Robuste';
@@ -196,7 +196,8 @@ export function registerComponents(Alpine) {
             window.addEventListener('scroll', update, { passive: true });
             update();
         },
-        get progressStyle() { return 'transform: scaleX(' + this.progress + ')'; },
+        // Objet (et non chaîne) : Alpine utilise style.setProperty, autorisé par une CSP sans 'unsafe-inline'.
+        get progressStyle() { return { transform: 'scaleX(' + this.progress + ')' }; },
         toggleMenu() { this.menuOpen ? this.closeMenu() : this.openMenu(); },
         openMenu() { this.menuOpen = true; document.documentElement.classList.add('overflow-hidden'); },
         closeMenu() { this.menuOpen = false; document.documentElement.classList.remove('overflow-hidden'); },

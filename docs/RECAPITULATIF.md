@@ -20,12 +20,13 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 
 ## 2. Résultats des vérifications
 
-- **Tests Pest : 312, tous verts (1 105 assertions)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
+- **Tests Pest : 320, tous verts (1 131 assertions)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
 - **Pint** propre, **Larastan niveau 6** sans erreur.
 - **Responsive** : 36 écrans × 5 largeurs (320, 375, 768, 1024, 1440) × 2 thèmes = 360 captures, aucun défilement horizontal (`docs/captures/rapport.md`).
 - **Accessibilité** : axe-core WCAG 2.1 A/AA sur tous ces écrans, clair et sombre : 0 violation sérieuse ou critique (`docs/captures/accessibilite.md`).
 - **Dépendances** : `composer audit` et `npm audit` sans vulnérabilité (pdf.js mis à jour en 6.5).
 - **Sauvegarde / restauration** : restauration complète testée dans une base vide (comptes de lignes et fichiers identiques).
+- **Audit de sécurité dynamique** (ZAP, sqlmap, nuclei, nikto, sondes manuelles sur Apache et en mode production) : 1 vulnérabilité haute (empoisonnement par l'en-tête Host), 1 moyenne (CSP des styles) et 4 faibles **corrigées** ; aucune injection SQL, aucun XSS exécutable, aucune escalade de privilèges (`docs/AUDIT-SECURITE.md`).
 
 ## 3. Ce qui n'a pas pu être vérifié ici
 

@@ -24,6 +24,6 @@
         </main>
         <p class="mt-8 text-center text-xs text-muted">Accès réservé aux membres invités · <a class="link" href="{{ url('/') }}">Retour au site</a></p>
     </div>
-    @livewireScriptConfig
+    @livewireScriptConfig(['nonce' => \Illuminate\Support\Facades\Vite::cspNonce()])
 </body>
 </html>

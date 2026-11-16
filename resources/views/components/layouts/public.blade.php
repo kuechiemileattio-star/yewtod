@@ -52,6 +52,6 @@
     </main>
     @include('partials.public.footer', ['siteName' => $siteName, 'socials' => $site->socialLinks(), 'footer' => $site->page('footer')])
     <x-toasts />
-    @livewireScriptConfig
+    @livewireScriptConfig(['nonce' => \Illuminate\Support\Facades\Vite::cspNonce()])
 </body>
 </html>

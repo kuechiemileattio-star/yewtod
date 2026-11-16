@@ -1,6 +1,6 @@
 # Audit d'accessibilité (axe-core, WCAG 2.1 A/AA)
 
-Mis à jour le 2026-11-16T02:28:10.197Z. Seules les violations « sérieuses » et « critiques » sont listées.
+Mis à jour le 2026-11-16T03:37:20.858Z. Seules les violations « sérieuses » et « critiques » sont listées.
 
 | Page | Thème | Violations |
 | --- | --- | --- |

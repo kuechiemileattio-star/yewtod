@@ -2,12 +2,14 @@
 
 use App\Http\Middleware\EnsureActiveMember;
 use App\Http\Middleware\EnsureTwoFactorEnabled;
+use App\Http\Middleware\PreventRequestForgery;
 use App\Http\Middleware\ProtectPreproduction;
 use App\Http\Middleware\RequirePermission;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery as BasePreventRequestForgery;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -29,6 +31,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustHosts(at: fn () => array_filter([
             '^'.preg_quote((string) parse_url((string) config('app.url'), PHP_URL_HOST)).'$',
         ]), subdomains: false);
+
+        // Pas de cookie XSRF-TOKEN : il ne sert qu'aux clients axios, absents ici
+        // (Livewire et les formulaires utilisent le jeton de la page). Un cookie
+        // lisible par JavaScript en moins (constat nikto/nuclei).
+        $middleware->web(replace: [BasePreventRequestForgery::class => PreventRequestForgery::class]);
 
         $middleware->alias([
             'member' => EnsureActiveMember::class,

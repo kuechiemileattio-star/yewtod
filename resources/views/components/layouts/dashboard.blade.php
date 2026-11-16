@@ -78,6 +78,6 @@
     </div>
 </div>
 <x-toasts />
-@livewireScriptConfig
+@livewireScriptConfig(['nonce' => \Illuminate\Support\Facades\Vite::cspNonce()])
 </body>
 </html>

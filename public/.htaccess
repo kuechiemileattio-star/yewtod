@@ -30,9 +30,9 @@ Options -Indexes -MultiViews
 
 # Fichiers envoyés (storage/app/public) : jamais exécutés comme du PHP ni interprétés.
 <IfModule mod_headers.c>
-    <FilesMatch "\.(webp|jpe?g|png|gif|avif|pdf)$">
-        Header set X-Content-Type-Options "nosniff"
-    </FilesMatch>
+    # Aussi pour les fichiers statiques servis directement par Apache (constat ZAP).
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Cross-Origin-Resource-Policy "same-site"
     # Assets compilés par Vite : noms avec empreinte, cache long et immuable (performance).
     <If "%{REQUEST_URI} =~ m#^/build/assets/#">
         Header set Cache-Control "public, max-age=31536000, immutable"

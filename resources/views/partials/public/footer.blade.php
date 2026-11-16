@@ -12,6 +12,8 @@
         <div>
             <p class="font-serif text-xl font-bold">{{ $siteName }}</p>
             <p class="mt-2 text-sm text-muted">{{ $footer['about'] }}</p>
+            {{-- Liens revérifiés à l'affichage (défense en profondeur : seuls http/https). --}}
+            @php($socials = $socials->filter(fn ($s) => \App\Rules\HttpUrl::isSafe($s->url)))
             @if ($socials->isNotEmpty())
                 <ul class="mt-4 flex flex-wrap gap-1" aria-label="Réseaux sociaux">
                     @foreach ($socials as $social)

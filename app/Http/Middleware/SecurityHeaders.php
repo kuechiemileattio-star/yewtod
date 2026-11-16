@@ -33,6 +33,15 @@ class SecurityHeaders
         $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()');
         $headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         $headers->remove('X-Powered-By');
+        // L'en-tête X-Powered-By ajouté par PHP lui-même (expose_php) n'est pas dans
+        // l'objet Response : on le retire au niveau de PHP. Révéler la version exacte
+        // aide un attaquant à cibler une faille connue (constat nikto/nuclei).
+        if (! headers_sent()) {
+            header_remove('X-Powered-By');
+        }
+        // Nos ressources ne sont pas chargeables par un autre site (fuites par canal auxiliaire).
+        $headers->set('Cross-Origin-Resource-Policy', 'same-site');
+        $headers->set('X-Permitted-Cross-Domain-Policies', 'none');
 
         if (app()->isProduction() || $request->isSecure()) {
             // HSTS seulement en HTTPS : un an, sous-domaines inclus.
@@ -51,7 +60,7 @@ class SecurityHeaders
             "script-src 'self' 'nonce-{$nonce}' https://challenges.cloudflare.com https://www.youtube.com{$hot}",
             // Les styles inline sont tolérés (Alpine/Livewire manipulent
             // l'attribut style) : risque bien moindre que des scripts.
-            "style-src 'self' 'unsafe-inline'{$hot}",
+            "style-src 'self' 'nonce-{$nonce}'{$hot}",
             "img-src 'self' data: blob: https://i.ytimg.com https://img.youtube.com",
             "font-src 'self'{$hot}",
             "media-src 'self' https:",

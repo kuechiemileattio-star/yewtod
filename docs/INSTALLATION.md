@@ -266,6 +266,26 @@ vendor/bin/phpstan analyse          # analyse statique (niveau 6)
 - Ouvre http://localhost:8000 : le site public s'affiche.
 - http://localhost:8000/login : connexion ; la double authentification sera exigée.
 
+### 6.1 Tester chaque rôle avec les comptes de démonstration
+
+Le `DemoSeeder` crée un compte par rôle, avec le mot de passe commun **`Demo-Yewtod-Local-2026!`** (local uniquement) :
+
+| Email | Rôle |
+| --- | --- |
+| `superadmin@yewtod.test` | Super Admin |
+| `admin@yewtod.test` | Administrateur |
+| `editeur@yewtod.test` | Éditeur |
+| `contributeur@yewtod.test` | Contributeur |
+| `collaborations@yewtod.test` | Modérateur des collaborations |
+
+Leur double authentification est déjà configurée. Pour obtenir le code à 6 chiffres au moment de la connexion :
+
+```bash
+php artisan yewtod:code-demo editeur@yewtod.test     # « Code actuel : 123456 », valable ~30 s
+```
+
+(Commande refusée hors environnement local et pour tout compte qui n'est pas `@yewtod.test`.)
+
 ---
 
 ## 7. Problèmes fréquents
