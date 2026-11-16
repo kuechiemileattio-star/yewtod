@@ -1,0 +1,7 @@
+# Dossier des fichiers envoyés (lien public/storage) : aucun script exécutable.
+<FilesMatch "\.(php\d?|phtml|phar|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>

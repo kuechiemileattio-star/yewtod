@@ -308,7 +308,13 @@ export function registerComponents(Alpine) {
         },
         show(index) {
             this.$el.querySelectorAll('.toc-panel').forEach((p) => { p.hidden = Number(p.dataset.index) !== index; });
-            this.$el.querySelectorAll('.toc-tab').forEach((t) => t.setAttribute('aria-selected', String(Number(t.dataset.index) === index)));
+            // Onglets ARIA (role=tab) : aria-selected ; liste de liens (sommaire) : aria-current.
+            this.$el.querySelectorAll('.toc-tab').forEach((t) => {
+                const on = Number(t.dataset.index) === index;
+                if (t.getAttribute('role') === 'tab') t.setAttribute('aria-selected', String(on));
+                else if (on) t.setAttribute('aria-current', 'true');
+                else t.removeAttribute('aria-current');
+            });
         },
     }));
 

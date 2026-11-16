@@ -13,9 +13,9 @@
 | 06 Livres | ✅ fait | |
 | 07 Écritures publiques | ✅ fait | |
 | 08 Administration | ✅ fait | |
-| 09 Revue finale | ⏳ en cours | |
-| 10 Déploiement | à faire | |
+| 09 Revue finale | ✅ fait | |
+| 10 Déploiement | ⏳ en cours | |
 
-**Prochaine action** : lot 09 (purges planifiées, sauvegardes chiffrées, revue de couverture, accessibilité, `docs/SECURITE.md`, captures complètes).
+**Prochaine action** : lot 10 (script de déploiement SSH LWS, cron, retour arrière, `docs/DEPLOIEMENT.md`, livraison finale).
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.

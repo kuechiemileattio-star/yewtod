@@ -28,7 +28,7 @@
         <ul class="mx-auto grid max-w-7xl gap-px px-4 sm:px-6 md:grid-cols-3 lg:px-8">
             @foreach ($home['pillars'] as $i => $pillar)
                 <li x-data="reveal" x-bind:class="revealClass" class="py-8 transition duration-700 md:px-6 md:first:pl-0">
-                    <p class="font-serif text-4xl font-bold text-accent-ink/40 dark:text-accent/50" aria-hidden="true">0{{ $i + 1 }}</p>
+                    <p class="font-serif text-4xl font-bold text-accent-ink dark:text-accent" aria-hidden="true">0{{ $i + 1 }}</p>
                     <h2 class="mt-1 text-xl font-bold">{{ $pillar['title'] }}</h2>
                     <p class="mt-2 text-sm text-muted">{{ $pillar['text'] }}</p>
                 </li>

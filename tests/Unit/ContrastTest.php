@@ -55,3 +55,22 @@ it('respecte 3:1 pour les bordures de champs et le focus', function (string $mod
         expect(ratio($t['focus'], $t[$bg]))->toBeGreaterThanOrEqual(3.0, "focus sur $bg ($mode)");
     }
 })->with('modes');
+
+/** Couleur d'un fond semi-transparent posé sur un autre fond (ex. bg-success/15). */
+function blend(string $fg, string $bg, float $alpha): string
+{
+    $f = array_map('hexdec', str_split(ltrim($fg, '#'), 2));
+    $b = array_map('hexdec', str_split(ltrim($bg, '#'), 2));
+
+    return '#'.implode('', array_map(fn ($i) => sprintf('%02X', (int) round($f[$i] * $alpha + $b[$i] * (1 - $alpha))), [0, 1, 2]));
+}
+
+it('respecte 4,5:1 pour les pastilles de statut (texte sur fond teinté)', function (string $mode) {
+    $t = tokens($mode);
+    foreach ([['success', 0.15], ['danger', 0.15], ['accent-2-ink', 0.15], ['warning-ink', 0.20]] as [$color, $alpha]) {
+        $base = $color === 'accent-2-ink' ? 'accent-2' : ($color === 'warning-ink' ? 'warning' : $color);
+        foreach (['surface', 'page'] as $bg) {
+            expect(ratio($t[$color], blend($t[$base], $t[$bg], $alpha)))->toBeGreaterThanOrEqual(4.5, "pastille $color sur $bg ($mode)");
+        }
+    }
+})->with('modes');

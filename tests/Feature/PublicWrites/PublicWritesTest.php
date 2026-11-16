@@ -187,7 +187,7 @@ describe('collaborations', function () {
         expect($c->fresh()->status)->toBe('in_progress');
         Livewire::actingAs(member('moderateur-collaborations'))->test(Collaborations::class)->call('changeStatus', $c->id, 'hack')->assertDispatched('toast', type: 'error');
         $c->forceFill(['created_at' => now()->subMonths(25)])->save();
-        $this->artisan('yewtod:purge-public-data')->assertSuccessful();
+        $this->artisan('yewtod:purge')->assertSuccessful();
         expect(Collaboration::query()->count())->toBe(0);
     });
 });
@@ -249,7 +249,7 @@ describe('newsletter (double opt-in)', function () {
         Mail::fake();
         app(NewsletterService::class)->subscribe('a@b.fr', null);
         $this->travel(8)->days();
-        $this->artisan('yewtod:purge-public-data')->assertSuccessful();
+        $this->artisan('yewtod:purge')->assertSuccessful();
         expect(NewsletterSubscriber::query()->count())->toBe(0);
     });
 

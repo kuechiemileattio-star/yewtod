@@ -12,7 +12,7 @@
 | Newsletter : double opt-in 48 h, réponse identique, désinscription en un clic, réinscription non silencieuse, synchronisation Brevo en file (désactivée sans clé) | `app/Services/NewsletterService.php`, `app/Jobs/SyncNewsletterWithBrevo.php` |
 | Anti-spam : champ piège, Turnstile côté serveur (désactivé sans clé), limitation par IP sur les 4 formulaires | `app/Services/SpamGuard.php`, `app/Services/Turnstile.php`, `AppServiceProvider` |
 | Pastilles du menu : avis en attente, nouvelles collaborations | `AppServiceProvider::registerPublicSources()` |
-| Purges quotidiennes : demandes > 24 mois, inscriptions non confirmées > 7 jours | `yewtod:purge-public-data` (`routes/console.php`) |
+| Purges quotidiennes : demandes > 24 mois, inscriptions non confirmées > 7 jours | `yewtod:purge` (`routes/console.php`) |
 
 ## Menaces traitées
 
@@ -22,5 +22,5 @@ Spam et robots (honeypot, Turnstile, limitation), énumération des abonnés (r�
 
 ```bash
 php artisan test tests/Feature/PublicWrites   # 32 tests
-php artisan yewtod:purge-public-data
+php artisan yewtod:purge
 ```

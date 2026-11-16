@@ -1,9 +1,13 @@
-<IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+# Yewtod SS — configuration Apache (LWS mutualisé, racine web = public/).
 
+# Jamais de listage de dossiers (cahier § 8.4), même hors mod_rewrite.
+Options -Indexes -MultiViews
+
+<IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Fichiers cachés (.env, .git…) : jamais servis, même s'ils arrivaient dans public/.
+    RewriteRule (^|/)\. - [F,L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -22,4 +26,22 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+# Fichiers envoyés (storage/app/public) : jamais exécutés comme du PHP ni interprétés.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|jpe?g|png|gif|avif|pdf)$">
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+    # Assets compilés par Vite : noms avec empreinte, cache long et immuable (performance).
+    <If "%{REQUEST_URI} =~ m#^/build/assets/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+    <If "%{REQUEST_URI} =~ m#^/storage/#">
+        Header set Cache-Control "public, max-age=604800"
+    </If>
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml application/xml application/rss+xml text/plain
 </IfModule>

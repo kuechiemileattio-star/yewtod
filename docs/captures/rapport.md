@@ -1,6 +1,6 @@
 # Revue responsive automatique
 
-Mise à jour le 2026-11-16T02:18:38.738Z.
+Mise à jour le 2026-11-16T02:36:28.776Z.
 
 | Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
 | --- | --- | --- | --- | --- | --- |
@@ -314,16 +314,16 @@ Mise à jour le 2026-11-16T02:18:38.738Z.
 | dashboard-collaborations | 768 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-collaborations | 1024 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-collaborations | 1440 | sombre | 200 | ✅ aucun | ✅ |
-| dashboard-vue-ensemble | 320 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, En relecture : la jeunesse rurale |
-| dashboard-vue-ensemble | 375 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 768 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 1024 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 1440 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 320 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, En relecture : la jeunesse rurale |
-| dashboard-vue-ensemble | 375 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 768 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 1024 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
-| dashboard-vue-ensemble | 1440 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 320 | clair | 200 | ✅ aucun | La société des égaux, Épisode 1 : S'installer, Série : Vivre de la terre |
+| dashboard-vue-ensemble | 375 | clair | 200 | ✅ aucun | La société des égaux, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer, Série : Vivre de la terre, Rapport 2026 sur la précarité étudiante |
+| dashboard-vue-ensemble | 768 | clair | 200 | ✅ aucun | Note : piste sur les tiers-lieux ruraux, La société des égaux, Ce que la sociologie dit vraiment du tél, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer |
+| dashboard-vue-ensemble | 1024 | clair | 200 | ✅ aucun | Note : piste sur les tiers-lieux ruraux, La société des égaux, Ce que la sociologie dit vraiment du tél, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer |
+| dashboard-vue-ensemble | 1440 | clair | 200 | ✅ aucun | La société des égaux, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer, Série : Vivre de la terre, Visualisation : l'évolution du taux d'em |
+| dashboard-vue-ensemble | 320 | sombre | 200 | ✅ aucun | La société des égaux, Épisode 1 : S'installer, Série : Vivre de la terre |
+| dashboard-vue-ensemble | 375 | sombre | 200 | ✅ aucun | La société des égaux, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer, Série : Vivre de la terre, Rapport 2026 sur la précarité étudiante |
+| dashboard-vue-ensemble | 768 | sombre | 200 | ✅ aucun | Note : piste sur les tiers-lieux ruraux, La société des égaux, Ce que la sociologie dit vraiment du tél, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer |
+| dashboard-vue-ensemble | 1024 | sombre | 200 | ✅ aucun | Note : piste sur les tiers-lieux ruraux, La société des égaux, Ce que la sociologie dit vraiment du tél, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer |
+| dashboard-vue-ensemble | 1440 | sombre | 200 | ✅ aucun | La société des égaux, Note : piste sur les tiers-lieux ruraux, Épisode 1 : S'installer, Série : Vivre de la terre, Visualisation : l'évolution du taux d'em |
 | dashboard-parametres | 320 | clair | 200 | ✅ aucun | ✅ |
 | dashboard-parametres | 375 | clair | 200 | ✅ aucun | ✅ |
 | dashboard-parametres | 768 | clair | 200 | ✅ aucun | ✅ |

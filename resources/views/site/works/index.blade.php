@@ -96,7 +96,7 @@
                         <div><label for="au" class="text-xs text-muted">Au</label><input id="au" type="date" name="au" value="{{ $filters['au'] }}" class="field-input"></div>
                     </div>
                 </fieldset>
-                <div class="space-y-3 opacity-70">
+                <div class="space-y-3">
                     <div><label for="pays" class="field-label">Pays</label><select id="pays" disabled class="field-input" aria-describedby="bientot"><option>Bientôt disponible</option></select></div>
                     <div><label for="langue" class="field-label">Langue</label><select id="langue" disabled class="field-input" aria-describedby="bientot"><option>Bientôt disponible</option></select></div>
                     <p id="bientot" class="field-help">Ces filtres seront alimentés prochainement.</p>

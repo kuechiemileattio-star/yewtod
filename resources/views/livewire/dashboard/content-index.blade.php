@@ -59,7 +59,7 @@
         <ul class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" role="list">
             @foreach ($contents as $c)
                 <li class="card flex flex-col overflow-hidden" wire:key="c-{{ $c->id }}">
-                    <button type="button" wire:click="preview({{ $c->id }})" class="block aspect-[16/9] w-full overflow-hidden" aria-label="Aperçu de {{ $c->title }}">
+                    <button type="button" wire:click="preview({{ $c->id }})" class="block aspect-[16/9] w-full overflow-hidden"><span class="sr-only">Aperçu de {{ $c->title }}</span>
                         <x-content-cover :content="$c" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw" />
                     </button>
                     <div class="flex flex-1 flex-col p-4">
