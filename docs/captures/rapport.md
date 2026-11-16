@@ -1,6 +1,6 @@
 # Revue responsive automatique
 
-Mise à jour le 2026-11-16T01:18:36.191Z.
+Mise à jour le 2026-11-16T02:18:38.738Z.
 
 | Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
 | --- | --- | --- | --- | --- | --- |
@@ -314,3 +314,53 @@ Mise à jour le 2026-11-16T01:18:36.191Z.
 | dashboard-collaborations | 768 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-collaborations | 1024 | sombre | 200 | ✅ aucun | ✅ |
 | dashboard-collaborations | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-vue-ensemble | 320 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, En relecture : la jeunesse rurale |
+| dashboard-vue-ensemble | 375 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 768 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 1024 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 1440 | clair | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 320 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, En relecture : la jeunesse rurale |
+| dashboard-vue-ensemble | 375 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 768 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 1024 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-vue-ensemble | 1440 | sombre | 200 | ✅ aucun | Série : Vivre de la terre, Épisode 1 : S'installer, Épisode 2 : Tenir, Épisode 3 : Transmettre, Brouillon : notes sur le logement social |
+| dashboard-parametres | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-parametres | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-pages | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-mediatheque | 1440 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-newsletter | 1440 | sombre | 200 | ✅ aucun | ✅ |

@@ -154,5 +154,30 @@
     "name": "dashboard-collaborations",
     "path": "/dashboard/collaborations",
     "auth": true
+  },
+  {
+    "name": "dashboard-vue-ensemble",
+    "path": "/dashboard",
+    "auth": true
+  },
+  {
+    "name": "dashboard-parametres",
+    "path": "/dashboard/parametres",
+    "auth": true
+  },
+  {
+    "name": "dashboard-pages",
+    "path": "/dashboard/pages",
+    "auth": true
+  },
+  {
+    "name": "dashboard-mediatheque",
+    "path": "/dashboard/mediatheque",
+    "auth": true
+  },
+  {
+    "name": "dashboard-newsletter",
+    "path": "/dashboard/newsletter",
+    "auth": true
   }
 ]

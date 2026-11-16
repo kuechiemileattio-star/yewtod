@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Dashboard\CollaborationFileController;
+use App\Http\Controllers\Dashboard\NewsletterExportController;
+use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\ThemePreferenceController;
 use App\Http\Controllers\Site;
 use App\Livewire\Dashboard;
@@ -60,7 +62,7 @@ Route::get('/apercu/{content}', [Site\WorkController::class, 'preview'])
  * Chaque module ajoute son contrôle de permission côté serveur.
  */
 Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboard')->group(function () {
-    Route::view('/', 'dashboard.home');
+    Route::get('/', OverviewController::class);
 
     Route::put('/preferences/theme', ThemePreferenceController::class)->name('.preferences.theme');
     Route::livewire('/profil', Dashboard\Profile::class)->name('.profile');
@@ -87,6 +89,15 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
         Route::livewire('/collaborations', Dashboard\Collaborations::class)->name('.collaborations');
         Route::get('/collaborations/export', [CollaborationFileController::class, 'export'])->name('.collaborations.export');
         Route::get('/collaborations/fichiers/{file}', [CollaborationFileController::class, 'download'])->middleware('signed')->whereNumber('file')->name('.collaborations.file');
+    });
+
+    // Administration (cahier § 4.8, § 4.9, § 10 P2, § 13.1).
+    Route::livewire('/parametres', Dashboard\Settings::class)->middleware('permission:manage_settings')->name('.settings');
+    Route::livewire('/pages', Dashboard\Pages::class)->middleware('permission:manage_pages')->name('.pages');
+    Route::livewire('/mediatheque', Dashboard\MediaManager::class)->middleware('permission:manage_media')->name('.media');
+    Route::middleware('permission:manage_newsletter')->group(function () {
+        Route::livewire('/newsletter', Dashboard\Newsletter::class)->name('.newsletter');
+        Route::get('/newsletter/export', NewsletterExportController::class)->name('.newsletter.export');
     });
 
     // Guide de style du système de design (documentation vivante).

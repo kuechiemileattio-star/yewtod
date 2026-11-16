@@ -12,10 +12,10 @@
 | 05 Site public | ✅ fait | |
 | 06 Livres | ✅ fait | |
 | 07 Écritures publiques | ✅ fait | |
-| 08 Administration | ⏳ en cours | |
-| 09 Revue finale | à faire | |
+| 08 Administration | ✅ fait | |
+| 09 Revue finale | ⏳ en cours | |
 | 10 Déploiement | à faire | |
 
-**Prochaine action** : lot 08 (Paramètres, Pages, Médiathèque, Newsletter admin, vue d'ensemble avec statistiques).
+**Prochaine action** : lot 09 (purges planifiées, sauvegardes chiffrées, revue de couverture, accessibilité, `docs/SECURITE.md`, captures complètes).
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.
