@@ -10,12 +10,12 @@
 | 03 Design system | ✅ fait | |
 | 04 Contenus | ✅ fait | |
 | 05 Site public | ✅ fait | |
-| 06 Livres | ⏳ en cours | |
-| 07 Écritures publiques | à faire | |
+| 06 Livres | ✅ fait | |
+| 07 Écritures publiques | ⏳ en cours | |
 | 08 Administration | à faire | |
 | 09 Revue finale | à faire | |
 | 10 Déploiement | à faire | |
 
-**Prochaine action** : lot 06 (migration `books` + `book_related`, modèle, policy `manage_books`, écran Livewire, pages `/books` et `/books/{slug}` 100 % en français, prix EUR).
+**Prochaine action** : lot 07 (avis polymorphes + modération, collaborations chiffrées + pièces jointes + export CSV sûr, newsletter double opt-in + Brevo, Turnstile, honeypot, limitation par IP, badges du menu).
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.

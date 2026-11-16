@@ -54,6 +54,7 @@ class DemoSeeder extends Seeder
         return array_values(array_filter([
             // Complété au fil des lots (contenus, livres, avis, collaborations, newsletter).
             DemoContentSeeder::class,
+            DemoBookSeeder::class,
         ], fn ($c) => class_exists($c)));
     }
 }

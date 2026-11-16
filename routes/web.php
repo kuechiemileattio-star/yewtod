@@ -21,6 +21,12 @@ Route::middleware('throttle:public-download')->group(function () {
     Route::get('/works/{workType}/{workSlug}/telecharger', [Site\WorkController::class, 'download'])->name('works.download');
     Route::get('/works/{workType}/{workSlug}/fichiers/{index}', [Site\WorkController::class, 'file'])->whereNumber('index')->name('works.file');
 });
+Route::get('/books', [Site\BookController::class, 'index'])->name('books.index');
+Route::get('/books/{bookSlug}', [Site\BookController::class, 'show'])->where('bookSlug', '[a-z0-9-]{1,320}')->name('books.show');
+Route::middleware('throttle:public-download')->where(['bookSlug' => '[a-z0-9-]{1,320}'])->group(function () {
+    Route::get('/books/{bookSlug}/extraits/{index}', [Site\BookController::class, 'excerpt'])->whereNumber('index')->name('books.excerpt');
+    Route::get('/books/{bookSlug}/livre-electronique', [Site\BookController::class, 'ebook'])->name('books.ebook');
+});
 Route::get('/meet', [Site\PageController::class, 'meet'])->name('meet');
 Route::get('/mentions-legales', [Site\PageController::class, 'legal'])->name('legal');
 Route::get('/confidentialite', [Site\PageController::class, 'privacy'])->name('privacy');
@@ -55,6 +61,9 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
         Route::livewire('/contenus/{type}/nouveau', Dashboard\ContentEditor::class)->name('.contents.create');
         Route::livewire('/contenus/{type}/{content}/modifier', Dashboard\ContentEditor::class)->whereNumber('content')->name('.contents.edit');
     });
+
+    // Livres (cahier § 4.4).
+    Route::livewire('/livres', Dashboard\Books::class)->middleware('permission:manage_books')->name('.books');
 
     // Guide de style du système de design (documentation vivante).
     Route::view('/design', 'dashboard.styleguide')->name('.styleguide');

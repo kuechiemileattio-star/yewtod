@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Book;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Events\CommandStarting;
@@ -34,6 +35,22 @@ class AppServiceProvider extends ServiceProvider
 
         $this->useMigrationConnection();
         $this->publicRateLimits();
+        $this->registerPublicSources();
+    }
+
+    /**
+     * Les livres alimentent le sitemap et la recherche globale sans que le
+     * code des publications ne dépende d'eux (sources étiquetées).
+     */
+    private function registerPublicSources(): void
+    {
+        $this->app->bind('sources.books.sitemap', fn () => fn () => Book::query()->published()->latestFirst()->limit(5000)->get(['slug', 'updated_at'])
+            ->map(fn (Book $b) => ['loc' => $b->publicUrl(), 'lastmod' => $b->updated_at->toAtomString()])->all());
+        $this->app->tag(['sources.books.sitemap'], 'sitemap.sources');
+        $this->app->bind('sources.books.search', fn () => fn (string $like) => Book::query()->published()
+            ->where(fn ($w) => $w->where('title', 'like', $like)->orWhere('author', 'like', $like))->limit(5)->get(['slug', 'title', 'author'])
+            ->map(fn (Book $b) => ['title' => $b->title, 'kind' => 'Livre · '.$b->author, 'url' => $b->publicUrl()]));
+        $this->app->tag(['sources.books.search'], 'search.sources');
     }
 
     /**

@@ -39,7 +39,7 @@
                 <li><a class="btn-secondary" href="{{ $meta['source_code_url'] }}" target="_blank" rel="noopener noreferrer"><x-icon name="external" class="size-4" /> Code source</a></li>
             @endif
             @foreach ((array) ($meta['downloads'] ?? []) as $i => $file)
-                <li><a class="btn-secondary" href="{{ route('works.file', [$content->type->value, $content->slug, $i]) }}"><x-icon name="download" class="size-4" /> {{ $file['label'] }} @if (! empty($file['size']))<span class="text-xs text-muted">({{ \Illuminate\Support\Number::fileSize((int) $file['size'], 1) }})</span>@endif</a></li>
+                <li><a class="btn-secondary" href="{{ route('works.file', [$content->type->value, $content->slug, $i]) }}"><x-icon name="download" class="size-4" /> {{ $file['label'] }} @if (! empty($file['size']))<span class="text-xs text-muted">({{ \App\Support\Format::fileSize((int) $file['size']) }})</span>@endif</a></li>
             @endforeach
         </ul>
     </div>

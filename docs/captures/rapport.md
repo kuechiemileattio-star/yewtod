@@ -1,6 +1,6 @@
 # Revue responsive automatique
 
-Mise à jour le 2026-11-16T00:56:49.473Z.
+Mise à jour le 2026-11-16T01:05:56.572Z.
 
 | Page | Largeur | Thème | HTTP | Défilement horizontal | Cibles < 44 px (hors liens dans le texte) |
 | --- | --- | --- | --- | --- | --- |
@@ -174,3 +174,33 @@ Mise à jour le 2026-11-16T00:56:49.473Z.
 | visualisation | 768 | sombre | 200 | ✅ aucun | Accueil, Travaux, Visualisations de données |
 | visualisation | 1024 | sombre | 200 | ✅ aucun | Accueil, Travaux, Visualisations de données |
 | visualisation | 1440 | sombre | 200 | ✅ aucun | Accueil, Travaux, Visualisations de données |
+| livres | 320 | clair | 200 | ✅ aucun | Le capital au XXIe siècle, La misère du monde, Sapiens, Le hasard et la nécessité, Retour à Reims |
+| livres | 375 | clair | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 768 | clair | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 1024 | clair | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 1440 | clair | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 320 | sombre | 200 | ✅ aucun | Le capital au XXIe siècle, La misère du monde, Sapiens, Le hasard et la nécessité, Retour à Reims |
+| livres | 375 | sombre | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 768 | sombre | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 1024 | sombre | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livres | 1440 | sombre | 200 | ✅ aucun | La société des égaux, Le capital au XXIe siècle, La misère du monde, Sapiens, L'âge du capitalisme de surveillance |
+| livre | 320 | clair | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 375 | clair | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 768 | clair | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 1024 | clair | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 1440 | clair | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 320 | sombre | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 375 | sombre | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 768 | sombre | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 1024 | sombre | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| livre | 1440 | sombre | 200 | ✅ aucun | Livres, Politique, Le capital au XXIe siècle, Retour à Reims |
+| dashboard-livres | 320 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 375 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 768 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 1024 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 1440 | clair | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 320 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 375 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 768 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 1024 | sombre | 200 | ✅ aucun | ✅ |
+| dashboard-livres | 1440 | sombre | 200 | ✅ aucun | ✅ |

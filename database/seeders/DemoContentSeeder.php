@@ -34,7 +34,7 @@ class DemoContentSeeder extends Seeder
 
         $editor = User::query()->where('email', 'editeur@yewtod.test')->first();
         $contrib = User::query()->where('email', 'contributeur@yewtod.test')->first();
-        $pdf = $this->demoPdf();
+        $pdf = self::demoPdf();
         $para = fn (int $n = 3) => collect(range(1, $n))->map(fn () => '<p>'.fake('fr_FR')->paragraph(6).'</p>')->implode('');
 
         $articles = [
@@ -136,7 +136,7 @@ class DemoContentSeeder extends Seeder
             'downloads_count' => $file ? random_int(5, 120) : 0,
         ]);
         if ($cover) {
-            $content->forceFill(['cover_path' => $this->cover($title), 'cover_alt' => 'Illustration : '.$title]);
+            $content->forceFill(['cover_path' => self::cover($title), 'cover_alt' => 'Illustration : '.$title]);
         }
         if ($file) {
             $content->forceFill(['file_path' => $file['path'], 'file_name' => 'demo.pdf', 'file_size' => $file['size']]);
@@ -148,10 +148,8 @@ class DemoContentSeeder extends Seeder
     }
 
     /** Couverture abstraite dessinée par GD puis passée par ImageProcessor (WebP + srcset). */
-    private function cover(string $seed): string
+    public static function cover(string $seed, string $directory = 'covers', int $w = 1600, int $h = 900): string
     {
-        $w = 1600;
-        $h = 900;
         $img = imagecreatetruecolor($w, $h);
         $palettes = [[[23, 34, 56], [240, 100, 77]], [[46, 145, 161], [23, 34, 56]], [[245, 185, 77], [240, 100, 77]], [[23, 34, 56], [46, 145, 161]]];
         [$a, $b] = $palettes[crc32($seed) % 4];
@@ -168,20 +166,20 @@ class DemoContentSeeder extends Seeder
         $tmp = tempnam(sys_get_temp_dir(), 'cov').'.png';
         imagepng($img, $tmp);
         imagedestroy($img);
-        $stored = app(ImageProcessor::class)->store(new UploadedFile($tmp, 'cover.png', 'image/png', null, true), 'covers');
+        $stored = app(ImageProcessor::class)->store(new UploadedFile($tmp, 'cover.png', 'image/png', null, true), $directory);
         @unlink($tmp);
 
         return $stored['path'];
     }
 
     /** @return array{path: string, size: int} PDF minimal valide sur le disque privé. */
-    private function demoPdf(): array
+    public static function demoPdf(string $directory = 'documents'): array
     {
         $pdf = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
             ."3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
             ."4 0 obj<</Length 58>>stream\nBT /F1 24 Tf 72 760 Td (Yewtod SS - document de demo) Tj ET\nendstream endobj\n"
             ."5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n";
-        $path = 'documents/demo-'.Str::random(20).'.pdf';
+        $path = $directory.'/demo-'.Str::random(20).'.pdf';
         Storage::disk('local')->put($path, $pdf);
 
         return ['path' => $path, 'size' => strlen($pdf)];

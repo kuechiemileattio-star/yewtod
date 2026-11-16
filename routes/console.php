@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\BookService;
 use App\Services\ContentWorkflow;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -11,7 +12,8 @@ use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('yewtod:publish-scheduled', function () {
     $count = ContentWorkflow::publishDue();
-    $this->info("{$count} contenu(s) programmé(s) publié(s).");
+    $books = BookService::publishDue();
+    $this->info("{$count} contenu(s) et {$books} livre(s) programmé(s) publié(s).");
 })->purpose('Publie les contenus programmés dont la date est passée');
 
 Schedule::command('yewtod:publish-scheduled')->everyMinute()->withoutOverlapping();

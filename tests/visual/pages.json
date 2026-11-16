@@ -45,6 +45,16 @@
     "auth": false
   },
   {
+    "name": "livres",
+    "path": "/books",
+    "auth": false
+  },
+  {
+    "name": "livre",
+    "path": "/books/la-societe-des-egaux",
+    "auth": false
+  },
+  {
     "name": "meet",
     "path": "/meet",
     "auth": false
@@ -123,6 +133,11 @@
   {
     "name": "editeur-visualisation",
     "path": "/dashboard/contenus/visualisations-de-donnees/nouveau",
+    "auth": true
+  },
+  {
+    "name": "dashboard-livres",
+    "path": "/dashboard/livres",
     "auth": true
   }
 ]
