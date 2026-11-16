@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureActiveMember;
 use App\Http\Middleware\EnsureTwoFactorEnabled;
+use App\Http\Middleware\ProtectPreproduction;
 use App\Http\Middleware\RequirePermission;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -17,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // En-têtes de sécurité sur toutes les réponses web.
-        $middleware->web(prepend: [SecurityHeaders::class]);
+        $middleware->web(prepend: [SecurityHeaders::class, ProtectPreproduction::class]);
 
         // Le cookie de thème est écrit par le navigateur : il n'est pas chiffré
         // (valeur fermée light/dark/system, revalidée côté serveur).

@@ -15,6 +15,13 @@ return [
         'host' => env('LEGAL_HOST') ?: 'LWS (Ligne Web Services), SAS — 2 rue Jules Ferry, 88190 Golbey, France — RCS Épinal 851 993 683 — https://www.lws.fr',
     ],
 
+    // Préproduction protégée (cahier § 12.3). Hacher le mot de passe avec :
+    // php -r 'echo password_hash("mot de passe", PASSWORD_ARGON2ID), PHP_EOL;'
+    'preprod' => [
+        'user' => env('PREPROD_USER', ''),
+        'password_hash' => env('PREPROD_PASSWORD_HASH', ''),
+    ],
+
     // Durées de conservation (cahier § 8.5, § 8.6) — utilisées par les purges (lot 09).
     'retention' => [
         'collaborations_months' => (int) env('RETENTION_COLLABORATIONS_MONTHS', 24),

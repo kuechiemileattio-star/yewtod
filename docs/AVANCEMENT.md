@@ -14,8 +14,8 @@
 | 07 Écritures publiques | ✅ fait | |
 | 08 Administration | ✅ fait | |
 | 09 Revue finale | ✅ fait | |
-| 10 Déploiement | ⏳ en cours | |
+| 10 Déploiement | ✅ fait (script et procédure ; exécution chez LWS à faire) | |
 
-**Prochaine action** : lot 10 (script de déploiement SSH LWS, cron, retour arrière, `docs/DEPLOIEMENT.md`, livraison finale).
+**Prochaine action** : tâches manuelles de Yann (voir le récapitulatif final, section « À faire manuellement ») : pousser `v2`, générer et committer `composer.lock`, préparer LWS, déployer la préproduction.
 
 **Points à vérifier par Yann** : voir la section « À faire manuellement » du récapitulatif final.

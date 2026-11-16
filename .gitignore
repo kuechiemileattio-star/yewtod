@@ -35,3 +35,6 @@ Thumbs.db
 # Temporaire (décision D3) : supprimer cette ligne après avoir généré le lock depuis Packagist
 /composer.lock
 /storage/framework/phpstan
+
+# Configuration de déploiement (hôtes, chemins)
+/scripts/deploiement.env
