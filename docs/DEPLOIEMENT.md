@@ -121,24 +121,26 @@ cd ~/yewtod && git switch v2 && git pull
 scripts/deployer-ftp.sh
 ```
 
-Le script :
+Le FTP de LWS est **bridé** (« bandwidth usage is restricted ») : envoyer 8 000 fichiers un par un n'aboutit pas. Le script envoie donc **une seule archive** du commit, et l'installation se fait sur le serveur, dans le Terminal web (D77). Le script :
+
 1. vérifie la branche et l'arbre propre, lance les **tests**, `composer audit` et `npm audit` ;
-2. construit le **paquet** du commit (`scripts/preparer-paquet.sh`) : dépendances sans outils de développement, assets compilés, protections `.htaccess` ;
-3. affiche les fichiers qui seraient supprimés sur le serveur et **demande confirmation** ;
-4. envoie les fichiers, le squelette de `storage/` (sans jamais toucher aux fichiers déjà présents) et le `.env` ;
-5. affiche les commandes à taper dans le **Terminal web**, à lancer **dans le dossier du site** (`cd htdocs` si le terminal s'ouvre au-dessus) :
+2. construit le **paquet** du commit (dépendances sans outils de développement, assets compilés, protections `.htaccess`), puis l'**archive** `yewtod-<commit>.zip` et son **empreinte** SHA-256 ;
+3. envoie l'archive et l'installateur dans `_deploiement/` (inaccessible depuis le web), puis le `.env` ; **le site en ligne n'est pas encore modifié** ;
+4. affiche les commandes à coller dans le **Terminal web**, **une ligne à la fois** (le terminal s'ouvre déjà dans le dossier du site) :
 
 ```bash
-php -v                                   # PHP 8.5 (ou la version choisie)
-php artisan migrate --force --seed       # tables + rôles, permissions et réglages de référence
-php artisan storage:link                 # lien public/storage
-php artisan yewtod:create-super-admin    # votre compte, interactif
-php artisan optimize:clear && php artisan optimize
+php _deploiement/installer.php yewtod-<commit>.zip <empreinte>
+php artisan migrate --force --seed
+php artisan yewtod:create-super-admin
+php artisan optimize:clear
+php artisan optimize
 php artisan yewtod:verifier-production
 php artisan up
 ```
 
-6. contrôle que `https://yewtod.com/up` répond 200.
+L'installateur vérifie l'empreinte (envoi complet et intact), met le site en maintenance, extrait l'archive, **échange** les dossiers du site (l'ancienne version est rangée dans `_deploiement/precedente`), complète `storage/` sans toucher à ses fichiers, garde le `.env`, retire la page d'attente de LWS et recrée le lien `public/storage`.
+
+5. contrôle enfin que `https://yewtod.com/up` répond 200.
 
 > Après **toute** modification du `.env` sur le serveur, relancez `php artisan optimize` : la configuration est mise en cache et le `.env` n'est plus relu sinon.
 
@@ -192,26 +194,34 @@ cd ~/yewtod && git switch v2 && git pull
 scripts/deployer-ftp.sh
 ```
 
-En plus du premier déploiement, le script **met le site en maintenance** pendant l'envoi (503), et, si de **nouvelles migrations** arrivent, demande d'abord une **sauvegarde** dans le Terminal web (`php artisan yewtod:backup`). Commandes affichées ensuite :
+Même déroulé, un seul envoi (environ 20 Mo). Commandes affichées ensuite :
 
 ```bash
+php artisan yewtod:backup                # seulement s'il y a de nouvelles migrations, AVANT l'installation
+php _deploiement/installer.php yewtod-<commit>.zip <empreinte>
 php artisan migrate --force              # seulement s'il y a de nouvelles migrations
-php artisan optimize:clear && php artisan optimize
+php artisan optimize:clear
+php artisan optimize
 php artisan yewtod:verifier-production
 php artisan up
 ```
 
-Le `.env` du serveur n'est **pas** renvoyé (sauf `scripts/deployer-ftp.sh --env`). Si l'envoi est interrompu, le site reste en maintenance : relancez le script, ou supprimez `storage/framework/down` par FTP pour le rouvrir.
+Le site reste en ligne pendant l'envoi ; il n'est en maintenance qu'entre l'installateur et `php artisan up`. Le `.env` du serveur n'est **pas** renvoyé (sauf `scripts/deployer-ftp.sh --env`).
 
 ## 8. Retour arrière, restauration, sauvegardes
 
-**Retour arrière du code** : redéployez le commit précédent (le numéro est affiché à la fin de chaque déploiement) :
+**Retour arrière instantané** (Terminal web) : l'installateur garde la version précédente.
 
 ```bash
-scripts/deployer-ftp.sh 1a2b3c4
+php _deploiement/installer.php --retour
+php artisan optimize:clear
+php artisan optimize
+php artisan up
 ```
 
-Si ce déploiement avait appliqué des migrations, annulez-les **avant**, dans le Terminal web : `php artisan migrate:rollback --step=N` (N = nombre de migrations du déploiement), ou restaurez la sauvegarde prise juste avant.
+Relancé une seconde fois, `--retour` revient à la version annulée. Si la version annulée avait appliqué des migrations, annulez-les **avant** (`php artisan migrate:rollback --step=N`) ou restaurez la sauvegarde prise juste avant.
+
+**Redéployer un ancien commit** (plus ancien que la version précédente) : `scripts/deployer-ftp.sh 1a2b3c4`.
 
 **Restauration de la base** (Terminal web) :
 

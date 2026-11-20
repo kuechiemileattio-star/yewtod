@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # =====================================================================
-# Déploiement Yewtod SS sur LWS Perso, SANS SSH (décision D73).
+# Déploiement Yewtod SS sur LWS Perso, SANS SSH (décisions D73, D77).
 #
 #   scripts/deployer-ftp.sh                    # déploie le commit courant (HEAD)
 #   scripts/deployer-ftp.sh --env              # envoie aussi le .env de production
 #   scripts/deployer-ftp.sh --sans-tests       # (déconseillé) saute les tests
 #   scripts/deployer-ftp.sh <commit>           # RETOUR ARRIÈRE : redéploie un ancien commit
 #
-# Ce qui est automatique (depuis WSL) : tests, paquet, mise en maintenance,
-# envoi FTP, contrôle de santé. Ce qui reste à taper dans le Terminal web
-# du panneau LWS (pas de SSH sur cette formule) : sauvegarde si des
-# migrations arrivent, migrations, caches, vérification, remise en ligne.
-# Le script s'arrête et affiche ces commandes au bon moment.
+# Le FTP de LWS est bridé : envoyer les fichiers un par un est interminable.
+# On envoie donc UNE archive du commit (+ son empreinte) et l'installateur ;
+# l'installation se lance ensuite dans le Terminal web (pas de SSH) :
+#   php _deploiement/installer.php <archive> <empreinte>
+# Il met le site en maintenance, échange les dossiers (la version précédente
+# est gardée pour un retour arrière instantané : installer.php --retour),
+# sans jamais toucher au .env ni aux fichiers de storage/.
 # =====================================================================
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -33,15 +35,16 @@ command -v lftp >/dev/null || { echo "lftp manquant : sudo apt install lftp"; ex
 
 step() { printf '\n\033[1;34m▶ %s\033[0m\n' "$*"; }
 ask() { local r; printf '%s [oui/non] ' "$1"; read -r r; [[ "$r" == "oui" ]]; }
-terminal() { printf '\n\033[1;33m   À taper dans le Terminal web LWS (dans le dossier du site) :\033[0m\n'; printf '     %s\n' "$@"; }
+terminal() { printf '\n\033[1;33m   À coller dans le Terminal web LWS, UNE ligne à la fois :\033[0m\n'; printf '     %s\n' "$@"; }
 
 read -r -s -p "Mot de passe FTP de $FTP_UTILISATEUR : " LFTP_PASSWORD; echo
 export LFTP_PASSWORD
 # shellcheck source=scripts/lib-ftp.sh
 source scripts/lib-ftp.sh
 ftp_preparer
+D="${FTP_DOSSIER%/}"   # « / » → « » : chemins du type $D/_deploiement
 
-step "1/7 Vérifications locales"
+step "1/6 Vérifications locales"
 SHA="$(git rev-parse --short "$REF")"
 if [[ "$REF" == "HEAD" ]]; then
   [[ "$(git rev-parse --abbrev-ref HEAD)" == "v2" ]] || { echo "Déployez depuis la branche v2."; exit 1; }
@@ -54,71 +57,52 @@ else
   ask "Confirmer le redéploiement de cet ancien commit ?" || exit 1
 fi
 
-step "2/7 Connexion FTP et état du serveur"
+step "2/6 État du serveur"
 # Seuls des fichiers visibles sont testés : beaucoup de serveurs FTP masquent les fichiers « . » (.env).
-REMOTE_LIST="$(ftp_run "cd '$FTP_DOSSIER'; cls -1 artisan; cls -1 database/migrations/" 2>/dev/null || true)"
+REMOTE_LIST="$(ftp_run "cd '${D:-/}'; cls -1 artisan; cls -1 database/migrations/" 2>/dev/null || true)"
 FIRST_INSTALL="oui"; grep -qx 'artisan' <<<"$REMOTE_LIST" && FIRST_INSTALL="non"
 echo "Première installation : $FIRST_INSTALL"
 
-step "3/7 Paquet du commit $SHA"
+step "3/6 Paquet et archive du commit $SHA"
 scripts/preparer-paquet.sh "$REF"
 NEW_MIGRATIONS="$(comm -23 <(ls build/paquet/database/migrations | sort) <(grep -o '[^/]*\.php$' <<<"$REMOTE_LIST" | sort) || true)"
 if [[ -n "$NEW_MIGRATIONS" ]]; then echo "Nouvelles migrations :"; sed 's/^/  - /' <<<"$NEW_MIGRATIONS"; else echo "Aucune nouvelle migration."; fi
-# Squelette de storage/ (dossiers, .gitignore, .htaccess) : envoyé SANS suppression,
-# pour ne jamais toucher aux fichiers du serveur (envois, sauvegardes, journaux).
-rm -rf build/squelette-storage && mkdir -p build/squelette-storage
-(cd build/paquet/storage && find . -type d -exec mkdir -p ../../squelette-storage/{} \; \
-  && find . \( -name '.gitignore' -o -name '.htaccess' \) -exec cp --parents {} ../../squelette-storage/ \;)
+ARCHIVE="yewtod-$SHA.zip"
+INFO="$(php scripts/creer-archive.php build/paquet "build/$ARCHIVE")"
+echo "Archive : $INFO"
+EMPREINTE="$(sed -n 's/.*sha256 \([a-f0-9]\{64\}\).*/\1/p' <<<"$INFO")"
+[[ -n "$EMPREINTE" ]] || { echo "Empreinte de l'archive introuvable."; exit 1; }
+printf '# Généré par deployer-ftp.sh : jamais servi par le web (D77).\nRequire all denied\n' > build/deploiement.htaccess
 
-if [[ "$FIRST_INSTALL" == "non" ]]; then
-  step "4/7 Mode maintenance"
-  # Même fichier que « php artisan down » (pilote « file ») : le site répond 503 pendant l'envoi.
-  printf '{"except":[],"redirect":null,"retry":60,"refresh":null,"secret":null,"status":503,"template":null}' > build/down
-  ftp_run "cd '$FTP_DOSSIER'; put build/down -o storage/framework/down"
-  echo "Site en maintenance."
-  if [[ -n "$NEW_MIGRATIONS" ]]; then
-    echo "Des migrations arrivent : sauvegarde chiffrée AVANT l'envoi."
-    terminal "php artisan yewtod:backup"
-    ask "La sauvegarde a-t-elle réussi (« Sauvegarde chiffrée créée ») ?" || { echo "Arrêt. Le site reste en maintenance : supprimez storage/framework/down par FTP pour le rouvrir."; exit 1; }
-  fi
-else
-  step "4/7 Première installation : pas de maintenance ni de sauvegarde"
-fi
-
-step "5/7 Envoi des fichiers"
-EXCLUDES=(--exclude-glob .env --exclude '^storage/' --exclude '^public/storage$' --exclude '^public/storage/'
-          --exclude '^\.well-known/' --exclude '^cgi-bin/')
-echo "Fichiers qui seraient SUPPRIMÉS sur le serveur (absents du commit) :"
-ftp_run "cd '$FTP_DOSSIER'; mirror -R --dry-run --delete --no-perms --no-symlinks ${EXCLUDES[*]} build/paquet ." 2>/dev/null | grep -E '^rm ' | sed 's/^/  /' | head -50 || true
-ask "Continuer l'envoi ?" || { echo "Arrêt. Supprimez storage/framework/down par FTP pour rouvrir le site."; exit 1; }
-ftp_run "cd '$FTP_DOSSIER'; mirror -R --delete --no-perms --no-symlinks --parallel=6 ${EXCLUDES[*]} build/paquet .; mirror -R --no-perms --no-symlinks --parallel=6 build/squelette-storage storage"
-# Le .env n'est envoyé qu'à la première installation ou sur demande (--env) : jamais écrasé par surprise.
+step "4/6 Envoi de l'archive (le site en ligne n'est pas encore modifié)"
+ftp_run "cd '${D:-/}'; mkdir -p _deploiement; put build/deploiement.htaccess -o _deploiement/.htaccess; put scripts/installer-version.php -o _deploiement/installer.php; put build/$ARCHIVE -o _deploiement/$ARCHIVE"
+echo "Archive et installateur envoyés dans _deploiement/."
 if [[ "$SEND_ENV" == "oui" || "$FIRST_INSTALL" == "oui" ]]; then
+  # Le .env n'est envoyé qu'à la première installation ou sur demande (--env) : jamais écrasé par surprise.
   [[ -f "$ENV_LOCAL" ]] || { echo "Fichier $ENV_LOCAL introuvable (voir docs/DEPLOIEMENT.md, étape .env)."; exit 1; }
   grep -q '^APP_KEY=base64:' "$ENV_LOCAL" || { echo "APP_KEY absente de $ENV_LOCAL."; exit 1; }
-  ftp_run "cd '$FTP_DOSSIER'; put '$ENV_LOCAL' -o .env; chmod 600 .env"
+  ftp_run "cd '${D:-/}'; put '$ENV_LOCAL' -o .env; chmod 600 .env"
   echo ".env envoyé (droits 600)."
 fi
 
-step "6/7 Commandes à lancer dans le Terminal web"
+step "5/6 Installation dans le Terminal web"
 CMDS=()
+[[ "$FIRST_INSTALL" == "non" && -n "$NEW_MIGRATIONS" ]] && CMDS+=("php artisan yewtod:backup")
+CMDS+=("php _deploiement/installer.php $ARCHIVE $EMPREINTE")
 if [[ "$FIRST_INSTALL" == "oui" ]]; then
-  CMDS+=("php -v                                   # version choisie dans le panneau (8.5)"
-         "php artisan migrate --force --seed       # tables + rôles et réglages de référence"
-         "php artisan storage:link"
-         "php artisan yewtod:create-super-admin    # votre compte, interactif")
+  CMDS+=("php artisan migrate --force --seed" "php artisan yewtod:create-super-admin")
 elif [[ -n "$NEW_MIGRATIONS" ]]; then
   CMDS+=("php artisan migrate --force")
 fi
-CMDS+=("php artisan optimize:clear && php artisan optimize"
-       "php artisan yewtod:verifier-production"
-       "php artisan up")
+CMDS+=("php artisan optimize:clear" "php artisan optimize" "php artisan yewtod:verifier-production" "php artisan up")
 terminal "${CMDS[@]}"
-ask "Ces commandes ont-elles été lancées sans erreur ?" || { echo "Corrigez puis relancez les commandes. Retour arrière possible : $0 <ancien commit>."; exit 1; }
+echo
+echo "   En cas de problème après l'installation : php _deploiement/installer.php --retour"
+ask "Ces commandes ont-elles été lancées sans erreur ?" || { echo "Corrigez, ou revenez en arrière (installer.php --retour). Rien d'autre à faire côté WSL."; exit 1; }
 
-step "7/7 Contrôle de santé"
+step "6/6 Contrôle de santé"
 code="$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL/up" || true)"
 home="$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL/" || true)"
 echo "/up → $code ; accueil → $home (401 normal si la protection de préproduction est active)"
-[[ "$code" == "200" ]] || { echo "⚠ Le site ne répond pas correctement : vérifiez storage/logs puis envisagez $0 <ancien commit>."; exit 1; }
-echo "Commit $SHA en ligne. Pensez à noter ce numéro (retour arrière : $0 $SHA~1)."
+[[ "$code" == "200" ]] || { echo "⚠ Le site ne répond pas correctement : vérifiez storage/logs, ou revenez en arrière (installer.php --retour)."; exit 1; }
+echo "Commit $SHA en ligne."
