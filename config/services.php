@@ -8,14 +8,6 @@
 
 return [
 
-    'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
-        'endpoint' => 'https://generativelanguage.googleapis.com/v1beta/models',
-        'timeout' => 60,
-        'max_pdf_bytes' => 20 * 1024 * 1024,
-    ],
-
     'brevo' => [
         'key' => env('BREVO_API_KEY'),
         'list_id' => env('BREVO_LIST_ID'),

@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -119,12 +118,6 @@ class Book extends Model implements Trackable
     public function related(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'book_related', 'book_id', 'related_id')->withPivot('position')->orderByPivot('position');
-    }
-
-    /** @return MorphMany<AiAnalysis, $this> */
-    public function analyses(): MorphMany
-    {
-        return $this->morphMany(AiAnalysis::class, 'analyzable');
     }
 
     /**

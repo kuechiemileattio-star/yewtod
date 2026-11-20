@@ -15,6 +15,7 @@
 | 08 Administration | ✅ fait | |
 | 09 Revue finale | ✅ fait | |
 | 10 Déploiement | ✅ fait (script et procédure ; exécution chez LWS à faire) | |
+| Retrait de l'analyse IA (D71) | ✅ fait (code, migration de suppression, tests, documentation) | |
 
 **Prochaine action** : tâches manuelles de Yann (voir le récapitulatif final, section « À faire manuellement ») : pousser `v2`, générer et committer `composer.lock`, préparer LWS, déployer la préproduction.
 

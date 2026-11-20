@@ -296,16 +296,6 @@
                 </div>
             </div>
 
-            <div class="card p-4" @if ($analysisId) wire:poll.3s="checkAnalysis" @endif>
-                <h2 class="mb-2 text-base font-bold">Analyse IA</h2>
-                @if ($aiEnabled)
-                    <p class="mb-3 text-xs text-muted">Remplit résumé, nombre de pages et sommaire depuis le PDF enregistré. Le titre saisi n'est jamais remplacé.</p>
-                    <button type="button" wire:click="analyzeWithAi" class="btn-secondary w-full" @disabled($analysisId !== null)>{{ $analysisId ? 'Analyse en cours…' : 'Analyser avec l\'IA' }}</button>
-                @else
-                    <p class="text-sm text-muted" role="note">Analyse IA désactivée : la clé Gemini n'est pas encore configurée (GEMINI_API_KEY).</p>
-                @endif
-            </div>
-
             <div class="card overflow-hidden" aria-label="Aperçu de la carte publique">
                 <p class="border-b border-line px-4 py-2 text-xs font-bold uppercase tracking-wider text-muted">Aperçu en direct</p>
                 <div class="aspect-[16/9] bg-surface-2">

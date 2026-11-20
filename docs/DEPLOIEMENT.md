@@ -51,7 +51,6 @@ MAIL_USERNAME=…
 MAIL_PASSWORD='…'
 MAIL_FROM_ADDRESS="no-reply@yewtod.com"
 
-GEMINI_API_KEY=                # facultatif : l'analyse IA se désactive sans clé
 BREVO_API_KEY=                 # facultatif : la synchronisation se désactive sans clé
 BREVO_LIST_ID=
 TURNSTILE_SITE_KEY=            # facultatif mais recommandé en production

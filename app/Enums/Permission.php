@@ -38,9 +38,9 @@ enum Permission: string
     public function description(): string
     {
         return match ($this) {
-            self::ManageArticles => 'Les 8 types de publications, la modération de leurs avis, l\'analyse IA',
+            self::ManageArticles => 'Les 8 types de publications, la modération de leurs avis',
             self::PublishContent => 'Passer un contenu en « publié » ou « programmé » (sinon : soumission en relecture)',
-            self::ManageBooks => 'Les livres, la modération de leurs avis, l\'analyse IA',
+            self::ManageBooks => 'Les livres, la modération de leurs avis',
             self::ManageCollaborations => 'Les demandes de collaboration et leurs pièces jointes',
             self::ManagePages => 'Les pages éditables (Meet, Accueil, pied de page)',
             self::ManageMedia => 'La médiathèque',

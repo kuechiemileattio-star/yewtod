@@ -111,10 +111,11 @@ describe('écran du dashboard', function () {
             ->assertSet('form.pages', 210)->assertSet('form.composition.1.title', 'Chapitre 2');
     });
 
-    it('désactive proprement l\'analyse IA sans clé Gemini', function () {
+    it('ne propose plus d\'analyse IA de l\'ebook (fonction retirée, D71)', function () {
         $book = Book::factory()->create();
-        Livewire::actingAs(member('editeur'))->test(Books::class)->call('edit', $book->id)->call('analyzeWithAi')
-            ->assertDispatched('toast', type: 'error', message: 'Analyse IA indisponible : la clé Gemini n\'est pas configurée.');
+        Livewire::actingAs(member('editeur'))->test(Books::class)->call('edit', $book->id)->set('tab', 'ebook')
+            ->assertDontSee('Analyser avec l\'IA')->assertDontSee('Gemini');
+        expect(method_exists(Books::class, 'analyzeWithAi'))->toBeFalse();
     });
 });
 

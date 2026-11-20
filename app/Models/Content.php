@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -123,12 +122,6 @@ class Content extends Model implements Trackable
     public function related(): BelongsToMany
     {
         return $this->belongsToMany(Content::class, 'content_related', 'content_id', 'related_id')->withPivot('position')->orderByPivot('position');
-    }
-
-    /** @return MorphMany<AiAnalysis, $this> */
-    public function analyses(): MorphMany
-    {
-        return $this->morphMany(AiAnalysis::class, 'analyzable');
     }
 
     /**

@@ -31,7 +31,6 @@
         <env name="ARGON_TIME" value="1"/>
         <env name="ARGON_THREADS" value="1"/>
         <env name="HIBP_ENABLED" value="false"/>
-        <env name="GEMINI_API_KEY" value=""/>
         <env name="BREVO_API_KEY" value=""/>
         <env name="TURNSTILE_SECRET_KEY" value=""/>
         <env name="SESSION_SECURE_COOKIE" value="false"/>

@@ -10,9 +10,9 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 | 01 | Fortify, invitations hachées 7 jours, onboarding, 2FA obligatoire + codes de secours, politique de mot de passe, réinitialisation, sessions, limitation, audit | `docs/lots/lot-01-authentification.md` |
 | 02 | Rôles et permissions, R1–R8, écrans Utilisateurs & rôles, Mon profil, journal d'audit | `docs/lots/lot-02-rbac.md` |
 | 03 | Système de design par jetons, mode sombre sans flash (public et dashboard), composants accessibles | `docs/lots/lot-03-design-system.md` |
-| 04 | Contenus unifiés (8 types), éditeur, circuit éditorial, programmation, envois sécurisés, pdf.js, Gemini en file | `docs/lots/lot-04-contenus.md` |
+| 04 | Contenus unifiés (8 types), éditeur, circuit éditorial, programmation, envois sécurisés, pdf.js (analyse IA retirée ensuite, D71) | `docs/lots/lot-04-contenus.md` |
 | 05 | Site public : accueil, catalogue filtrable, 3 gabarits de détail, graphiques SVG, vidéos, téléchargements comptés, aperçu signé, Meet, pages légales, 404, SEO, sitemap, RSS, Ctrl K | `docs/lots/lot-05-site-public.md` |
-| 06 | Livres : prix EUR, fiche 100 % française, ebook et extraits privés, éditeur modal, signets PDF, IA | `docs/lots/lot-06-livres.md` |
+| 06 | Livres : prix EUR, fiche 100 % française, ebook et extraits privés, éditeur modal, signets PDF | `docs/lots/lot-06-livres.md` |
 | 07 | Avis pré-modérés et modération, collaborations chiffrées + pièces jointes privées + export CSV sûr, newsletter double opt-in + Brevo, Turnstile, honeypot, limitation par IP | `docs/lots/lot-07-ecritures-publiques.md` |
 | 08 | Paramètres, pages éditables, médiathèque, newsletter, vue d'ensemble | `docs/lots/lot-08-administration.md` |
 | 09 | Seeders de démo complets, purges, sauvegardes chiffrées et restauration testée, tests d'architecture, audit d'accessibilité, `SECURITE.md` | `docs/lots/lot-09-revue-finale.md` |
@@ -20,7 +20,7 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 
 ## 2. Résultats des vérifications
 
-- **Tests Pest : 320, tous verts (1 131 assertions)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
+- **Tests Pest : 315, tous verts (1 111 assertions ; après le retrait de l'analyse IA, D71)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
 - **Pint** propre, **Larastan niveau 6** sans erreur.
 - **Responsive** : 36 écrans × 5 largeurs (320, 375, 768, 1024, 1440) × 2 thèmes = 360 captures, aucun défilement horizontal (`docs/captures/rapport.md`).
 - **Accessibilité** : axe-core WCAG 2.1 A/AA sur tous ces écrans, clair et sombre : 0 violation sérieuse ou critique (`docs/captures/accessibilite.md`).
@@ -31,7 +31,7 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 ## 3. Ce qui n'a pas pu être vérifié ici
 
 - Le **déploiement réel chez LWS** (aucun accès à l'hébergement depuis l'environnement de génération) : scripts relus et syntaxe vérifiée (`bash -n`), à exécuter en préproduction.
-- Les **services tiers avec de vraies clés** : Gemini, Brevo, Turnstile et SMTP sont testés avec des réponses simulées et en mode « désactivé » ; les appels réels sont à valider avec vos clés de test.
+- Les **services tiers avec de vraies clés** : Brevo, Turnstile et SMTP sont testés avec des réponses simulées et en mode « désactivé » ; les appels réels sont à valider avec vos clés de test.
 - **Have I Been Pwned** en conditions réelles (API injoignable depuis l'environnement de génération ; testé par simulation, D10).
 - La **version exacte de MariaDB chez LWS** : le projet est testé sur MariaDB 10.11 ; à confirmer avec `SELECT VERSION();`.
 - `composer.lock` : généré ici mais **non versionné** (D3) car une dépendance de développement (phpstan) a dû être installée depuis un dossier local ; à régénérer chez vous.
@@ -56,7 +56,7 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 | 4 Menu par permission | Couvert | `DashboardMenu`, `AccessAndProfileTest` |
 | 4.1 Vue d'ensemble | Couvert | `OverviewController`, `AdministrationTest` |
 | 4.2 Listes de contenus | Couvert | `ContentIndex`, `EditorTest` |
-| 4.3 Éditeur | Couvert (texte riche minimal, D25) | `ContentEditor`, `EditorTest`, `UploadsAndAiTest` |
+| 4.3 Éditeur | Couvert (texte riche minimal, D25) | `ContentEditor`, `EditorTest`, `UploadsTest` |
 | 4.4 Livres (dashboard) | Couvert | `Books` (Livewire), `BooksTest` |
 | 4.5 Collaborations (dashboard) | Couvert | `Collaborations` (Livewire), `PublicWritesTest` |
 | 4.6 Modération | Couvert | `Moderation` (Livewire), `PublicWritesTest` |
@@ -71,7 +71,7 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 | 5.5 Collaborations | Couvert | `CollaborationService`, `PublicWritesTest` |
 | 5.6 Newsletter | Couvert | `NewsletterService`, `PublicWritesTest` |
 | 5.7 Comptes, invitations | Couvert | `InvitationService`, `InvitationOnboardingTest` |
-| 5.8 Analyse PDF | Couvert | `pdf-analyse.js`, `GeminiAnalyzer`, `UploadsAndAiTest` |
+| 5.8 Analyse PDF | Partiel (choix) | `pdf-analyse.js` (pages, signets) ; analyse IA retirée à la demande du propriétaire (D71) |
 | 5.9 Contenus éditables | Couvert | `SiteAdmin`, `AdministrationTest` |
 | 6 Rôles, R1–R8 | Couvert | `RoleAssignment`, `RulesTest` (matrice dans `SECURITE.md` § 6) |
 | 7 Modèle de données | Couvert (pas de reprise, décision 4) | migrations |

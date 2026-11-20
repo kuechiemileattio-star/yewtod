@@ -77,7 +77,7 @@
     {{-- Éditeur --}}
     <x-modal :show="$editing" :title="$bookId ? 'Modifier le livre' : 'Nouveau livre'" max-width="max-w-4xl">
         @if ($editing)
-            <div x-data="unsavedGuard" x-on:input="markDirty" @if ($analysisId) wire:poll.5s="checkAnalysis" @endif>
+            <div x-data="unsavedGuard" x-on:input="markDirty">
                 <x-tabs :tabs="\App\Livewire\Dashboard\Books::TABS" :current="$tab" />
                 @if ($errors->any())
                     <p class="mb-4 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger" role="alert">Des champs sont à corriger : {{ collect($errors->keys())->map(fn ($k) => explode('.', $k)[0])->unique()->implode(', ') }}.</p>
@@ -165,11 +165,6 @@
                         <p class="field-help" x-text="progress"></p>
                         <p wire:loading wire:target="ebook" class="field-help">Envoi en cours…</p>
                         @if ($current?->ebook_path)<p class="field-help">Un PDF est déjà enregistré ({{ \App\Support\Format::fileSize((int) $current->ebook_size) }}).</p>@endif
-                    </div>
-                    <div class="mb-4 flex flex-wrap items-center gap-2">
-                        <button type="button" wire:click="analyzeWithAi" class="btn-secondary" @disabled(! $aiEnabled)><x-icon name="eye" class="size-4" /> Analyser avec l'IA</button>
-                        @if (! $aiEnabled)<span class="text-sm text-muted">Analyse IA désactivée : clé Gemini absente.</span>@endif
-                        @if ($analysisId)<span class="text-sm text-muted" role="status">Analyse en cours…</span>@endif
                     </div>
                     <x-editor.field model="form.ebook_description" label="Description de l'ebook" :textarea="true" :rows="4" maxlength="5000" />
                     <fieldset class="mb-4">

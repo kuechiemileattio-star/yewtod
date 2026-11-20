@@ -3,13 +3,10 @@
 namespace App\Livewire\Dashboard;
 
 use App\Enums\ContentType;
-use App\Jobs\AnalyzePdfWithAi;
 use App\Livewire\Concerns\Toasts;
-use App\Models\AiAnalysis;
 use App\Models\Content;
 use App\Models\User;
 use App\Services\ContentWorkflow;
-use App\Services\GeminiAnalyzer;
 use App\Services\UploadService;
 use App\Support\Taxonomy;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -56,8 +53,6 @@ class ContentEditor extends Component
     public string $downloadLabel = '';
 
     public string $relatedSearch = '';
-
-    public ?int $analysisId = null;
 
     public function mount(string $type, ?Content $content = null): void
     {
@@ -218,60 +213,6 @@ class ContentEditor extends Component
         }
     }
 
-    /* ---------- Analyse IA (Gemini, en file d'attente) ---------- */
-
-    public function analyzeWithAi(): void
-    {
-        if (! GeminiAnalyzer::enabled()) {
-            $this->toast('Analyse IA indisponible : la clé Gemini n\'est pas configurée.', 'error');
-
-            return;
-        }
-        $content = $this->contentId ? Content::query()->find($this->contentId) : null;
-        if ($content?->file_path === null) {
-            $this->toast('Enregistrez d\'abord le contenu avec son PDF : l\'IA n\'analyse que des fichiers stockés sur le site.', 'error');
-
-            return;
-        }
-        $analysis = new AiAnalysis;
-        $analysis->forceFill(['analyzable_type' => Content::class, 'analyzable_id' => $content->id, 'requested_by' => $this->me()->id])->save();
-        AnalyzePdfWithAi::dispatch($analysis->id, $content->file_path);
-        $this->analysisId = $analysis->id;
-        $this->toast('Analyse lancée : le résultat s\'affichera ici d\'ici une minute.');
-    }
-
-    public function checkAnalysis(): void
-    {
-        $analysis = $this->analysisId ? AiAnalysis::query()->find($this->analysisId) : null;
-        if ($analysis === null || in_array($analysis->status, ['pending', 'running'], true)) {
-            return;
-        }
-        $this->analysisId = null;
-        if ($analysis->status === 'failed') {
-            $this->toast((string) $analysis->error, 'error');
-
-            return;
-        }
-        $r = (array) $analysis->result;
-        // Le titre déjà saisi n'est jamais remplacé (cahier § 5.8).
-        if (trim((string) $this->form['title']) === '' && ! empty($r['title'])) {
-            $this->form['title'] = $r['title'];
-        }
-        if (! empty($r['summary'])) {
-            $this->form['summary'] = $r['summary'];
-        }
-        if (! empty($r['pages'])) {
-            $this->form['meta']['pages'] = $r['pages'];
-        }
-        if (! empty($r['sections'])) {
-            $this->form['meta']['toc'] = array_map(fn ($s) => ['title' => $s['title'], 'page' => null, 'summary' => $s['summary']], $r['sections']);
-        }
-        if (! empty($r['doi']) && in_array($this->type, ['rapports', 'etudes'], true)) {
-            $this->form['meta']['doi'] ??= $r['doi'];
-        }
-        $this->toast('Analyse IA appliquée : vérifiez les champs avant d\'enregistrer.');
-    }
-
     public function render(): View
     {
         $type = ContentType::from($this->type);
@@ -281,7 +222,6 @@ class ContentEditor extends Component
             'contentType' => $type,
             'content' => $this->contentId ? Content::query()->find($this->contentId) : null,
             'canPublish' => app(ContentWorkflow::class)->canPublish($this->me()),
-            'aiEnabled' => GeminiAnalyzer::enabled(),
             'themes' => Taxonomy::THEMES,
             'series' => $type === ContentType::DocumentaryEpisode ? Content::query()->ofType(ContentType::DocumentarySeries)->orderBy('title')->get(['id', 'title']) : collect(),
             'relatedItems' => Content::query()->whereIn('id', $this->form['related'])->get(['id', 'title', 'type']),

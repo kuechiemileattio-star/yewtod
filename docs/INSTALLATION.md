@@ -64,7 +64,7 @@ sudo apt install -y php8.3-cli php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip
 | `mysql` (pdo_mysql) | Connexion à MariaDB |
 | `gd` | Conversion des images en WebP, miniatures |
 | `mbstring`, `intl` | Textes en français (accents, slugs) |
-| `xml`, `curl`, `zip` | Laravel, Composer, appels Gemini/Brevo/Turnstile |
+| `xml`, `curl`, `zip` | Laravel, Composer, appels Brevo/Turnstile |
 
 **Vérifier :**
 

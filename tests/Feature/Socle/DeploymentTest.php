@@ -20,7 +20,7 @@ it('signale une configuration de production non conforme', function () {
     config(['app.debug' => true, 'app.url' => 'http://exemple.test', 'session.secure' => false]);
     $this->artisan('yewtod:verifier-production')
         ->expectsOutputToContain('APP_DEBUG=false')
-        ->expectsOutputToContain('Analyse IA (GEMINI_API_KEY) — la fonction se désactive proprement')->assertFailed();
+        ->expectsOutputToContain('Newsletter Brevo (BREVO_API_KEY, BREVO_LIST_ID) — la fonction se désactive proprement')->assertFailed();
 });
 
 it('donne le code 2FA d\'un compte de démo en local uniquement', function () {

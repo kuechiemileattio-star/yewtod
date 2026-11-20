@@ -3,13 +3,10 @@
 namespace App\Livewire\Dashboard;
 
 use App\Enums\ContentStatus;
-use App\Jobs\AnalyzePdfWithAi;
 use App\Livewire\Concerns\Toasts;
-use App\Models\AiAnalysis;
 use App\Models\Book;
 use App\Models\User;
 use App\Services\BookService;
-use App\Services\GeminiAnalyzer;
 use App\Services\UploadService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
@@ -25,7 +22,7 @@ use Livewire\WithPagination;
 /**
  * Livres du dashboard (cahier § 4.4) : liste filtrable, aperçu modal,
  * éditeur en fenêtre modale avec tous les champs de la section 3.1,
- * analyse du PDF de l'ebook (navigateur puis IA). La validation, les droits
+ * analyse du PDF de l'ebook dans le navigateur (pdf.js). La validation, les droits
  * et la programmation sont dans BookService.
  */
 #[Layout('layouts::dashboard')]
@@ -68,8 +65,6 @@ class Books extends Component
 
     public string $relatedSearch = '';
 
-    public ?int $analysisId = null;
-
     public function mount(): void
     {
         abort_unless($this->me()->hasPermission('manage_books'), 403);
@@ -101,7 +96,7 @@ class Books extends Component
     {
         $this->previewId = null;
         $this->editing = false;
-        $this->reset(['bookId', 'form', 'cover', 'ebook', 'excerpt', 'excerptLabel', 'analysisId', 'relatedSearch']);
+        $this->reset(['bookId', 'form', 'cover', 'ebook', 'excerpt', 'excerptLabel', 'relatedSearch']);
         $this->resetErrorBag();
     }
 
@@ -188,56 +183,6 @@ class Books extends Component
         $this->open($saved);
     }
 
-    /* ---------- Analyse IA ---------- */
-
-    public function analyzeWithAi(): void
-    {
-        if (! GeminiAnalyzer::enabled()) {
-            $this->toast('Analyse IA indisponible : la clé Gemini n\'est pas configurée.', 'error');
-
-            return;
-        }
-        $book = $this->bookId ? Book::query()->find($this->bookId) : null;
-        if ($book?->ebook_path === null) {
-            $this->toast('Enregistrez d\'abord le livre avec le PDF de l\'ebook : l\'IA n\'analyse que des fichiers stockés sur le site.', 'error');
-
-            return;
-        }
-        $analysis = new AiAnalysis;
-        $analysis->forceFill(['analyzable_type' => Book::class, 'analyzable_id' => $book->id, 'requested_by' => $this->me()->id])->save();
-        AnalyzePdfWithAi::dispatch($analysis->id, $book->ebook_path, 'book');
-        $this->analysisId = $analysis->id;
-        $this->toast('Analyse lancée : le résultat s\'affichera ici d\'ici une minute.');
-    }
-
-    public function checkAnalysis(): void
-    {
-        $analysis = $this->analysisId ? AiAnalysis::query()->find($this->analysisId) : null;
-        if ($analysis === null || in_array($analysis->status, ['pending', 'running'], true)) {
-            return;
-        }
-        $this->analysisId = null;
-        if ($analysis->status === 'failed') {
-            $this->toast((string) $analysis->error, 'error');
-
-            return;
-        }
-        $r = (array) $analysis->result;
-        if (! empty($r['summary'])) {
-            $this->form['description'] = $r['summary'];
-        }
-        if (! empty($r['author_bio'])) {
-            $this->form['author_bio'] = $r['author_bio'];
-        }
-        if (! empty($r['pages'])) {
-            $this->form['pages'] = $r['pages'];
-        }
-        if (! empty($r['sections'])) {
-            $this->form['composition'] = array_map(fn ($s) => ['title' => $s['title'], 'page' => null], $r['sections']);
-        }
-        $this->toast('Analyse IA appliquée (description, biographie, composition) : vérifiez avant d\'enregistrer.');
-    }
-
     public function render(): View
     {
         $term = trim(mb_substr($this->search, 0, 100));
@@ -254,7 +199,6 @@ class Books extends Component
             'books' => $books,
             'previewed' => $this->previewId ? Book::query()->find($this->previewId) : null,
             'current' => $this->bookId ? Book::query()->find($this->bookId) : null,
-            'aiEnabled' => GeminiAnalyzer::enabled(),
             'relatedItems' => $this->editing ? Book::query()->whereIn('id', $this->form['related'] ?? [])->get(['id', 'title']) : collect(),
             'relatedResults' => $this->editing && $rterm !== '' ? Book::query()->where('title', 'like', '%'.addcslashes($rterm, '%_\\').'%')
                 ->when($this->bookId, fn ($q) => $q->whereKeyNot($this->bookId))->limit(8)->get(['id', 'title']) : collect(),
