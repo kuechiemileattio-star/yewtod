@@ -38,3 +38,7 @@ Thumbs.db
 
 # Configuration de déploiement (hôtes, chemins)
 /scripts/deploiement.env
+
+# Paquet de déploiement (scripts/preparer-paquet.sh)
+/build/
+/scripts/deploiement-ftp.env

@@ -20,7 +20,7 @@ Branche `v2`, 11 commits (lots 00 à 10), tous au nom de Yann OLOU, sans mention
 
 ## 2. Résultats des vérifications
 
-- **Tests Pest : 328, tous verts (1 157 assertions ; après le retrait de l'analyse IA, D71, et l'ajout du webmail, D72)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
+- **Tests Pest : 334, tous verts (1 188 assertions ; après le retrait de l'analyse IA, D71, le webmail, D72, et le déploiement LWS Perso, D73)**, sur MariaDB 10.11 réelle (base `yewtod_test`), après `php artisan migrate:fresh --seed`.
 - **Pint** propre, **Larastan niveau 6** sans erreur.
 - **Responsive** : 36 écrans × 5 largeurs (320, 375, 768, 1024, 1440) × 2 thèmes = 360 captures, aucun défilement horizontal (`docs/captures/rapport.md`).
 - **Accessibilité** : axe-core WCAG 2.1 A/AA sur tous ces écrans, clair et sombre : 0 violation sérieuse ou critique (`docs/captures/accessibilite.md`).

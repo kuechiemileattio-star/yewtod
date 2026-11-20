@@ -17,6 +17,7 @@
 | 10 Déploiement | ✅ fait (script et procédure ; exécution chez LWS à faire) | |
 | Retrait de l'analyse IA (D71) | ✅ fait (code, migration de suppression, tests, documentation) | |
 | Lien Webmail + permission `access_webmail` (D72) | ✅ fait | |
+| Déploiement LWS Perso sans SSH (D73) : `.htaccess` racine, paquet, FTP, cron 5 min | ✅ fait (exécution chez LWS à faire) | |
 
 **Prochaine action** : tâches manuelles de Yann (voir le récapitulatif final, section « À faire manuellement ») : pousser `v2`, générer et committer `composer.lock`, préparer LWS, déployer la préproduction.
 

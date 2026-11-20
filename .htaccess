@@ -1,0 +1,44 @@
+# =====================================================================
+# Yewtod SS — .htaccess RACINE pour la formule LWS Perso (décision D73)
+#
+# Sur cette formule, la racine web est /htdocs et ne peut pas être changée :
+# tout le projet Laravel s'y trouve, .env compris. Ce fichier fait en sorte
+# que SEUL le dossier public/ soit joignable depuis le web. Trois couches :
+#   1. toute requête est réécrite vers public/ (rien d'autre n'est servi) ;
+#   2. les noms sensibles sont refusés même si la réécriture ne s'appliquait
+#      pas (module absent, .htaccess d'un sous-dossier) ;
+#   3. le paquet de déploiement ajoute un « Require all denied » dans chaque
+#      dossier de premier niveau autre que public/ (scripts/preparer-paquet.sh).
+# Avec une racine web sur public/ (formule Starter et plus), ce fichier
+# n'est pas lu.
+# =====================================================================
+
+Options -Indexes -MultiViews
+
+# --- Couche 2 : noms sensibles refusés à la racine et dans tous les sous-dossiers.
+<FilesMatch "^\.|^(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon|pint\.json|vite\.config\.js|README\.md)$|\.(env|sql|ybk|log|sh|md|neon|lock|bak|zip|tar|gz)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # HTTPS obligatoire et domaine sans « www » (APP_URL n'accepte qu'un seul hôte).
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+    # Fichiers cachés (.env, .git…) : 403 avant toute autre règle.
+    RewriteRule (^|/)\. - [F,L]
+
+    # --- Couche 1 : tout part vers public/ (qui a son propre .htaccess).
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Sans mod_rewrite, le site ne peut pas fonctionner : on refuse tout plutôt
+# que d'exposer les fichiers du projet.
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>

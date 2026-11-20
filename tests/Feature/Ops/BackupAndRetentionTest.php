@@ -63,8 +63,9 @@ describe('sauvegardes chiffrées', function () {
     });
 
     it('est planifiée chaque nuit, comme la purge et la bascule des programmés', function () {
-        $commands = collect(app(Schedule::class)->events())->map(fn ($e) => $e->command)->implode(' ');
-        expect($commands)->toContain('yewtod:backup')->toContain('yewtod:purge')->toContain('yewtod:publish-scheduled')->toContain('queue:work');
+        // Tâches en processus (D73) : identifiées par leur nom, pas par une ligne de commande.
+        $names = collect(app(Schedule::class)->events())->map(fn ($e) => $e->description)->implode(' ');
+        expect($names)->toContain('yewtod:backup')->toContain('yewtod:purge')->toContain('yewtod:publish-scheduled')->toContain('yewtod:file-attente');
     });
 });
 

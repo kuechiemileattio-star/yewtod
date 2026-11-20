@@ -30,3 +30,20 @@ it('donne le code 2FA d\'un compte de démo en local uniquement', function () {
     $this->artisan('yewtod:code-demo editeur@yewtod.test')->expectsOutputToContain('Code actuel')->assertSuccessful();
     $this->artisan('yewtod:code-demo quelquun@exemple.fr')->assertFailed();
 });
+
+it('ne laisse joignable que public/ sur LWS Perso : .htaccess racine (D73)', function () {
+    $root = file_get_contents(base_path('.htaccess'));
+    expect($root)->toContain('RewriteRule ^(.*)$ public/$1 [L]')        // couche 1 : tout vers public/
+        ->toContain('RewriteRule (^|/)\. - [F,L]')                         // fichiers cachés (.env)
+        ->toContain('Require all denied')                                  // couche 2 et repli sans mod_rewrite
+        ->toContain('<IfModule !mod_rewrite.c>')
+        ->not->toContain('DirectoryIndex disabled');                       // casserait l'accueil (public/index.php)
+
+    $public = file_get_contents(public_path('.htaccess'));
+    expect($public)->toContain('^(?:/public(?=/))?(.+)/$')                 // redirection sans « /public » ajouté
+        ->toContain('m#^(/public)?/build/assets/#');
+
+    $paquet = file_get_contents(base_path('scripts/preparer-paquet.sh'));
+    expect($paquet)->toContain('for sub in app framework logs')            // couche 3, sans bloquer /storage/…
+        ->toContain('Require all denied');
+});

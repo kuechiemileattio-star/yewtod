@@ -1,164 +1,245 @@
-# Déploiement sur l'hébergement mutualisé LWS
+# Déploiement sur LWS — formule Perso (sans SSH)
 
-Cadre (décision 12) : SSH, Composer, PHP 8.3+, cron à la minute, racine web modifiable, **pas** de worker permanent, **pas** de Node en production. Les assets sont compilés dans WSL et envoyés par `rsync` ; la file d'attente `database` est vidée par le cron (`schedule:run`).
+Cadre (décision D73, qui adapte la décision 12) :
 
-Ordre : **préproduction d'abord**, validation, puis production avec le **même commit**.
+| Contrainte de la formule Perso | Réponse du projet |
+| --- | --- |
+| Pas d'accès SSH, seulement le **Terminal web** du panneau | Envoi des fichiers par **FTP** (`scripts/deployer-ftp.sh`) ; les commandes `php artisan` se tapent dans le Terminal web |
+| Racine web fixée sur `/htdocs` | Tout le projet dans `/htdocs` ; le **`.htaccess` racine** n'ouvre que `public/` (3 couches, testées sur Apache) |
+| **Une seule** base MySQL/MariaDB | Un seul utilisateur de base (`DB_MIGRATE_USERNAME` vide) ; pas de préproduction séparée : **mise en ligne protégée par mot de passe**, puis ouverture |
+| Cron du panneau : 240 s maximum, chaque minute déconseillé | `schedule:run` **toutes les 5 minutes** ; tâches exécutées dans le processus du cron (pas de `proc_open`) |
+| Pas de Node sur le serveur | Assets compilés dans WSL, envoyés avec le reste |
 
-## 1. Préparer chaque environnement dans le panel LWS (une fois)
+Si vous passez un jour à la formule Starter (SSH), l'ancienne procédure reste disponible : annexe en fin de document.
 
-1. **PHP** : version 8.3 ou plus récente, extensions `pdo_mysql`, `mbstring`, `intl`, `gd`, `zip`, `fileinfo`, `sodium`, `openssl`. Vérifier en SSH : `php -v && php -m`. Noter le chemin exact du binaire (`which php`, ou `/usr/local/php8.3/bin/php` selon l'offre) : il sert au cron et à `scripts/deploiement.env`.
-2. **Accès SSH** : l'activer, puis déposer votre clé publique (`~/.ssh/id_ed25519.pub` de WSL) dans l'espace client. Tester : `ssh utilisateur@ssh.clusterXXX.lws.fr`.
-3. **Base de données** : créer la base et son utilisateur (un seul par base chez LWS, voir `docs/SECURITE.md` § 2). Relever la version : phpMyAdmin → `SELECT VERSION();` — votre MariaDB locale doit être de la même version majeure (`docs/INSTALLATION.md` § 1.2). Désactiver tout accès distant à la base.
-4. **Domaine** : préproduction sur `preprod.yewtod.com`, production sur `yewtod.com`. Faire pointer la **racine web** sur le dossier `public/` de l'application (ex. `/home/utilisateur/yewtod.com/public`). Activer le certificat **SSL** (Let's Encrypt) et la redirection HTTPS.
-5. **DNS** (lors du transfert du domaine, décision 11) : enregistrements `A`/`AAAA` vers l'hébergement LWS, `CNAME preprod` ; pour les emails, enregistrements **SPF**, **DKIM** et **DMARC** fournis par LWS (ou par le service SMTP choisi) ; pour Brevo, les enregistrements d'authentification du domaine expéditeur.
+---
 
-## 2. Fichier `.env` du serveur (une fois par environnement)
+## 1. Panneau LWS (une fois)
 
-Créé à la main en SSH dans le dossier de l'application, droits `600`, **jamais** dans Git :
+1. **PHP** : rubrique « Configuration PHP » → **8.3**. Extensions attendues : `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `sodium`, `zip`, `curl`, `dom`, `xml` (la commande de vérification du § 5 les contrôle).
+2. **Terminal web** : rubrique « Logiciels ». Ouvrez-le une fois et tapez `php -v` : il doit afficher PHP 8.3. Si une autre version s'affiche, notez le nom de la commande proposée par LWS pour la 8.3 (par exemple `php83`) et utilisez-le partout à la place de `php`.
+3. **Base de données** : créez la base. Notez le serveur, le nom de la base, l'utilisateur et son mot de passe. Relevez la version (`SELECT VERSION();` dans phpMyAdmin) : votre MariaDB locale doit avoir la même version majeure.
+4. **SSL** : activez le certificat (Let's Encrypt) pour `yewtod.com` **et** `www.yewtod.com` (le `.htaccess` redirige `www` vers le domaine nu).
+5. **FTP** : rubrique « Accès FTP » : notez le serveur et l'identifiant ; regardez ce que contient la racine du compte FTP (dossier `htdocs/` visible, ou déjà dedans).
+6. **Emails** : boîtes créées (`no-reply@`, `contact@`…), **SPF / DKIM / DMARC** actifs pour `yewtod.com`.
+7. **Videz `/htdocs`** s'il contient une page d'attente LWS (`index.html`…). Ne touchez pas à un éventuel dossier `.well-known/` (certificat).
+
+## 2. Le fichier `.env` de production (une fois, sur VOTRE machine)
+
+Il est préparé dans WSL, gardé hors du dépôt, puis envoyé par le script :
+
+```bash
+mkdir -p ~/.yewtod && chmod 700 ~/.yewtod
+cp .env.example ~/.yewtod/env.production && chmod 600 ~/.yewtod/env.production
+php artisan key:generate --show          # copiez la valeur dans APP_KEY
+openssl rand -base64 48                  # copiez la valeur dans BACKUP_PASSPHRASE
+nano ~/.yewtod/env.production
+```
+
+Valeurs à mettre (les autres lignes de `.env.example` restent telles quelles) :
 
 ```dotenv
-APP_NAME="Yewtod SS"
 APP_ENV=production
-APP_KEY=                       # php artisan key:generate --show (en local), puis coller ici
+APP_KEY=base64:…                 # généré ci-dessus, UNE fois, puis jamais changé
 APP_DEBUG=false
-APP_URL=https://yewtod.com     # https://preprod.yewtod.com en préproduction
-APP_LOCALE=fr
-APP_FALLBACK_LOCALE=fr
+APP_URL=https://yewtod.com
 
 LOG_CHANNEL=daily
 LOG_LEVEL=warning
 
-DB_CONNECTION=mariadb
-DB_HOST=…                      # indiqué par LWS
-DB_PORT=3306
+DB_HOST=…                        # indiqué par LWS
 DB_DATABASE=…
 DB_USERNAME=…
 DB_PASSWORD='…'
-DB_MIGRATE_USERNAME=           # vide chez LWS : utilisateur unique
+DB_MIGRATE_USERNAME=             # VIDE : un seul utilisateur chez LWS
 DB_MIGRATE_PASSWORD=
 
-SESSION_DRIVER=database
-SESSION_LIFETIME=30
 SESSION_SECURE_COOKIE=true
-SESSION_SAME_SITE=lax
-QUEUE_CONNECTION=database
-CACHE_STORE=database
 
-MAIL_MAILER=smtp               # SMTP LWS ou service transactionnel
-MAIL_HOST=…
-MAIL_PORT=587
-MAIL_USERNAME=…
-MAIL_PASSWORD='…'
+MAIL_MAILER=smtp
+MAIL_HOST=mail97.lwspanel.com    # nom du serveur tel que dans le panneau (certificat), pas mail.yewtod.com
+MAIL_PORT=465
+MAIL_SCHEME=smtps
+MAIL_USERNAME="no-reply@yewtod.com"
+MAIL_PASSWORD="…"
 MAIL_FROM_ADDRESS="no-reply@yewtod.com"
 
-BREVO_API_KEY=                 # facultatif : la synchronisation se désactive sans clé
-WEBMAIL_URL=https://mail.yewtod.com/roundcube/   # facultatif : lien « Webmail » du dashboard (https uniquement)
-BREVO_LIST_ID=
-TURNSTILE_SITE_KEY=            # facultatif mais recommandé en production
-TURNSTILE_SECRET_KEY=
-HIBP_ENABLED=true
+BREVO_API_KEY="…"                # clé DISTINCTE de celle du local
+BREVO_LIST_ID=…
+TURNSTILE_SITE_KEY=…             # recommandé en production
+TURNSTILE_SECRET_KEY=…
+WEBMAIL_URL=https://mail.yewtod.com/roundcube/
 
-BACKUP_PASSPHRASE='…'          # 32+ caractères aléatoires, distincte d'APP_KEY
+BACKUP_PASSPHRASE='…'            # généré ci-dessus
 
-LEGAL_PUBLISHER="…"            # mentions légales obligatoires
+LEGAL_PUBLISHER="…"              # mentions légales obligatoires (LCEN)
 LEGAL_ADDRESS="…"
 LEGAL_DIRECTOR="…"
-LEGAL_CONTACT_EMAIL="…"
+LEGAL_CONTACT_EMAIL="contact@yewtod.com"
 
-# Préproduction UNIQUEMENT (laisser vide en production) :
-PREPROD_USER=
-PREPROD_PASSWORD_HASH=
+# Phase de mise en ligne protégée (§ 6) : à vider pour ouvrir le site.
+PREPROD_USER=relecture
+PREPROD_PASSWORD_HASH='$argon2id$…'
 ```
 
-> Conservez `APP_KEY` et `BACKUP_PASSPHRASE` dans votre gestionnaire de mots de passe : sans `APP_KEY`, les secrets 2FA, les sessions et les descriptions chiffrées sont perdus ; sans `BACKUP_PASSPHRASE`, les sauvegardes sont illisibles.
-
-En préproduction, protégez l'accès (cahier § 12.3) :
+Le hachage du mot de passe de relecture se calcule en local (le mot de passe lui-même n'est écrit nulle part) :
 
 ```bash
-php -r 'echo password_hash("un mot de passe long", PASSWORD_ARGON2ID), PHP_EOL;'
-# puis dans .env : PREPROD_USER=relecture  et  PREPROD_PASSWORD_HASH='$argon2id$…'
+php -r 'echo password_hash("une phrase longue et unique", PASSWORD_ARGON2ID), PHP_EOL;'
 ```
 
-## 3. Cron (une fois par environnement)
+> Rangez `APP_KEY` et `BACKUP_PASSPHRASE` dans votre gestionnaire de mots de passe. Sans `APP_KEY`, les secrets 2FA, les sessions et les données chiffrées sont perdus ; sans `BACKUP_PASSPHRASE`, les sauvegardes sont illisibles.
 
-Dans le panel LWS (« Tâches planifiées / Cron »), **une seule** ligne, chaque minute :
-
-```cron
-* * * * * /usr/local/php8.3/bin/php /home/utilisateur/yewtod.com/artisan schedule:run >> /dev/null 2>&1
-```
-
-Ce cron lance : la bascule des contenus programmés (chaque minute), la file d'attente (`queue:work --stop-when-empty`, chaque minute), la sauvegarde chiffrée (2 h 30), les purges RGPD (3 h 15). Vérifier : `php artisan schedule:list`.
-
-## 4. Configurer le script de déploiement (une fois, dans WSL)
+## 3. Configurer le script (une fois, dans WSL)
 
 ```bash
-cp scripts/deploiement.env.example scripts/deploiement.env   # ignoré par Git
-nano scripts/deploiement.env                                  # hôtes SSH, dossiers, binaire PHP, URL
+sudo apt install -y lftp
+cp scripts/deploiement-ftp.env.example scripts/deploiement-ftp.env    # ignoré par Git
+nano scripts/deploiement-ftp.env                                      # serveur FTP, identifiant, dossier, URL
 ```
 
-## 5. Premier déploiement
+Le mot de passe FTP n'est jamais enregistré : le script le demande à chaque envoi. L'envoi est **chiffré** (FTPS). Si `lftp` refuse le certificat, mettez dans `FTP_HOTE` le nom de serveur indiqué par LWS (même cause que pour le SMTP) ; ne passez `FTP_TLS="non"` qu'en dernier recours (mot de passe en clair sur le réseau).
+
+## 4. Premier déploiement
 
 ```bash
-scripts/deployer.sh preprod
+cd ~/yewtod && git switch v2 && git pull
+scripts/deployer-ftp.sh
 ```
 
-Puis, en SSH sur le serveur :
+Le script :
+1. vérifie la branche et l'arbre propre, lance les **tests**, `composer audit` et `npm audit` ;
+2. construit le **paquet** du commit (`scripts/preparer-paquet.sh`) : dépendances sans outils de développement, assets compilés, protections `.htaccess` ;
+3. affiche les fichiers qui seraient supprimés sur le serveur et **demande confirmation** ;
+4. envoie les fichiers, le squelette de `storage/` (sans jamais toucher aux fichiers déjà présents) et le `.env` ;
+5. affiche les commandes à taper dans le **Terminal web**, à lancer **dans le dossier du site** (`cd htdocs` si le terminal s'ouvre au-dessus) :
 
 ```bash
-cd ~/preprod.yewtod.com
-php artisan migrate --force          # si vous avez répondu « non » pendant le script
-php artisan db:seed --class=ReferenceSeeder --force   # rôles, permissions, réglages (jamais de démo en ligne)
-php artisan yewtod:create-super-admin                 # premier Super Admin, interactif
-php artisan yewtod:verifier-production                # doit tout afficher « OK » (sauf options désactivées)
+php -v                                   # PHP 8.3
+php artisan migrate --force --seed       # tables + rôles, permissions et réglages de référence
+php artisan storage:link                 # lien public/storage
+php artisan yewtod:create-super-admin    # votre compte, interactif
+php artisan optimize:clear && php artisan optimize
+php artisan yewtod:verifier-production
+php artisan up
 ```
 
-Connectez-vous, activez la 2FA, relisez le site. **Testez une restauration** une fois avant la mise en ligne (voir § 7).
+6. contrôle que `https://yewtod.com/up` répond 200.
 
-## 6. Déploiements suivants
+> Après **toute** modification du `.env` sur le serveur, relancez `php artisan optimize` : la configuration est mise en cache et le `.env` n'est plus relu sinon.
+
+## 5. Cron (une fois)
+
+Panneau LWS → « Base de données & PHP » → **Tâches cron** → nouvelle tâche, type **appel PHP**, fréquence **toutes les 5 minutes** :
+
+```
+php83 /htdocs/artisan schedule:run
+```
+
+Remplacez `php83` par le nom de la commande PHP 8.3 que propose le panneau (sans précision, LWS utilise PHP 8.0, trop ancien). Ce cron lance : le battement de contrôle, la publication des contenus programmés et la file d'attente (emails d'invitation, synchronisation Brevo) à chaque passage, la sauvegarde chiffrée (2 h 30 UTC) et les purges RGPD (3 h 15 UTC).
+
+**Vérifier** 10 minutes plus tard, dans le Terminal web :
 
 ```bash
-git switch v2 && git pull
-scripts/deployer.sh preprod     # puis validation
-scripts/deployer.sh prod        # même commit
+php artisan yewtod:verifier-production    # ligne « Cron : dernier passage il y a N min (OK) »
+php artisan schedule:list
 ```
 
-Le script refuse un arbre non propre ou une autre branche, lance les tests, `composer audit` et `npm audit`, compile les assets, met le site en maintenance, **sauvegarde**, archive le code en place, envoie les fichiers, installe les dépendances sans outils de développement, **demande confirmation** avant les migrations, régénère les caches, vérifie la configuration, remet en ligne et contrôle `/up`.
+## 6. Mise en ligne protégée, puis ouverture
 
-## 7. Retour arrière et restauration
+Avec une seule base, il n'y a pas de préproduction séparée : le site est d'abord en ligne **derrière un mot de passe** (`PREPROD_USER`), sur le vrai domaine. Les visiteurs et les moteurs de recherche ne voient rien (401, `noindex`).
+
+Pendant cette phase, vérifiez :
+
+- [ ] connexion avec votre compte, **activation de la 2FA** (code reçu par email, QR code), codes de secours rangés ;
+- [ ] invitation d'un membre : email reçu, lien fonctionnel ;
+- [ ] newsletter : inscription, email de confirmation, contact présent dans la liste Brevo ;
+- [ ] formulaires publics avec Turnstile, envoi d'une couverture et d'un PDF, affichage des fichiers publics ;
+- [ ] lien **Webmail** du dashboard ;
+- [ ] le lendemain : une sauvegarde `yewtod-*.ybk` dans `storage/app/backups` ;
+- [ ] **test de restauration** (§ 8) ;
+- [ ] accès refusés : `https://yewtod.com/.env`, `/vendor/autoload.php`, `/storage/logs/laravel.log`, `/composer.json` doivent tous répondre **403** ;
+- [ ] en-têtes : https://securityheaders.com sur `https://yewtod.com` ;
+- [ ] `php artisan yewtod:verifier-production` : seul « Site ouvert au public » est en échec (normal pendant cette phase).
+
+**Ouverture** : dans le Terminal web, éditez le `.env` du serveur (`nano .env`) et videz `PREPROD_USER` et `PREPROD_PASSWORD_HASH`, puis :
 
 ```bash
-scripts/retour-arriere.sh prod            # code de la version précédente
-scripts/retour-arriere.sh prod --base     # code + base de la dernière sauvegarde
+php artisan optimize
+php artisan yewtod:verifier-production    # plus aucun échec
 ```
 
-Restauration manuelle d'une sauvegarde donnée :
+Faites la même modification dans `~/.yewtod/env.production`, pour qu'un futur `--env` ne remette pas la protection.
+
+## 7. Déploiements suivants
 
 ```bash
-php artisan yewtod:backup:restore storage/app/backups/yewtod-AAAAMMJJ-HHMMSS.ybk --dossier=/tmp/restau            # vérifier
-php artisan yewtod:backup:restore storage/app/backups/yewtod-AAAAMMJJ-HHMMSS.ybk --dossier=/tmp/restau --importer # écraser la base
-cp -r /tmp/restau/fichiers/private/* storage/app/private/ && cp -r /tmp/restau/fichiers/public/* storage/app/public/
+cd ~/yewtod && git switch v2 && git pull
+scripts/deployer-ftp.sh
 ```
 
-**Test de restauration avant la mise en ligne** : sur la préproduction, créez une seconde base vide dans le panel, puis lancez la restauration avec `DB_DATABASE=… DB_USERNAME=… DB_PASSWORD=… php artisan yewtod:backup:restore … --importer`, comparez le nombre de lignes des tables principales, supprimez la base de test. Notez la date dans `docs/SECURITE.md` § 3.
-
-## 8. Sauvegardes hors de l'hébergeur
-
-Chaque semaine, depuis WSL :
+En plus du premier déploiement, le script **met le site en maintenance** pendant l'envoi (503), et, si de **nouvelles migrations** arrivent, demande d'abord une **sauvegarde** dans le Terminal web (`php artisan yewtod:backup`). Commandes affichées ensuite :
 
 ```bash
-scripts/recuperer-sauvegardes.sh prod      # copie dans ~/sauvegardes-yewtod/prod (chiffrées)
+php artisan migrate --force              # seulement s'il y a de nouvelles migrations
+php artisan optimize:clear && php artisan optimize
+php artisan yewtod:verifier-production
+php artisan up
 ```
 
-Les sauvegardes de LWS (offre) s'ajoutent à celles-ci mais ne les remplacent pas. Ne copiez jamais la base de production vers votre environnement de développement (cahier § 8.6).
+Le `.env` du serveur n'est **pas** renvoyé (sauf `scripts/deployer-ftp.sh --env`). Si l'envoi est interrompu, le site reste en maintenance : relancez le script, ou supprimez `storage/framework/down` par FTP pour le rouvrir.
 
-## 9. Liste de contrôle avant la mise en ligne
+## 8. Retour arrière, restauration, sauvegardes
 
-- [ ] `php artisan yewtod:verifier-production` : aucun échec.
-- [ ] `APP_DEBUG=false`, HTTPS forcé, certificat valide, en-têtes vérifiés (https://securityheaders.com).
-- [ ] Mentions légales complètes (éditeur, directeur de publication, hébergeur à jour).
-- [ ] SMTP testé (invitation envoyée et reçue), SPF/DKIM/DMARC en place.
-- [ ] Turnstile et Brevo configurés (ou volontairement désactivés).
-- [ ] Premier Super Admin créé, 2FA activée, codes de secours rangés.
-- [ ] Cron actif (`schedule:list`), une sauvegarde nocturne présente, restauration testée.
-- [ ] Préproduction protégée (`PREPROD_USER`), production **sans** protection.
-- [ ] `composer audit` et `npm audit` sans vulnérabilité haute.
+**Retour arrière du code** : redéployez le commit précédent (le numéro est affiché à la fin de chaque déploiement) :
+
+```bash
+scripts/deployer-ftp.sh 1a2b3c4
+```
+
+Si ce déploiement avait appliqué des migrations, annulez-les **avant**, dans le Terminal web : `php artisan migrate:rollback --step=N` (N = nombre de migrations du déploiement), ou restaurez la sauvegarde prise juste avant.
+
+**Restauration de la base** (Terminal web) :
+
+```bash
+php artisan yewtod:backup:restore storage/app/backups/yewtod-AAAAMMJJ-HHMMSS.ybk --dossier=storage/app/restau            # vérifier
+php artisan yewtod:backup:restore storage/app/backups/yewtod-AAAAMMJJ-HHMMSS.ybk --dossier=storage/app/restau --importer # écrase la base
+cp -r storage/app/restau/fichiers/private/* storage/app/private/ && cp -r storage/app/restau/fichiers/public/* storage/app/public/
+rm -rf storage/app/restau
+```
+
+**Copie hors de l'hébergeur**, chaque semaine depuis WSL :
+
+```bash
+scripts/recuperer-sauvegardes-ftp.sh     # dans ~/sauvegardes-yewtod (chiffrées)
+```
+
+**Test de restauration avant l'ouverture** (la formule n'a qu'une base, le test se fait donc en local, tant que le site ne contient que vos données de test) : récupérez une sauvegarde, puis
+
+```bash
+source ~/.yewtod-db-pass                # mots de passe locaux (INSTALLATION, étape 4)
+sudo mariadb -e "CREATE DATABASE yewtod_restau; GRANT ALL ON yewtod_restau.* TO 'yewtod_migrate'@'localhost';"
+DB_DATABASE=yewtod_restau DB_USERNAME=yewtod_migrate DB_PASSWORD="$MIGRATE" \
+  php artisan yewtod:backup:restore ~/sauvegardes-yewtod/yewtod-….ybk --dossier=/tmp/restau --importer
+# phrase de passe demandée : celle de PRODUCTION ; comparez le nombre de lignes, puis :
+sudo mariadb -e "DROP DATABASE yewtod_restau" && rm -rf /tmp/restau
+```
+
+Notez la date du test dans `docs/SECURITE.md` § 3. Une fois le site ouvert, **ne copiez plus jamais** la base de production sur votre machine (cahier § 8.6).
+
+## 9. Liste de contrôle avant l'ouverture
+
+- [ ] `php artisan yewtod:verifier-production` : aucun échec (après avoir vidé `PREPROD_*`).
+- [ ] `APP_DEBUG=false`, HTTPS forcé, `www` redirigé, certificat valide.
+- [ ] Fichiers sensibles en 403 (§ 6), en-têtes vérifiés.
+- [ ] Mentions légales complètes (éditeur, directeur de publication, hébergeur).
+- [ ] SMTP testé, SPF/DKIM/DMARC en place, Brevo et Turnstile configurés.
+- [ ] Super Admin créé, 2FA activée, codes de secours rangés.
+- [ ] Cron vérifié (battement OK), sauvegarde nocturne présente, restauration testée, copie hors de l'hébergeur faite.
+- [ ] `composer audit` et `npm audit` sans vulnérabilité haute (faits par le script).
+
+---
+
+## Annexe — formule avec SSH (Starter et plus)
+
+Si l'hébergement passe à une formule avec SSH et racine web modifiable (pointée sur `public/`), les scripts d'origine restent utilisables : `scripts/deployer.sh` (envoi `rsync`, migrations et caches lancés par le script), `scripts/retour-arriere.sh` et `scripts/recuperer-sauvegardes.sh`, configurés par `scripts/deploiement.env` (modèle `scripts/deploiement.env.example`). Le `.htaccess` racine n'est alors pas lu, et le cron peut tourner chaque minute avec la même commande `schedule:run`.

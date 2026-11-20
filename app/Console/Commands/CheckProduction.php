@@ -6,7 +6,9 @@ use App\Jobs\SyncNewsletterWithBrevo;
 use App\Services\Backup;
 use App\Services\Turnstile;
 use App\Support\Webmail;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,6 +25,7 @@ class CheckProduction extends Command
     public function handle(): int
     {
         $blocking = [
+            'Extensions PHP requises'.$this->missingExtensions() => $this->missingExtensions() === '',
             'APP_ENV=production' => app()->isProduction(),
             'APP_DEBUG=false' => ! config('app.debug'),
             'APP_KEY définie' => filled(config('app.key')),
@@ -34,7 +37,7 @@ class CheckProduction extends Command
             'Assets compilés (public/build)' => is_file(public_path('build/manifest.json')),
             'File d\'attente « database »' => config('queue.default') === 'database',
             'Sauvegardes configurées (BACKUP_PASSPHRASE)' => Backup::enabled(),
-            'Préproduction : protection vide en production' => ! app()->isProduction() || blank(config('yewtod.preprod.user')),
+            'Site ouvert au public (PREPROD_USER vide)' => ! app()->isProduction() || blank(config('yewtod.preprod.user')),
         ];
         $optional = [
             'Emails (SMTP)' => config('mail.default') !== 'log' && filled(config('mail.mailers.smtp.host')),
@@ -54,9 +57,38 @@ class CheckProduction extends Command
             $this->line(($ok ? '<info>  OK  </info>' : '<comment> DÉSACTIVÉ </comment>').' '.$label.($ok ? '' : ' — la fonction se désactive proprement'));
         }
         $this->newLine();
+        $this->line('Cron (tâche planifiée LWS) : '.$this->lastCronRun());
+        $this->newLine();
         $failed > 0 ? $this->error("{$failed} exigence(s) bloquante(s) non remplie(s).") : $this->info('Configuration de production conforme.');
 
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
+    }
+
+    /** Extensions utilisées par le projet (images, sauvegardes chiffrées, base, archives…). */
+    private function missingExtensions(): string
+    {
+        $missing = array_filter(
+            ['pdo_mysql', 'mbstring', 'openssl', 'fileinfo', 'gd', 'sodium', 'zip', 'curl', 'dom', 'xml'],
+            fn (string $ext) => ! extension_loaded($ext),
+        );
+
+        return $missing === [] ? '' : ' — manquantes : '.implode(', ', $missing);
+    }
+
+    /** Dernier passage de `schedule:run`, noté par la tâche « yewtod:battement ». */
+    private function lastCronRun(): string
+    {
+        try {
+            $last = Cache::get('yewtod:cron:dernier-passage');
+        } catch (\Throwable) {
+            return 'inconnu (cache inaccessible)';
+        }
+        if (! is_string($last)) {
+            return 'aucun passage enregistré : vérifiez la tâche cron du panneau LWS';
+        }
+        $minutes = (int) Carbon::parse($last)->diffInMinutes(now());
+
+        return $minutes <= 10 ? "dernier passage il y a {$minutes} min (OK)" : "dernier passage il y a {$minutes} min : la tâche cron ne tourne plus ?";
     }
 
     private function databaseReachable(): bool

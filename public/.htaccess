@@ -18,8 +18,9 @@ Options -Indexes -MultiViews
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
     # Redirect Trailing Slashes If Not A Folder...
+    # « /public » est retiré s'il a été ajouté par le .htaccess racine (LWS Perso, D73).
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteCond %{REQUEST_URI} ^(?:/public(?=/))?(.+)/$
     RewriteRule ^ %1 [L,R=301]
 
     # Send Requests To Front Controller...
@@ -34,10 +35,11 @@ Options -Indexes -MultiViews
     Header always set X-Content-Type-Options "nosniff"
     Header always set Cross-Origin-Resource-Policy "same-site"
     # Assets compilés par Vite : noms avec empreinte, cache long et immuable (performance).
-    <If "%{REQUEST_URI} =~ m#^/build/assets/#">
+    # « (/public)? » : sur LWS Perso, le .htaccess racine réécrit l'adresse vers public/ (D73).
+    <If "%{REQUEST_URI} =~ m#^(/public)?/build/assets/#">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </If>
-    <If "%{REQUEST_URI} =~ m#^/storage/#">
+    <If "%{REQUEST_URI} =~ m#^(/public)?/storage/#">
         Header set Cache-Control "public, max-age=604800"
     </If>
 </IfModule>
