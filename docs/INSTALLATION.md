@@ -29,7 +29,7 @@ cat /etc/os-release | grep -E 'VERSION_CODENAME|VERSION_ID'
 
 Pourquoi : une fonction SQL qui marche en local mais pas chez LWS ferait planter la mise en ligne. En installant la même version majeure, tu testes sur le même moteur.
 
-Note aussi la version de PHP proposée par LWS (panel → « Configuration PHP ») : vise la même en local (8.3 ou 8.4).
+Note aussi la version de PHP proposée par LWS (panel → « Configuration PHP ») : vise la même en local si possible. Le projet est testé sur PHP 8.3 et 8.5, et sur MariaDB 10.11 et MySQL 8.0 (décision D74) : une MariaDB locale convient même si LWS fournit MySQL (en ligne, mettre `DB_DRIVER=mysql`).
 
 ---
 

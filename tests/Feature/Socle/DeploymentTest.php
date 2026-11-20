@@ -47,3 +47,16 @@ it('ne laisse joignable que public/ sur LWS Perso : .htaccess racine (D73)', fun
     expect($paquet)->toContain('for sub in app framework logs')            // couche 3, sans bloquer /storage/…
         ->toContain('Require all denied');
 });
+
+it('vérifie que DB_DRIVER correspond au moteur réel (MySQL chez LWS Perso, D74)', function () {
+    $version = (string) DB::selectOne('SELECT VERSION() AS v')->v;
+    $real = str_contains(strtolower($version), 'mariadb') ? 'mariadb' : 'mysql';
+
+    $this->artisan('yewtod:verifier-production')->expectsOutputToContain('Moteur de base compatible');
+    expect(DB::connection()->getDriverName())->toBe($real); // l'environnement de test est cohérent
+
+    // Pilote inverse : la vérification le signale avec la valeur à mettre.
+    config(['database.connections.mariadb.driver' => $real === 'mysql' ? 'mariadb' : 'mysql']);
+    DB::purge('mariadb');
+    $this->artisan('yewtod:verifier-production')->expectsOutputToContain("mettez DB_DRIVER={$real}");
+});

@@ -103,7 +103,7 @@ fi
 step "6/7 Commandes à lancer dans le Terminal web"
 CMDS=()
 if [[ "$FIRST_INSTALL" == "oui" ]]; then
-  CMDS+=("php -v                                   # doit afficher PHP 8.3"
+  CMDS+=("php -v                                   # version choisie dans le panneau (8.5)"
          "php artisan migrate --force --seed       # tables + rôles et réglages de référence"
          "php artisan storage:link"
          "php artisan yewtod:create-super-admin    # votre compte, interactif")

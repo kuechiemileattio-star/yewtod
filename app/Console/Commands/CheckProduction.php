@@ -32,6 +32,7 @@ class CheckProduction extends Command
             'APP_URL en https' => str_starts_with((string) config('app.url'), 'https://'),
             'SESSION_SECURE_COOKIE=true' => (bool) config('session.secure'),
             'Base de données joignable' => $this->databaseReachable(),
+            'Moteur de base compatible'.$this->databaseEngine() => $this->databaseEngine() === '',
             'storage/ inscriptible' => is_writable(storage_path('framework')) && is_writable(storage_path('logs')),
             'Lien public/storage présent' => is_link(public_path('storage')) || is_dir(public_path('storage')),
             'Assets compilés (public/build)' => is_file(public_path('build/manifest.json')),
@@ -89,6 +90,28 @@ class CheckProduction extends Command
         $minutes = (int) Carbon::parse($last)->diffInMinutes(now());
 
         return $minutes <= 10 ? "dernier passage il y a {$minutes} min (OK)" : "dernier passage il y a {$minutes} min : la tâche cron ne tourne plus ?";
+    }
+
+    /**
+     * D74 : DB_DRIVER doit correspondre au serveur réel, et le serveur doit
+     * appliquer les contraintes CHECK (MySQL 8.0.16+, MariaDB 10.6+).
+     */
+    private function databaseEngine(): string
+    {
+        try {
+            $version = (string) DB::selectOne('SELECT VERSION() AS v')->v;
+        } catch (\Throwable) {
+            return ' — serveur injoignable';
+        }
+        $isMariaDb = str_contains(strtolower($version), 'mariadb');
+        $driver = DB::connection()->getDriverName();
+        if ($isMariaDb !== ($driver === 'mariadb')) {
+            return ' — serveur '.($isMariaDb ? 'MariaDB' : 'MySQL')." {$version} : mettez DB_DRIVER=".($isMariaDb ? 'mariadb' : 'mysql');
+        }
+        preg_match('/^\d+\.\d+\.\d+/', $version, $m);
+        $minimum = $isMariaDb ? '10.6.0' : '8.0.16';
+
+        return version_compare($m[0] ?? '0', $minimum, '>=') ? '' : " — {$version} trop ancien (minimum {$minimum})";
     }
 
     private function databaseReachable(): bool

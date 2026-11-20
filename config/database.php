@@ -1,5 +1,7 @@
 <?php
 
+use Pdo\Mysql;
+
 /*
  * Connexions à la base (cahier § 8.6, décision 12).
  *
@@ -10,12 +12,17 @@
  *   l'utilisateur unique (limite du mutualisé LWS). Le basculement se fait dans
  *   AppServiceProvider::useMigrationConnection().
  *
- * Aucune fonctionnalité propre à MySQL 8+/9 n'est utilisée : le driver
- * « mariadb » de Laravel est choisi pour coller au serveur réel de LWS.
+ * Moteur (décision D74) : DB_DRIVER=mariadb (par défaut, local) ou
+ * DB_DRIVER=mysql (LWS Perso, qui fournit MySQL). Le nom de la connexion
+ * reste « mariadb » ; seul le pilote Laravel (grammaire SQL) change. Aucune
+ * fonctionnalité propre à l'un des deux moteurs n'est utilisée : la suite de
+ * tests passe sur MariaDB 10.11 et sur MySQL 8.
  */
 
+$driver = in_array(env('DB_DRIVER'), ['mysql', 'mariadb'], true) ? env('DB_DRIVER') : 'mariadb';
+
 $mariadb = static fn (?string $user, ?string $password): array => [
-    'driver' => 'mariadb',
+    'driver' => $driver,
     'url' => env('DB_URL'),
     'host' => env('DB_HOST', '127.0.0.1'),
     'port' => env('DB_PORT', '3306'),
@@ -37,7 +44,8 @@ $mariadb = static fn (?string $user, ?string $password): array => [
         // Pas d'émulation des requêtes préparées : les paramètres liés sont
         // envoyés séparément du SQL par le serveur.
         PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+        // PHP 8.4+ : Pdo\Mysql::ATTR_SSL_CA (l'ancienne constante est dépréciée en 8.5).
+        (class_exists(Mysql::class) ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
     ], static fn ($v) => $v !== null) : [],
 ];
 

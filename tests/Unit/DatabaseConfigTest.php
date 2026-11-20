@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Hash;
 
 // Cahier § 8.6 : configuration de la base et repli sur l'utilisateur unique (LWS).
 
-it('utilise MariaDB en mode strict, utf8mb4 et UTC', function () {
+it('utilise MariaDB ou MySQL (DB_DRIVER, D74) en mode strict, utf8mb4 et UTC', function () {
     $c = config('database.connections.mariadb');
-    expect($c['driver'])->toBe('mariadb')
+    expect($c['driver'])->toBe(in_array(env('DB_DRIVER'), ['mysql', 'mariadb'], true) ? env('DB_DRIVER') : 'mariadb')
         ->and($c['strict'])->toBeTrue()
         ->and($c['charset'])->toBe('utf8mb4')
         ->and($c['timezone'])->toBe('+00:00')

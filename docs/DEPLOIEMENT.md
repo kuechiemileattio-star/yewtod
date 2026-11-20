@@ -16,9 +16,9 @@ Si vous passez un jour à la formule Starter (SSH), l'ancienne procédure reste 
 
 ## 1. Panneau LWS (une fois)
 
-1. **PHP** : rubrique « Configuration PHP » → **8.3**. Extensions attendues : `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `sodium`, `zip`, `curl`, `dom`, `xml` (la commande de vérification du § 5 les contrôle).
-2. **Terminal web** : rubrique « Logiciels ». Ouvrez-le une fois et tapez `php -v` : il doit afficher PHP 8.3. Si une autre version s'affiche, notez le nom de la commande proposée par LWS pour la 8.3 (par exemple `php83`) et utilisez-le partout à la place de `php`.
-3. **Base de données** : créez la base. Notez le serveur, le nom de la base, l'utilisateur et son mot de passe. Relevez la version (`SELECT VERSION();` dans phpMyAdmin) : votre MariaDB locale doit avoir la même version majeure.
+1. **PHP** : rubrique « Configuration PHP » → **8.5** (ou 8.3 ; les deux sont testés, voir D74). Extensions attendues : `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `sodium`, `zip`, `curl`, `dom`, `xml` (la commande de vérification du § 5 les contrôle).
+2. **Terminal web** : rubrique « Logiciels ». Ouvrez-le une fois et tapez `php -v` : il doit afficher la version choisie (8.5). Si une autre version s'affiche, notez le nom de la commande proposée par LWS pour cette version (par exemple `php85`) et utilisez-le partout à la place de `php`.
+3. **Base de données** : LWS Perso fournit **MySQL** (une base, un utilisateur). Notez l'IP du serveur, le nom de la base, l'utilisateur et son mot de passe. Relevez la version dans phpMyAdmin (`SELECT VERSION();`) : il faut **MySQL 8.0.16 ou plus** (avant, les contraintes CHECK sont ignorées). Votre MariaDB locale reste valable : la suite de tests passe sur les deux moteurs.
 4. **SSL** : activez le certificat (Let's Encrypt) pour `yewtod.com` **et** `www.yewtod.com` (le `.htaccess` redirige `www` vers le domaine nu).
 5. **FTP** : rubrique « Accès FTP » : notez le serveur et l'identifiant ; regardez ce que contient la racine du compte FTP (dossier `htdocs/` visible, ou déjà dedans).
 6. **Emails** : boîtes créées (`no-reply@`, `contact@`…), **SPF / DKIM / DMARC** actifs pour `yewtod.com`.
@@ -47,7 +47,8 @@ APP_URL=https://yewtod.com
 LOG_CHANNEL=daily
 LOG_LEVEL=warning
 
-DB_HOST=…                        # indiqué par LWS
+DB_DRIVER=mysql                  # LWS Perso fournit MySQL (D74)
+DB_HOST=…                        # IP du serveur MySQL indiquée par LWS
 DB_DATABASE=…
 DB_USERNAME=…
 DB_PASSWORD='…'
@@ -115,7 +116,7 @@ Le script :
 5. affiche les commandes à taper dans le **Terminal web**, à lancer **dans le dossier du site** (`cd htdocs` si le terminal s'ouvre au-dessus) :
 
 ```bash
-php -v                                   # PHP 8.3
+php -v                                   # PHP 8.5 (ou la version choisie)
 php artisan migrate --force --seed       # tables + rôles, permissions et réglages de référence
 php artisan storage:link                 # lien public/storage
 php artisan yewtod:create-super-admin    # votre compte, interactif
@@ -133,10 +134,10 @@ php artisan up
 Panneau LWS → « Base de données & PHP » → **Tâches cron** → nouvelle tâche, type **appel PHP**, fréquence **toutes les 5 minutes** :
 
 ```
-php83 /htdocs/artisan schedule:run
+php85 /htdocs/artisan schedule:run
 ```
 
-Remplacez `php83` par le nom de la commande PHP 8.3 que propose le panneau (sans précision, LWS utilise PHP 8.0, trop ancien). Ce cron lance : le battement de contrôle, la publication des contenus programmés et la file d'attente (emails d'invitation, synchronisation Brevo) à chaque passage, la sauvegarde chiffrée (2 h 30 UTC) et les purges RGPD (3 h 15 UTC).
+Remplacez `php85` par le nom de la commande de votre version PHP que propose le panneau (sans précision, LWS utilise PHP 8.0, trop ancien : le cron échouerait). Ce cron lance : le battement de contrôle, la publication des contenus programmés et la file d'attente (emails d'invitation, synchronisation Brevo) à chaque passage, la sauvegarde chiffrée (2 h 30 UTC) et les purges RGPD (3 h 15 UTC).
 
 **Vérifier** 10 minutes plus tard, dans le Terminal web :
 
@@ -160,7 +161,7 @@ Pendant cette phase, vérifiez :
 - [ ] **test de restauration** (§ 8) ;
 - [ ] accès refusés : `https://yewtod.com/.env`, `/vendor/autoload.php`, `/storage/logs/laravel.log`, `/composer.json` doivent tous répondre **403** ;
 - [ ] en-têtes : https://securityheaders.com sur `https://yewtod.com` ;
-- [ ] `php artisan yewtod:verifier-production` : seul « Site ouvert au public » est en échec (normal pendant cette phase).
+- [ ] `php artisan yewtod:verifier-production` : seul « Site ouvert au public » est en échec (normal pendant cette phase) ; « Moteur de base compatible » est OK (sinon : `DB_DRIVER` ou version de MySQL).
 
 **Ouverture** : dans le Terminal web, éditez le `.env` du serveur (`nano .env`) et videz `PREPROD_USER` et `PREPROD_PASSWORD_HASH`, puis :
 
