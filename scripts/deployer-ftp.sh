@@ -37,9 +37,9 @@ terminal() { printf '\n\033[1;33m   À taper dans le Terminal web LWS (dans le d
 
 read -r -s -p "Mot de passe FTP de $FTP_UTILISATEUR : " LFTP_PASSWORD; echo
 export LFTP_PASSWORD
-SSL_OPTS="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate true;"
-[[ "${FTP_TLS:-oui}" == "oui" ]] || SSL_OPTS="set ftp:ssl-allow false;"
-ftp_run() { lftp -e "set net:max-retries 2; set net:timeout 30; $SSL_OPTS $1; bye" --env-password -u "$FTP_UTILISATEUR" "$FTP_HOTE"; }
+# shellcheck source=scripts/lib-ftp.sh
+source scripts/lib-ftp.sh
+ftp_preparer
 
 step "1/7 Vérifications locales"
 SHA="$(git rev-parse --short "$REF")"

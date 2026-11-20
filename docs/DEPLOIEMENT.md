@@ -99,7 +99,20 @@ cp scripts/deploiement-ftp.env.example scripts/deploiement-ftp.env    # ignoré 
 nano scripts/deploiement-ftp.env                                      # serveur FTP, identifiant, dossier, URL
 ```
 
-Le mot de passe FTP n'est jamais enregistré : le script le demande à chaque envoi. L'envoi est **chiffré** (FTPS). Si `lftp` refuse le certificat, mettez dans `FTP_HOTE` le nom de serveur indiqué par LWS (même cause que pour le SMTP) ; ne passez `FTP_TLS="non"` qu'en dernier recours (mot de passe en clair sur le réseau).
+Le mot de passe FTP n'est jamais enregistré : le script le demande à chaque envoi. L'envoi est **chiffré** (FTPS).
+
+**Certificat du serveur FTP.** Chez LWS, `ftp.yewtod.com` présente le certificat `*.lwspanel.com` : le nom ne correspond pas et `lftp` refuse (à raison) la connexion. Deux solutions sûres (D75) :
+
+1. **Un nom en `.lwspanel.com`** associé à l'IP du serveur FTP (panneau → Accès FTP), dans le fichier `hosts` de Windows (`C:\Windows\System32\drivers\etc\hosts`, puis `wsl --shutdown`) : `83.229.19.113 yewtod-ftp.lwspanel.com`, et `FTP_HOTE="yewtod-ftp.lwspanel.com"`. Vérification complète, rien n'est désactivé.
+2. **L'empreinte du certificat** : on garde `FTP_HOTE="ftp.yewtod.com"` et on renseigne `FTP_EMPREINTE`. Avant chaque connexion, le script vérifie que le serveur présente exactement ce certificat ; `lftp` contrôle toujours qu'il est signé par une autorité reconnue, seul le contrôle du nom est sauté. Relevez l'empreinte :
+
+   ```bash
+   openssl s_client -connect ftp.yewtod.com:21 -starttls ftp </dev/null 2>/dev/null | openssl x509 -noout -subject -fingerprint -sha256
+   ```
+
+   Vérifiez que `subject` est bien `CN=*.lwspanel.com`, puis copiez l'empreinte (`AA:BB:…`) dans `FTP_EMPREINTE`. Quand LWS renouvellera son certificat (en général une fois par an), le script s'arrêtera en affichant l'empreinte reçue : refaites ce contrôle avant de la mettre à jour.
+
+Ne passez `FTP_TLS="non"` qu'en tout dernier recours : le mot de passe FTP circulerait en clair, et il donne accès au `.env`.
 
 ## 4. Premier déploiement
 

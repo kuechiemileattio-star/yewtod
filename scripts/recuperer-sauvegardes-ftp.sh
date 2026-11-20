@@ -10,9 +10,10 @@ DEST="${1:-$HOME/sauvegardes-yewtod}"
 mkdir -p "$DEST" && chmod 700 "$DEST"
 read -r -s -p "Mot de passe FTP de $FTP_UTILISATEUR : " LFTP_PASSWORD; echo
 export LFTP_PASSWORD
-SSL_OPTS="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate true;"
-[[ "${FTP_TLS:-oui}" == "oui" ]] || SSL_OPTS="set ftp:ssl-allow false;"
-lftp -e "$SSL_OPTS mirror --only-newer --no-perms --include-glob 'yewtod-*.ybk' '$FTP_DOSSIER/storage/app/backups' '$DEST'; bye" --env-password -u "$FTP_UTILISATEUR" "$FTP_HOTE"
+# shellcheck source=scripts/lib-ftp.sh
+source scripts/lib-ftp.sh
+ftp_preparer
+ftp_run "mirror --only-newer --no-perms --include-glob 'yewtod-*.ybk' '$FTP_DOSSIER/storage/app/backups' '$DEST'"
 chmod 600 "$DEST"/*.ybk 2>/dev/null || true
 echo "Sauvegardes copiées dans $DEST :"; ls -1t "$DEST" | head -5
 echo "Elles sont chiffrées : gardez BACKUP_PASSPHRASE et APP_KEY dans votre gestionnaire de mots de passe."
