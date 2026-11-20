@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 class DashboardMenu
 {
     /**
-     * @return list<array{label: string|null, items: list<array{label: string, route: string, icon: string, badge: int}>}>
+     * @return list<array{label: string|null, items: list<array{label: string, route: string, icon: string, badge: int, external: bool}>}>
      */
     public static function for(User $user): array
     {
@@ -37,6 +37,7 @@ class DashboardMenu
                 ['Pages', 'dashboard.pages', 'page', 'manage_pages'],
                 ['Paramètres', 'dashboard.settings', 'cog', 'manage_settings'],
                 ['Journal d\'audit', 'dashboard.audit', 'list', 'super_admin'],
+                ['Webmail', 'dashboard.webmail', 'mail', 'access_webmail'],
             ]],
             [null, [
                 ['Mon profil', 'dashboard.profile', 'user', null],
@@ -51,7 +52,12 @@ class DashboardMenu
                 if (! Route::has($route) || ! self::allowed($user, $permission)) {
                     continue;
                 }
-                $visible[] = ['label' => $itemLabel, 'route' => $route, 'icon' => $icon, 'badge' => $badges[$route] ?? 0];
+                // Webmail : ouvert dans un nouvel onglet, masqué tant que WEBMAIL_URL n'est pas valide.
+                $external = $route === 'dashboard.webmail';
+                if ($external && ! Webmail::enabled()) {
+                    continue;
+                }
+                $visible[] = ['label' => $itemLabel, 'route' => $route, 'icon' => $icon, 'badge' => $badges[$route] ?? 0, 'external' => $external];
             }
             if ($visible !== []) {
                 $menu[] = ['label' => $label, 'items' => $visible];

@@ -4,7 +4,8 @@ namespace App\Enums;
 
 /**
  * Les permissions du cahier (§ 6) + `publish_content` (décision 10 : circuit
- * éditorial, un Contributeur soumet, un Éditeur publie).
+ * éditorial, un Contributeur soumet, un Éditeur publie) + `access_webmail`
+ * (décision D72 : lien vers le webmail de l'équipe).
  */
 enum Permission: string
 {
@@ -18,6 +19,7 @@ enum Permission: string
     case ManageUsers = 'manage_users';
     case InviteUsers = 'invite_users';
     case ManageNewsletter = 'manage_newsletter';
+    case AccessWebmail = 'access_webmail';
 
     public function label(): string
     {
@@ -32,6 +34,7 @@ enum Permission: string
             self::ManageUsers => 'Gérer les membres et les rôles',
             self::InviteUsers => 'Inviter des membres',
             self::ManageNewsletter => 'Gérer la newsletter',
+            self::AccessWebmail => 'Accéder au webmail',
         };
     }
 
@@ -48,6 +51,7 @@ enum Permission: string
             self::ManageUsers => 'Membres, rôles, permissions des rôles',
             self::InviteUsers => 'Envoi et révocation d\'invitations',
             self::ManageNewsletter => 'Abonnés à la newsletter et synchronisation Brevo',
+            self::AccessWebmail => 'Lien vers la messagerie de l\'équipe (Roundcube LWS) ; chaque boîte demande ses propres identifiants',
         };
     }
 }

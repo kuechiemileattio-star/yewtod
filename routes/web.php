@@ -4,6 +4,7 @@ use App\Http\Controllers\Dashboard\CollaborationFileController;
 use App\Http\Controllers\Dashboard\NewsletterExportController;
 use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\ThemePreferenceController;
+use App\Http\Controllers\Dashboard\WebmailController;
 use App\Http\Controllers\Site;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,7 @@ Route::middleware(['auth', 'member', '2fa'])->prefix('dashboard')->name('dashboa
         Route::livewire('/newsletter', Dashboard\Newsletter::class)->name('.newsletter');
         Route::get('/newsletter/export', NewsletterExportController::class)->name('.newsletter.export');
     });
+    Route::get('/webmail', WebmailController::class)->middleware(['permission:access_webmail', 'throttle:30,1'])->name('.webmail');
 
     // Guide de style du système de design (documentation vivante).
     Route::view('/design', 'dashboard.styleguide')->name('.styleguide');

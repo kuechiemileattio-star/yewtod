@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SyncNewsletterWithBrevo;
 use App\Services\Backup;
 use App\Services\Turnstile;
+use App\Support\Webmail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -39,6 +40,7 @@ class CheckProduction extends Command
             'Emails (SMTP)' => config('mail.default') !== 'log' && filled(config('mail.mailers.smtp.host')),
             'Newsletter Brevo (BREVO_API_KEY, BREVO_LIST_ID)' => SyncNewsletterWithBrevo::enabled(),
             'Anti-robots Turnstile (clés site et secrète)' => Turnstile::enabled(),
+            'Webmail de l\'équipe (WEBMAIL_URL en https)' => Webmail::enabled(),
             'Mentions légales (LEGAL_PUBLISHER, LEGAL_DIRECTOR)' => filled(config('yewtod.legal.publisher')) && filled(config('yewtod.legal.director')),
         ];
 

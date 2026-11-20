@@ -52,6 +52,7 @@ MAIL_PASSWORD='…'
 MAIL_FROM_ADDRESS="no-reply@yewtod.com"
 
 BREVO_API_KEY=                 # facultatif : la synchronisation se désactive sans clé
+WEBMAIL_URL=https://mail.yewtod.com/roundcube/   # facultatif : lien « Webmail » du dashboard (https uniquement)
 BREVO_LIST_ID=
 TURNSTILE_SITE_KEY=            # facultatif mais recommandé en production
 TURNSTILE_SECRET_KEY=

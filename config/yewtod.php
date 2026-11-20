@@ -6,6 +6,9 @@
  * doivent être exactes dès la mise en ligne (LCEN, art. 6 III).
  */
 return [
+    // Webmail de l'équipe (D72). Vide = lien masqué. Seule une URL https est acceptée.
+    'webmail_url' => env('WEBMAIL_URL', ''),
+
     'legal' => [
         'publisher' => env('LEGAL_PUBLISHER', ''),
         'publisher_address' => env('LEGAL_ADDRESS', ''),

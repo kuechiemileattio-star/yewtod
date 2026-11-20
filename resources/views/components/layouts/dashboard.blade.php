@@ -34,9 +34,11 @@
                         @php($active = request()->routeIs($item['route']) || request()->routeIs($item['route'].'.*'))
                         <li>
                             <a href="{{ route($item['route']) }}" @if ($active) aria-current="page" @endif
+                               @if ($item['external']) target="_blank" rel="noopener noreferrer" @endif
                                @class(['flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition', 'bg-surface-2 text-ink' => $active, 'text-muted hover:bg-surface-2 hover:text-ink' => ! $active])>
                                 <x-icon :name="$item['icon']" />
-                                <span class="flex-1">{{ $item['label'] }}</span>
+                                <span class="flex-1">{{ $item['label'] }}@if ($item['external'])<span class="sr-only"> (nouvel onglet)</span>@endif</span>
+                                @if ($item['external'])<x-icon name="external" class="size-4" />@endif
                                 @if ($item['badge'] > 0)
                                     <span class="badge bg-accent-ink text-white dark:bg-accent dark:text-on-accent" aria-label="{{ $item['badge'] }} en attente">{{ $item['badge'] }}</span>
                                 @endif
