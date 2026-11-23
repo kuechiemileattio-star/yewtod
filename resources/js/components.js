@@ -216,7 +216,7 @@ export function registerComponents(Alpine) {
             }, { rootMargin: '0px 0px -10% 0px' });
             io.observe(this.$el);
         },
-        get revealClass() { return this.shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'; },
+        get revealClass() { return this.shown ? 'reveal-in' : 'reveal-init'; },
     }));
 
     Alpine.data('backToTop', () => ({

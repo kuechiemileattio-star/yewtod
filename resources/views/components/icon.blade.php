@@ -2,6 +2,9 @@
 @props(['name', 'class' => 'size-5'])
 <svg {{ $attributes->merge(['class' => $class]) }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 @switch($name)
+    @case('flask')<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>@break
+    @case('pen')<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>@break
+    @case('mic')<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/>@break
     @case('home')<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>@break
     @case('report')<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>@break
     @case('article')<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>@break
@@ -37,6 +40,13 @@
     @case('external')<path d="M14 3h7v7M21 3 10 14M19 14v7H3V5h7"/>@break
     @case('check')<path d="m5 12 5 5 9-10"/>@break
     @case('upload')<path d="M12 21V9M7 14l5-5 5 5M4 3h16"/>@break
+    @case('arrow-up-right')<path d="M7 17 17 7M8 7h9v9"/>@break
+    @case('compass')<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>@break
+    @case('network')<rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-2h12v2"/>@break
+    @case('lightbulb')<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>@break
+    @case('play')<path d="M7 5v14l12-7z"/>@break
+    @case('calendar')<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>@break
+    @case('clock')<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>@break
     @default<circle cx="12" cy="12" r="9"/>
 @endswitch
 </svg>

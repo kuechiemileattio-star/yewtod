@@ -3,8 +3,8 @@
     est un simple lien vers le catalogue filtrable.
 --}}
 <div x-data="globalSearch" data-url="{{ route('search') }}" data-works="{{ url('/works') }}">
-    <a href="{{ url('/works') }}" x-on:click.prevent="show" class="btn-ghost min-w-11 px-2" title="Rechercher (Ctrl K)">
-        <x-icon name="search" /><span class="sr-only">Rechercher</span><kbd class="hidden rounded border border-line px-1.5 text-[10px] font-semibold text-muted xl:inline">Ctrl K</kbd>
+    <a href="{{ url('/works') }}" x-on:click.prevent="show" class="{{ $buttonClass ?? 'btn-ghost min-w-11 px-2' }}" title="Rechercher (Ctrl K)">
+        <x-icon name="search" /><span class="sr-only">Rechercher</span>
     </a>
     <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-start justify-center bg-ink/50 p-4 pt-[10vh]" x-on:keydown.escape.window="close" x-on:click.self="close">
         <div role="dialog" aria-modal="true" aria-labelledby="titre-recherche" class="w-full max-w-xl overflow-hidden card shadow-2xl">

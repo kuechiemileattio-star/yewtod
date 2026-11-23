@@ -12,26 +12,20 @@
 <x-layouts.public :title="$title" :noindex="$items->currentPage() > 1 || $hasFilters && ! $pill"
     :canonical="$pill ? url('/works').'?categorie='.$pill : url('/works')"
     description="Toutes les publications de Yewtod SS : articles, rapports, études, notes de recherche, documentaires, expérimentations et visualisations de données.">
-    <section class="border-b border-line bg-surface">
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <p class="text-xs font-bold uppercase tracking-[0.25em] text-accent-ink dark:text-accent">Travaux</p>
-            <h1 class="mt-2 text-4xl font-bold sm:text-5xl">{{ $title }}</h1>
-            <p class="mt-3 text-muted">{{ trans_choice(':count publication en accès libre|:count publications en accès libre', $total, ['count' => number_format($total, 0, ',', ' ')]) }}</p>
-            {{-- Pastilles de type avec compteur --}}
-            <nav class="-mx-4 mt-6 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" aria-label="Types de publications">
-                <ul class="flex w-max gap-2 sm:w-auto sm:flex-wrap">
-                    <li><a href="{{ url('/works').($keep ? '?'.http_build_query($keep) : '') }}" @if (! $pill && ! $filters['types']) aria-current="page" @endif
-                           class="badge min-h-11 gap-2 border px-4 text-sm {{ ! $pill && ! $filters['types'] ? 'border-ink bg-ink text-page' : 'border-line bg-page hover:border-line-strong' }}">Toutes <span class="opacity-70">{{ $total }}</span></a></li>
-                    @foreach (\App\Enums\ContentType::cases() as $type)
-                        <li><a href="{{ url('/works').'?'.http_build_query(['categorie' => $type->value] + $keep) }}" @if ($pill === $type->value) aria-current="page" @endif
-                               class="badge min-h-11 gap-2 border px-4 text-sm {{ $pill === $type->value ? 'border-ink bg-ink text-page' : 'border-line bg-page hover:border-line-strong' }}">{{ $type->plural() }} <span class="opacity-70">{{ $typeCounts[$type->value] }}</span></a></li>
-                    @endforeach
-                </ul>
-            </nav>
-        </div>
-    </section>
+    <x-site.hero-band :title="$title" :text="trans_choice(':count analyse, rapport ou travail en accès libre — la bibliothèque de réflexion de Yewtod SS.|:count analyses, rapports et travaux en accès libre — la bibliothèque de réflexion de Yewtod SS.', $total, ['count' => number_format($total, 0, ',', ' ')])" />
+    {{-- Pastilles de type avec compteur --}}
+    <nav class="mx-auto max-w-[1280px] overflow-x-auto px-6 py-[18px]" aria-label="Types de publications">
+        <ul class="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+            <li><a href="{{ url('/works').($keep ? '?'.http_build_query($keep) : '') }}" @if (! $pill && ! $filters['types']) aria-current="page" @endif
+                   class="inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-semibold transition {{ ! $pill && ! $filters['types'] ? 'border-accent-2-ink bg-accent-2-ink text-on-accent-2' : 'border-line bg-card text-ink hover:border-accent' }}">Toutes <span class="text-[11px] font-normal">{{ $total }}</span></a></li>
+            @foreach (\App\Enums\ContentType::cases() as $type)
+                <li><a href="{{ url('/works').'?'.http_build_query(['categorie' => $type->value] + $keep) }}" @if ($pill === $type->value) aria-current="page" @endif
+                       class="inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-semibold transition {{ $pill === $type->value ? 'border-accent-2-ink bg-accent-2-ink text-on-accent-2' : 'border-line bg-card text-ink hover:border-accent' }}">{{ $type->plural() }} <span class="text-[11px] font-normal">{{ $typeCounts[$type->value] }}</span></a></li>
+            @endforeach
+        </ul>
+    </nav>
 
-    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[17rem_1fr] lg:px-8" x-data="drawer">
+    <div class="mx-auto grid max-w-[1280px] grid-cols-1 items-start gap-8 px-6 pb-16 lg:grid-cols-[260px_minmax(0,1fr)]" x-data="drawer">
         {{-- Filtres : colonne sur grand écran, tiroir sur mobile --}}
         <div class="lg:hidden">
             <button type="button" class="btn-secondary w-full" x-on:click="show" aria-controls="filtres">
@@ -40,13 +34,14 @@
         </div>
         <div class="fixed inset-0 z-40 bg-ink/40 lg:hidden" x-show="open" x-cloak x-on:click="close" aria-hidden="true"></div>
         <aside id="filtres" aria-label="Filtres"
-               class="fixed inset-y-0 left-0 z-50 w-[min(22rem,90vw)] -translate-x-full overflow-y-auto bg-page p-5 shadow-xl transition-transform lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:overflow-visible lg:bg-transparent lg:p-0 lg:shadow-none"
+               class="fixed inset-y-0 left-0 z-50 w-[min(22rem,90vw)] -translate-x-full overflow-y-auto bg-page p-5 shadow-xl transition-transform lg:sticky lg:top-24 lg:z-auto lg:w-auto lg:translate-x-0 lg:overflow-visible lg:rounded-lg lg:border lg:border-line lg:bg-card lg:p-[18px] lg:shadow-none lg:backdrop-blur-sm"
                x-bind:class="open ? 'translate-x-0' : ''" x-on:keydown.escape="close">
             <div class="mb-4 flex items-center justify-between lg:hidden">
-                <p class="font-serif text-xl font-bold">Filtres</p>
+                <p class="font-serif text-xl">Filtres</p>
                 <button type="button" class="btn-ghost min-w-11 px-2" x-on:click="close" aria-label="Fermer les filtres"><x-icon name="close" /></button>
             </div>
-            <form method="GET" action="{{ url('/works') }}" x-data="autoSubmit" x-on:change="submit" class="space-y-6" role="search">
+            <p class="mb-3.5 hidden font-mono text-[11px] font-bold uppercase tracking-[0.05em] lg:block">Filtrer</p>
+            <form method="GET" action="{{ url('/works') }}" x-data="autoSubmit" x-on:change="submit" class="filters divide-y divide-line [&>*]:py-3.5 [&>*:first-child]:pt-0" role="search">
                 <div>
                     <label for="q" class="field-label">Rechercher</label>
                     <div class="relative">
@@ -116,16 +111,16 @@
 
         <section aria-labelledby="resultats" class="min-w-0">
             <h2 id="resultats" class="sr-only">Résultats</h2>
-            <p class="mb-5 text-sm text-muted" role="status">{{ $items->total() }} résultat{{ $items->total() > 1 ? 's' : '' }} sur {{ $total }}</p>
+            <p class="mb-[22px] text-[13.5px] text-muted" role="status">{{ $items->total() }} résultat{{ $items->total() > 1 ? 's' : '' }} sur {{ $total }}</p>
             @if ($items->isEmpty())
                 <x-empty-state icon="search" title="Aucune publication ne correspond">
                     Essayez d'élargir la période ou de retirer un filtre.
                     <x-slot:action><a href="{{ url('/works') }}" class="btn-secondary">Réinitialiser les filtres</a></x-slot:action>
                 </x-empty-state>
             @else
-                <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                <div class="grid gap-7 md:grid-cols-2">
                     @foreach ($items as $item)
-                        <x-site.work-card :content="$item" heading-level="h3" />
+                        <x-site.work-card :content="$item" heading-level="h3" variant="full" />
                     @endforeach
                 </div>
                 <div class="mt-10">{{ $items->onEachSide(1)->links('vendor.pagination.tailwind') }}</div>
